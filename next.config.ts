@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ["better-sqlite3"],
+  poweredByHeader: false,
+  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;
