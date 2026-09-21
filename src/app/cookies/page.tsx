@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Cookies",
   description:
-    "Squeaky Clean does not use analytics or ad cookies. The only cookie is an admin login session.",
+    "Squeaky Solutions does not use analytics or ad cookies. The only cookie is an admin login session.",
   path: "/cookies",
 });
 

@@ -5,7 +5,7 @@ export async function NextAvailableStrip() {
   const next = await getNextAvailable();
 
   return (
-    <div className="strip-pulse border-b border-line bg-ink text-paper">
+    <div className="strip-pulse border-b border-white/10 bg-ink text-paper">
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 py-2.5 text-sm sm:flex-row sm:items-center md:px-6">
         <p className="font-medium">
           <span className="mr-2 inline-block rounded-full bg-sun px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-wide text-ink">

@@ -3,11 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  COMBINED_PACKAGES,
+  EXTERIOR_PACKAGES,
   FREQUENCIES,
+  INTERIOR_PACKAGES,
   PACKAGES,
-  VEHICLES,
+  SIZES,
   estimatePrice,
+  isMaintenance,
   packageLabel,
+  resolvePackageId,
   vehicleLabel,
   type Frequency,
   type PackageId,
@@ -30,6 +35,7 @@ type SlotInfo = {
 type Props = {
   initialSlots: SlotInfo[];
   initialSuburb?: string;
+  initialPackage?: string;
 };
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
@@ -59,12 +65,22 @@ function dayLabel(date: string): string {
   return `${WEEKDAYS[weekday]}, ${d} ${MONTHS[m - 1]}`;
 }
 
-export function BookingForm({ initialSlots, initialSuburb = "" }: Props) {
+export function BookingForm({
+  initialSlots,
+  initialSuburb = "",
+  initialPackage = "good",
+}: Props) {
   const router = useRouter();
   const [slots, setSlots] = useState(initialSlots);
-  const [vehicle, setVehicle] = useState<VehicleId>("sedan");
-  const [packageId, setPackageId] = useState<PackageId>("full");
-  const [frequency, setFrequency] = useState<Frequency>("one-off");
+  const [vehicle, setVehicle] = useState<VehicleId>("medium");
+  const [packageId, setPackageId] = useState<PackageId>(() =>
+    resolvePackageId(initialPackage),
+  );
+  const [frequency, setFrequency] = useState<Frequency>(() =>
+    resolvePackageId(initialPackage) === "maintenance"
+      ? "fortnightly"
+      : "one-off",
+  );
   const [date, setDate] = useState("");
   const [slot, setSlot] = useState<Slot | "">("");
   const [name, setName] = useState("");
@@ -239,11 +255,11 @@ export function BookingForm({ initialSlots, initialSuburb = "" }: Props) {
   return (
     <form onSubmit={onSubmit} className="card noise space-y-7 p-5 md:p-8">
       <section>
-        <h2 className="font-display text-xl font-semibold">1. Vehicle & package</h2>
+        <h2 className="font-display text-xl font-semibold">1. Size & package</h2>
         <fieldset className="mt-3">
-          <legend className="label">Vehicle</legend>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {VEHICLES.map((v) => (
+          <legend className="label">Vehicle size</legend>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {SIZES.map((v) => (
               <button
                 key={v.id}
                 type="button"
@@ -261,54 +277,76 @@ export function BookingForm({ initialSlots, initialSuburb = "" }: Props) {
             ))}
           </div>
         </fieldset>
-        <fieldset className="mt-4">
-          <legend className="label">Package</legend>
-          <div className="grid gap-2 sm:grid-cols-3">
-            {PACKAGES.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                aria-pressed={packageId === p.id}
-                onClick={() => setPackageId(p.id)}
-                className={`choice rounded-2xl border-2 p-3 text-left ${
-                  packageId === p.id
-                    ? "border-fresh bg-fresh/10"
-                    : "border-line bg-paper hover:border-ink/40"
-                }`}
-              >
-                <span className="block text-sm font-bold">{p.label}</span>
-                <span className="text-xs text-ink-soft">{p.blurb}</span>
-              </button>
-            ))}
-          </div>
-        </fieldset>
-        <fieldset className="mt-4">
-          <legend className="label">How often</legend>
-          <div className="grid gap-2 sm:grid-cols-3">
-            {FREQUENCIES.map((f) => (
-              <label
-                key={f.id}
-                className={`flex cursor-pointer items-start gap-2 rounded-2xl border-2 p-3 ${
-                  frequency === f.id
-                    ? "border-sun bg-sun/15"
-                    : "border-line bg-paper"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="frequency"
-                  className="mt-1 h-4 w-4 accent-[#c47f08]"
-                  checked={frequency === f.id}
-                  onChange={() => setFrequency(f.id)}
-                />
-                <span>
-                  <span className="block text-sm font-bold">{f.label}</span>
-                  <span className="text-xs text-ink-soft">{f.blurb}</span>
-                </span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        {(
+          [
+            ["Combined visit", COMBINED_PACKAGES],
+            ["Exterior only", EXTERIOR_PACKAGES],
+            ["Interior only", INTERIOR_PACKAGES],
+            ["Keep it going", PACKAGES.filter((p) => p.family === "maintenance")],
+          ] as const
+        ).map(([heading, list]) => (
+          <fieldset key={heading} className="mt-4">
+            <legend className="label">{heading}</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {list.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  aria-pressed={packageId === p.id}
+                  onClick={() => {
+                    setPackageId(p.id);
+                    setFrequency(
+                      p.id === "maintenance" ? "fortnightly" : "one-off",
+                    );
+                  }}
+                  className={`choice rounded-2xl border-2 p-3 text-left ${
+                    packageId === p.id
+                      ? "border-fresh bg-fresh/10"
+                      : "border-line bg-paper hover:border-ink/40"
+                  }`}
+                >
+                  <span className="block text-sm font-bold">
+                    {p.grade} · {p.label}
+                  </span>
+                  <span className="text-xs text-ink-soft">{p.blurb}</span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        ))}
+        {isMaintenance(packageId) ? (
+          <fieldset className="mt-4">
+            <legend className="label">How often</legend>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {FREQUENCIES.filter((f) => f.id !== "one-off").map((f) => (
+                <label
+                  key={f.id}
+                  className={`flex cursor-pointer items-start gap-2 rounded-2xl border-2 p-3 ${
+                    frequency === f.id
+                      ? "border-sun bg-sun/15"
+                      : "border-line bg-paper"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="frequency"
+                    className="mt-1 h-4 w-4 accent-sun-deep"
+                    checked={frequency === f.id}
+                    onChange={() => setFrequency(f.id)}
+                  />
+                  <span>
+                    <span className="block text-sm font-bold">{f.label}</span>
+                    <span className="text-xs text-ink-soft">{f.blurb}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ) : (
+          <p className="mt-3 text-sm text-ink-soft">
+            One visit. Standing slots live on the maintenance plan.
+          </p>
+        )}
         <p className="mt-3 text-sm font-semibold text-ink">
           Estimate: ${price}{" "}
           <span className="font-normal text-ink-soft">

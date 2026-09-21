@@ -2,11 +2,11 @@ import type { FaqItem } from "@/lib/faq";
 
 export function FaqList({ items }: { items: FaqItem[] }) {
   return (
-    <div className="space-y-3">
+    <div>
       {items.map((item) => (
         <details
           key={item.q}
-          className="group rounded-2xl border border-line bg-paper px-4 py-3"
+          className="group border-b border-line px-0 py-4 first:pt-0"
         >
           <summary className="cursor-pointer list-none font-semibold text-ink [&::-webkit-details-marker]:hidden">
             <span className="flex items-start justify-between gap-3">

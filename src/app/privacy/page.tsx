@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Privacy",
   description:
-    "What Squeaky Clean collects when you book a Brisbane driveway detail, why we keep it, and how to ask us to delete it.",
+    "What Squeaky Solutions collects when you book a Brisbane driveway detail, why we keep it, and how to ask us to delete it.",
   path: "/privacy",
 });
 

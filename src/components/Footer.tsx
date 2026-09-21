@@ -1,16 +1,17 @@
 import Link from "next/link";
+import { BrandMark } from "@/components/BrandMark";
 import { IconMark } from "@/components/IconMark";
-import { SqueakyDuck } from "@/components/SqueakyDuck";
 import { BUSINESS } from "@/lib/constants";
 import { isPublishedAbn } from "@/lib/site";
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-line bg-ink text-paper">
+    <footer className="mt-auto bg-ink text-paper">
+      <div className="greek-rail" aria-hidden />
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:px-6">
         <div>
           <div className="flex items-center gap-3">
-            <SqueakyDuck size={48} mood="still" />
+            <BrandMark size={64} className="h-16 w-16 shrink-0" />
             <p className="font-display text-2xl font-semibold">{BUSINESS.name}</p>
           </div>
           <p className="mt-2 max-w-sm text-sm text-paper/85">{BUSINESS.tagline}</p>

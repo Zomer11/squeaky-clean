@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Terms",
   description:
-    "Booking rules for Squeaky Clean mobile car detailing in Brisbane — driveway access, pay on the day, and what the package covers.",
+    "Booking rules for Squeaky Solutions mobile car detailing in Brisbane — driveway access, pay on the day, and what the package covers.",
   path: "/terms",
 });
 

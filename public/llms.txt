@@ -1,13 +1,13 @@
-# Squeaky Clean
+# Squeaky Solutions
 
-> Brisbane mobile car detailing at your driveway. Exterior, interior, and full detail. Morning and afternoon slots, seven days including Sunday. Pay on the day — cash or card.
+> Brisbane mobile car detailing at your driveway. Combined visits (The Essentials, Full Detail, Full Treatment), exterior, interior, and a maintenance plan. Morning and afternoon slots, seven days including Sunday. Pay on the day — cash or card. Ten percent of income goes towards Palestine.
 
-Squeaky Clean is a local Brisbane operator, not a franchise. We come to the house. Bookings confirm on the live calendar. No online payment, no deposit.
+Squeaky Solutions is a local Brisbane operator, not a franchise. We come to the house. Bookings confirm on the live calendar. No online payment, no deposit.
 
 ## Pages
 
 - [Home](/): What we do and how a booking works
-- [Services & pricing](/services): Exterior, interior, full detail; hatch to ute
+- [Services & pricing](/services): Combined visits, exterior, interior, maintenance; small / medium / large
 - [Service areas](/areas): Greater Brisbane suburbs + maps / directions links
 - [Book](/book): Live AM/PM calendar
 - [Contact](/contact): Inquiries and out-of-area

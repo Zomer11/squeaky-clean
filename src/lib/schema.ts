@@ -4,6 +4,8 @@ import { siteUrl } from "@/lib/site";
 
 export function localBusinessJsonLd() {
   const url = siteUrl();
+  const low = estimatePrice("interior-basic", "small", "one-off");
+  const high = estimatePrice("best", "large", "one-off");
   return {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "AutomotiveBusiness"],
@@ -13,7 +15,7 @@ export function localBusinessJsonLd() {
     telephone: BUSINESS.phone.replace(/\s/g, ""),
     email: BUSINESS.email,
     image: `${url}/opengraph-image`,
-    priceRange: `$${estimatePrice("exterior", "hatch", "one-off")}–$${estimatePrice("full", "ute", "one-off")}`,
+    priceRange: `$${low}–$${high}`,
     currenciesAccepted: "AUD",
     paymentAccepted: "Cash, Credit Card",
     areaServed: {
@@ -47,16 +49,18 @@ export function localBusinessJsonLd() {
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Mobile car detailing",
-      itemListElement: PACKAGES.map((pkg) => ({
-        "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: `${pkg.label} detail`,
-          description: pkg.blurb,
-        },
-        priceCurrency: PRICING.currency,
-        price: estimatePrice(pkg.id, "hatch", "one-off"),
-      })),
+      itemListElement: PACKAGES.filter((pkg) => pkg.id !== "maintenance").map(
+        (pkg) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: pkg.label,
+            description: pkg.blurb,
+          },
+          priceCurrency: PRICING.currency,
+          price: estimatePrice(pkg.id, "small", "one-off"),
+        }),
+      ),
     },
   };
 }

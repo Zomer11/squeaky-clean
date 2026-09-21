@@ -9,7 +9,7 @@ export function DetailBeforeAfter() {
         <p className="text-xs font-bold uppercase tracking-[0.16em] text-ink-soft">
           Paint check · 3D
         </p>
-        <span className="chip">Before → After</span>
+        <p className="text-xs font-semibold text-fresh-deep">Before → after</p>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <figure className="relative overflow-hidden rounded-2xl bg-cream-deep px-2 pb-3 pt-6">

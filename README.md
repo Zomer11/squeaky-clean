@@ -1,4 +1,4 @@
-# Squeaky Clean
+# Squeaky Solutions
 
 Brisbane mobile car-detailing site with a duck mascot, live AM/PM booking calendar, and a simple admin desk.
 

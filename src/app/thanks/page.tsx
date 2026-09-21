@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { SqueakyDuck } from "@/components/SqueakyDuck";
 import { ThanksDetails } from "@/components/ThanksDetails";
 import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
   title: "Thanks",
-  description: "Your Squeaky Clean booking or inquiry is in.",
+  description: "Your Squeaky Solutions booking or inquiry is in.",
   path: "/thanks",
   index: false,
 });
@@ -21,8 +20,7 @@ export default async function ThanksPage({
   return (
     <div className="section-pad mx-auto max-w-2xl">
       <div className="card noise p-6 md:p-8">
-        <SqueakyDuck size={72} mood="bob" />
-        <p className="chip mt-4">{kind === "inquiry" ? "Inquiry sent" : "Booked"}</p>
+        <p className="chip">{kind === "inquiry" ? "Inquiry sent" : "Booked"}</p>
         <h1 className="font-display mt-3 text-4xl font-semibold tracking-tight">
           {kind === "inquiry" ? "Got it." : "You’re on the run."}
         </h1>

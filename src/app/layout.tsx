@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Outfit } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { LaurelField } from "@/components/LaurelField";
 import { JsonLd } from "@/components/JsonLd";
 import { SkipLink } from "@/components/SkipLink";
 import { StickyBookBar } from "@/components/StickyBookBar";
@@ -22,7 +23,7 @@ const body = Outfit({
 });
 
 const description =
-  "Squeaky Clean — mobile car detailing across Brisbane. Exterior, interior and full detail at your driveway. Book morning or afternoon online. Pay on the day.";
+  "Squeaky Solutions — showroom finish at your Brisbane driveway. Combined visits, exterior or interior. Book morning or afternoon online. Pay on the day.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     "mobile car detailing Brisbane",
     "driveway car wash Brisbane",
     "car detailing Sunday",
-    "Squeaky Clean",
+    "Squeaky Solutions",
   ],
   alternates: { canonical: "/" },
   openGraph: {
@@ -66,7 +67,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f6f0e4",
+  themeColor: "#0c1014",
   width: "device-width",
   initialScale: 1,
 };
@@ -79,6 +80,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${body.variable} h-full`}
     >
       <body className="flex min-h-full flex-col antialiased">
+        <LaurelField />
         <JsonLd data={localBusinessJsonLd()} />
         <SkipLink />
         <Header />

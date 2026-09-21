@@ -16,7 +16,7 @@ export function FormConsent({ id, checked, onChange }: Props) {
         id={id}
         name="consent"
         type="checkbox"
-        className="mt-0.5 h-4 w-4 shrink-0 accent-[#0a6e69]"
+        className="mt-0.5 h-4 w-4 shrink-0 accent-fresh-deep"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
         required

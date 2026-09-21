@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Squeaky Clean">
-  <rect width="32" height="32" rx="8" fill="#e39b12"/>
-  <ellipse cx="16" cy="20" rx="8.5" ry="6.5" fill="#f5c518"/>
-  <circle cx="18" cy="12.5" r="5" fill="#f5c518"/>
-  <circle cx="20.2" cy="11.4" r="1.1" fill="#1a2430"/>
-  <path d="M22.4 13.2c1.6.2 2.6 1 2.6 1.8 0 .7-1.1 1.1-2.4.8" fill="#f08a24"/>
-  <ellipse cx="13.5" cy="20" rx="2.4" ry="3.2" fill="#ffe566" opacity=".7"/>
-</svg>

@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Refunds & cancellations",
   description:
-    "Cancel a Squeaky Clean booking for free until 6pm the day before. Pay on the day, so there is usually nothing to refund.",
+    "Cancel a Squeaky Solutions booking for free until 6pm the day before. Pay on the day, so there is usually nothing to refund.",
   path: "/refunds",
 });
 

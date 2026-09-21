@@ -17,7 +17,7 @@ export function RelatedLinks({ links }: { links: RelatedLink[] }) {
           <li key={link.href}>
             <Link
               href={link.href}
-              className="card card-lift block h-full p-4 hover:border-ink/30"
+              className="block h-full border-t border-line pt-4 hover:text-fresh-deep"
             >
               <span className="font-semibold text-fresh-deep">{link.label}</span>
               <span className="mt-1 block text-sm text-ink-soft">{link.blurb}</span>

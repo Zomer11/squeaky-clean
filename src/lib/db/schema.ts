@@ -8,7 +8,7 @@ export const bookings = sqliteTable("bookings", {
   suburb: text("suburb").notNull(),
   address: text("address").notNull(),
   binTypes: text("bin_types").notNull(), // JSON array of package ids
-  vehicle: text("vehicle"), // hatch|sedan|suv|ute
+  vehicle: text("vehicle"), // small|medium|large
   frequency: text("frequency").notNull(), // one-off|fortnightly|monthly
   date: text("date").notNull(), // YYYY-MM-DD
   slot: text("slot").notNull(), // am|pm

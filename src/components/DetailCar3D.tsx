@@ -1,15 +1,26 @@
 import type { CSSProperties } from "react";
-import type { VehicleId } from "@/lib/constants";
 
-const PAINT: Record<VehicleId, { body: string; dark: string; glass: string }> = {
-  hatch: { body: "#e39b12", dark: "#c47f08", glass: "#8ec4c8" },
-  sedan: { body: "#1a2430", dark: "#0f141a", glass: "#9bb8c4" },
-  suv: { body: "#0f8f88", dark: "#0a6e69", glass: "#b7d4d6" },
-  ute: { body: "#3d4a5c", dark: "#1a2430", glass: "#a8bcc4" },
+export type CarKind = "hatch" | "sedan" | "suv" | "ute";
+
+const PAINT: Record<CarKind, { body: string; dark: string; glass: string }> = {
+  hatch: { body: "#47a9da", dark: "#1e6fa0", glass: "#b7d4e4" },
+  sedan: { body: "#0c1014", dark: "#06080b", glass: "#9bb8c4" },
+  suv: { body: "#2a8ec4", dark: "#164e78", glass: "#c5d5e0" },
+  ute: { body: "#3e4a56", dark: "#0c1014", glass: "#a8bcc4" },
+};
+
+const FROM_SIZE: Record<string, CarKind> = {
+  small: "hatch",
+  medium: "sedan",
+  large: "suv",
+  hatch: "hatch",
+  sedan: "sedan",
+  suv: "suv",
+  ute: "ute",
 };
 
 type Props = {
-  vehicle?: VehicleId;
+  vehicle?: string;
   dirty?: boolean;
   size?: "sm" | "md" | "lg";
   interactive?: boolean;
@@ -26,7 +37,8 @@ export function DetailCar3D({
   className = "",
 }: Props) {
   const w = SIZES[size];
-  const paint = PAINT[vehicle];
+  const kind = FROM_SIZE[vehicle] ?? "sedan";
+  const paint = PAINT[kind];
 
   return (
     <div
@@ -42,11 +54,11 @@ export function DetailCar3D({
       }
       aria-hidden
     >
-      <div className={`car3d ${dirty ? "is-dirty" : "is-clean"} ${vehicle}`}>
+      <div className={`car3d ${dirty ? "is-dirty" : "is-clean"} ${kind}`}>
         <div className="car3d-shadow" />
         <div className="car3d-cabin" />
         <div className="car3d-body" />
-        {vehicle === "ute" && <div className="car3d-tray" />}
+        {kind === "ute" && <div className="car3d-tray" />}
         <div className="car3d-wheel car3d-wheel-fl" />
         <div className="car3d-wheel car3d-wheel-fr" />
         <div className="car3d-wheel car3d-wheel-rl" />

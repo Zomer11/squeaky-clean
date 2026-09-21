@@ -1,11 +1,16 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { BUSINESS } from "@/lib/constants";
 
-export const alt = "Squeaky Clean — Brisbane mobile car detailing";
+export const alt = "Squeaky Solutions — Brisbane mobile car detailing";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const logo = await readFile(join(process.cwd(), "public/logo.png"));
+  const logoSrc = `data:image/png;base64,${logo.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -13,30 +18,31 @@ export default function OpenGraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
+          alignItems: "center",
           justifyContent: "space-between",
           padding: 72,
-          background: "linear-gradient(135deg, #f6f0e4 0%, #ebe3d2 55%, #d9efe9 100%)",
-          color: "#1a2430",
+          background:
+            "radial-gradient(70% 80% at 90% 10%, rgba(71, 169, 218, 0.28), transparent 55%), #0c1014",
+          color: "#f8fafc",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            fontSize: 28,
-            fontWeight: 700,
-            color: "#0a6e69",
-          }}
-        >
-          Brisbane · mobile detailing
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 720 }}>
           <div
             style={{
               display: "flex",
-              fontSize: 86,
+              fontSize: 22,
+              fontWeight: 700,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              color: "#7ec8e8",
+            }}
+          >
+            Brisbane · mobile detailing
+          </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 68,
               fontWeight: 700,
               letterSpacing: -2,
               lineHeight: 1.05,
@@ -44,29 +50,11 @@ export default function OpenGraphImage() {
           >
             {BUSINESS.name}
           </div>
-          <div
-            style={{
-              display: "flex",
-              fontSize: 34,
-              color: "#3d4a5c",
-              maxWidth: 860,
-            }}
-          >
-            Your car. Your driveway. Exterior, interior, or a full reset —
-            Sundays included.
+          <div style={{ display: "flex", fontSize: 28, color: "#c5cdd4", maxWidth: 640 }}>
+            Showroom finish. Your driveway. Pay on the day.
           </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: 24,
-            color: "#3d4a5c",
-          }}
-        >
-          <span>Pay on the day</span>
-          <span>7 days · AM / PM</span>
-        </div>
+        <img src={logoSrc} width={280} height={280} alt="" />
       </div>
     ),
     { ...size },

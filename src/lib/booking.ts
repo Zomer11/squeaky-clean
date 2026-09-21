@@ -3,7 +3,16 @@ import "server-only";
 import { and, count, eq, gte, ne } from "drizzle-orm";
 import { db } from "./db";
 import { blockedDates, bookings, settings } from "./db/schema";
-import type { Frequency, PackageId, Slot, VehicleId } from "./constants";
+import {
+  MAINTENANCE_FREQUENCIES,
+  PACKAGE_IDS,
+  SIZE_IDS,
+  isMaintenance,
+  type Frequency,
+  type PackageId,
+  type Slot,
+  type VehicleId,
+} from "./constants";
 import { isServiceSuburb } from "./suburbs";
 
 export type SlotAvailability = {
@@ -143,14 +152,24 @@ export async function createBooking(
   if (!name || !phone || !suburb || !address) {
     return { ok: false, error: "Name, phone, suburb and address are required." };
   }
-  if (!["hatch", "sedan", "suv", "ute"].includes(input.vehicle)) {
-    return { ok: false, error: "Pick a vehicle type." };
+  if (!(SIZE_IDS as readonly string[]).includes(input.vehicle)) {
+    return { ok: false, error: "Pick a vehicle size." };
   }
-  if (!["exterior", "interior", "full"].includes(input.packageId)) {
+  if (!(PACKAGE_IDS as readonly string[]).includes(input.packageId)) {
     return { ok: false, error: "Pick a detail package." };
   }
-  if (!["one-off", "fortnightly", "monthly"].includes(input.frequency)) {
-    return { ok: false, error: "Invalid frequency." };
+  if (isMaintenance(input.packageId)) {
+    if (!(MAINTENANCE_FREQUENCIES as readonly string[]).includes(input.frequency)) {
+      return {
+        ok: false,
+        error: "Pick weekly, fortnightly or monthly for the maintenance plan.",
+      };
+    }
+  } else if (input.frequency !== "one-off") {
+    return {
+      ok: false,
+      error: "That package is a one-off. Use the maintenance plan for a standing slot.",
+    };
   }
   if (!["am", "pm"].includes(input.slot)) {
     return { ok: false, error: "Invalid slot." };

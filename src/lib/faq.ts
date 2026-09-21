@@ -3,10 +3,33 @@ export type FaqItem = {
   a: string;
 };
 
+export const PACKAGE_FAQS: FaqItem[] = [
+  {
+    q: "What’s the difference between Good, Better and Best?",
+    a: "The Essentials (Good) is a proper inside-and-out clean. The Full Detail (Better) adds iron decon, ceramic spray, leather, and shampoo. The Full Treatment (Best) adds clay, water spots, stain and odour work. Times are 1–1.5 hrs, 2.5–3.5 hrs, and 4–5 hrs.",
+  },
+  {
+    q: "Can I just book exterior or interior?",
+    a: "Yes. Exterior Basic or Premium, Interior Basic or Premium. Combined visits are cheaper than stacking both sides as separate premium jobs.",
+  },
+  {
+    q: "What’s the maintenance plan?",
+    a: "A standing slot: quick exterior wash, tyre shine, interior vacuum and wipe, windows. Weekly, fortnightly or monthly. It’s not a discount on a Full Treatment — it’s a lighter visit to keep a detail from sliding.",
+  },
+  {
+    q: "Can I knock something out of a package for a discount?",
+    a: "No. The packages are built to fit a morning or afternoon window. If we skip a step we don’t refund it — we spend that time on the rest of the car.",
+  },
+  {
+    q: "Why do larger cars cost more?",
+    a: "More glass, more wheels, more carpet. Same work, bigger object. Small / medium / large is on the size guide.",
+  },
+];
+
 export const FAQS: FaqItem[] = [
   {
     q: "Do you come to my house?",
-    a: "Yes. Squeaky Clean is mobile — we detail at your Brisbane driveway. You need the car on the drive, a working hose tap, and enough room to work around it.",
+    a: "Yes. Squeaky Solutions is mobile — we detail at your Brisbane driveway. You need the car on the drive, a working hose tap, and enough room to work around it.",
   },
   {
     q: "How do I pay?",
@@ -22,7 +45,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: "How long does a detail take?",
-    a: "Most exterior or interior jobs fit a morning or afternoon window. A full detail on a big SUV or ute can use most of that window. Exact arrival moves with the day’s route.",
+    a: "The Essentials 1–1.5 hrs. Full Detail 2.5–3.5 hrs. Full Treatment 4–5 hrs, especially on a large SUV. Exterior or interior only is usually under two hours. Arrival moves with the day’s route.",
   },
   {
     q: "What if I need to cancel?",
@@ -34,7 +57,15 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: "Do you do ceramic coating or paint correction?",
-    a: "Not on the current card. We wash, wipe, vacuum and reset. Chips, swirls and stains that were already there may still show.",
+    a: "Ceramic spray protection is in The Full Detail and up. A multi-year ceramic coating and machine polish / paint correction are not on the kit yet — listed as coming soon. Chips, swirls and stains that were already there may still show.",
+  },
+  {
+    q: "Where does the ten percent go?",
+    a: "Ten percent of what we take goes towards Palestine. It comes out of the job, not as an extra on your bill. We haven’t named a specific charity on this site yet — if you need the recipient in writing, ask us.",
+  },
+  {
+    q: "How does the regulars card work?",
+    a: "Four paid Exterior Basics, the fifth Exterior Basic is free — same size car. We mark it against the phone you book with. Put “regulars card” in the notes. It doesn’t stack with the maintenance plan.",
   },
   {
     q: "What about dogs, gates, or no hose?",

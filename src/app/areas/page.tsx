@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { IconMark } from "@/components/IconMark";
+import { PageMast } from "@/components/PageMast";
 import { RelatedLinks } from "@/components/RelatedLinks";
 import { SuburbExplorer } from "@/components/SuburbExplorer";
 import { REGIONS } from "@/lib/suburbs";
@@ -10,7 +10,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Service areas",
   description:
-    "Squeaky Clean covers Greater Brisbane — inner, northside, southside, east and west. Check your suburb and open maps for directions.",
+    "Squeaky Solutions covers Greater Brisbane — inner, northside, southside, east and west. Check your suburb and open maps for directions.",
   path: "/areas",
 });
 
@@ -24,25 +24,22 @@ const REGION_QUERIES: Record<(typeof REGIONS)[number], string> = {
 
 export default function AreasPage() {
   return (
-    <div className="section-pad mx-auto max-w-6xl">
-      <Breadcrumbs items={[{ href: "/areas", label: "Areas" }]} />
-      <p className="chip">Greater Brisbane</p>
-      <h1 className="font-display mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-        Where we run
-      </h1>
-      <p className="mt-4 max-w-2xl text-ink-soft">
-        If your suburb is on the list, you can{" "}
-        <Link href="/book" className="font-semibold text-fresh-deep underline">
-          book a driveway detail
-        </Link>{" "}
-        online. Outside the list — still{" "}
-        <Link href="/contact" className="font-semibold text-fresh-deep underline">
-          ask
-        </Link>
-        ; we sometimes stretch for a cluster of jobs.
-      </p>
+    <>
+      <PageMast
+        title="Where we run"
+        crumbs={[{ href: "/areas", label: "Areas" }]}
+        width="wide"
+      >
+        <p>
+          If your suburb is on the list, you can{" "}
+          <Link href="/book">book a driveway detail</Link> online. Outside the
+          list — still <Link href="/contact">ask</Link>; we sometimes stretch
+          for a cluster of jobs.
+        </p>
+      </PageMast>
+      <div className="section-pad mx-auto max-w-6xl !pt-10">
 
-      <section className="mt-10">
+      <section>
         <h2 className="font-display text-2xl font-semibold">Maps & directions</h2>
         <p className="mt-2 max-w-2xl text-sm text-ink-soft">
           We don’t embed Google Maps on this site. These open Maps in a new
@@ -112,10 +109,11 @@ export default function AreasPage() {
           {
             href: "/jobs",
             label: "Typical jobs",
-            blurb: "West End hatch, Carindale SUV, Wynnum ute.",
+            blurb: "West End small, Carindale medium, Wynnum large.",
           },
         ]}
-      />
-    </div>
+        />
+      </div>
+    </>
   );
 }

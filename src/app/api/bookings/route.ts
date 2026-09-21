@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createBooking } from "@/lib/booking";
+import { PACKAGE_IDS, SIZE_IDS } from "@/lib/constants";
 
 export const runtime = "nodejs";
 
@@ -10,9 +11,9 @@ const schema = z.object({
   email: z.string().email().optional().or(z.literal("")),
   suburb: z.string().min(1).max(80),
   address: z.string().min(3).max(200),
-  vehicle: z.enum(["hatch", "sedan", "suv", "ute"]),
-  packageId: z.enum(["exterior", "interior", "full"]),
-  frequency: z.enum(["one-off", "fortnightly", "monthly"]),
+  vehicle: z.enum(SIZE_IDS),
+  packageId: z.enum(PACKAGE_IDS),
+  frequency: z.enum(["one-off", "weekly", "fortnightly", "monthly"]),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   slot: z.enum(["am", "pm"]),
   notes: z.string().max(500).optional(),
