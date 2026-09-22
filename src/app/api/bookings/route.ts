@@ -19,6 +19,36 @@ const schema = z.object({
   notes: z.string().max(500).optional(),
 });
 
+function schemaErrorMessage(error: z.ZodError): string {
+  const key = error.issues[0]?.path[0];
+  switch (key) {
+    case "name":
+      return "Name is required.";
+    case "phone":
+      return "Phone needs a real number — at least 8 digits.";
+    case "email":
+      return "That email doesn’t look right. Leave it blank if you don’t have one.";
+    case "suburb":
+      return "Choose a suburb from the list.";
+    case "address":
+      return "Street address is too short.";
+    case "vehicle":
+      return "Pick a vehicle size.";
+    case "packageId":
+      return "Pick a package.";
+    case "frequency":
+      return "Pick how often.";
+    case "date":
+      return "Pick a date.";
+    case "slot":
+      return "Pick morning or afternoon.";
+    case "notes":
+      return "Notes are too long. Keep it under 500 characters.";
+    default:
+      return "Check the form — something’s missing or invalid.";
+  }
+}
+
 export async function POST(request: Request) {
   let body: unknown;
   try {
@@ -30,7 +60,7 @@ export async function POST(request: Request) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Check the form — something’s missing or invalid." },
+      { error: schemaErrorMessage(parsed.error) },
       { status: 400 },
     );
   }

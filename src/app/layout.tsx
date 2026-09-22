@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Outfit } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { LaurelField } from "@/components/LaurelField";
+import { GiveBackPopup } from "@/components/GiveBackPopup";
 import { JsonLd } from "@/components/JsonLd";
 import { SkipLink } from "@/components/SkipLink";
 import { StickyBookBar } from "@/components/StickyBookBar";
@@ -23,7 +23,7 @@ const body = Outfit({
 });
 
 const description =
-  "Squeaky Solutions — showroom finish at your Brisbane driveway. Combined visits, exterior or interior. Book morning or afternoon online. Pay on the day.";
+  "Squeaky Solutions — showroom finish at your Brisbane driveway. Inside + outside bundles, or exterior / interior only. Book morning or afternoon online. Pay on the day.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -80,7 +80,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${body.variable} h-full`}
     >
       <body className="flex min-h-full flex-col antialiased">
-        <LaurelField />
         <JsonLd data={localBusinessJsonLd()} />
         <SkipLink />
         <Header />
@@ -89,6 +88,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <Footer />
         <StickyBookBar />
+        <GiveBackPopup />
       </body>
     </html>
   );

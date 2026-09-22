@@ -1,6 +1,6 @@
-import type { FaqItem } from "@/lib/faq";
+import type { FaqItem, FaqSection } from "@/lib/faq";
 
-export function FaqList({ items }: { items: FaqItem[] }) {
+function Items({ items }: { items: FaqItem[] }) {
   return (
     <div>
       {items.map((item) => (
@@ -26,4 +26,31 @@ export function FaqList({ items }: { items: FaqItem[] }) {
       ))}
     </div>
   );
+}
+
+export function FaqList({
+  items,
+  sections,
+}: {
+  items?: FaqItem[];
+  sections?: FaqSection[];
+}) {
+  if (sections?.length) {
+    return (
+      <div className="space-y-12">
+        {sections.map((section) => (
+          <section key={section.id} id={section.id}>
+            <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+              {section.title}
+            </h2>
+            <div className="mt-4">
+              <Items items={section.items} />
+            </div>
+          </section>
+        ))}
+      </div>
+    );
+  }
+
+  return <Items items={items ?? []} />;
 }

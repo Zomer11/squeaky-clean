@@ -5,7 +5,7 @@ import { BUSINESS } from "@/lib/constants";
 import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
-  title: "About",
+  title: "Our Story",
   description:
     "Squeaky Solutions is a Brisbane mobile car-detailing run — one operator, driveway visits, seven days including Sunday.",
   path: "/about",
@@ -14,7 +14,7 @@ export const metadata = pageMeta({
 export default function AboutPage() {
   return (
     <>
-      <PageMast title={`About ${BUSINESS.name}`} crumbs={[{ href: "/about", label: "About" }]}>
+      <PageMast title="Our Story" crumbs={[{ href: "/about", label: "Our Story" }]}>
         <p>
           One operator, Brisbane driveways, seven days including Sunday. Not a
           national call centre.
@@ -28,8 +28,8 @@ export default function AboutPage() {
             Morning or afternoon slots, Sundays included.
           </p>
           <p>
-            Book a combined visit, exterior, or interior online. Inquiries: we aim
-            to reply the same day.
+            Book an inside + outside bundle, or just exterior or interior,
+            online. Inquiries: we aim to reply the same day.
           </p>
           <p>
             {BUSINESS.hours}. {BUSINESS.payNote}

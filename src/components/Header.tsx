@@ -9,7 +9,7 @@ const links = [
   { href: "/faq", label: "FAQ" },
   { href: "/book", label: "Book" },
   { href: "/contact", label: "Contact" },
-  { href: "/about", label: "About" },
+  { href: "/about", label: "Our Story" },
 ];
 
 export function Header() {

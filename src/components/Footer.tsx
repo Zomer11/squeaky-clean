@@ -77,7 +77,7 @@ export function Footer() {
             </li>
             <li>
               <Link href="/about" className="hover:text-sun-on-ink">
-                About
+                Our Story
               </Link>
             </li>
             <li>

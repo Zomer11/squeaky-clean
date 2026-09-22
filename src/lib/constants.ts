@@ -216,7 +216,7 @@ export const PACKAGES = [
     notIncluded: [
       "Clay / iron / shampoo (book a detail)",
       "Doesn’t stack with the regulars card",
-      "One-off visits — pick a combined or a la carte package",
+      "One-off visits — pick a bundle or one side only",
     ],
     prices: { small: 60, medium: 70, large: 85 },
   },
@@ -304,8 +304,8 @@ export const EXTRAS = [
 export const DONATION = {
   percent: 10,
   cause: "Palestine",
-  title: "Ten percent",
-  lead: "Ten percent of what we take goes towards Palestine. It comes out of the job — not a tip on top of the price.",
+  title: "10%",
+  lead: "That's a donation from us — taken out of the job total, not an extra tip on your bill.",
 } as const;
 
 const OLD_PACKAGE_ALIASES: Record<string, PackageId> = {

@@ -29,7 +29,8 @@ export default async function BookPage({
       <NextAvailableStrip />
       <PageMast title="Book a driveway detail" crumbs={[{ href: "/book", label: "Book" }]}>
         <p>
-          Pick the size, the package, and an open slot. {BUSINESS.payNote} Free
+          Pick the size, then a bundle (inside + outside) or one side only, and
+          an open slot. {BUSINESS.payNote} Free
           cancel until 6pm the day before —{" "}
           <Link href="/refunds">refunds</Link>. Confirmations are instant; we
           don’t sit on the booking. Regulars:{" "}

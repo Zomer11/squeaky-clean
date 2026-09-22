@@ -6,9 +6,10 @@ import { FaqList } from "@/components/FaqList";
 import { GiveBack } from "@/components/GiveBack";
 import { HeroCrest } from "@/components/HeroCrest";
 import { NextAvailableStrip } from "@/components/NextAvailableStrip";
+import { PhotoRibbon } from "@/components/PhotoRibbon";
 import { RegularsOffer } from "@/components/RegularsOffer";
 import { BUSINESS, COMBINED_PACKAGES, PRICING, estimatePrice } from "@/lib/constants";
-import { FAQS } from "@/lib/faq";
+import { HOME_FAQS } from "@/lib/faq";
 import { TYPICAL_JOBS } from "@/lib/jobs";
 import { pageMeta } from "@/lib/site";
 
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   ...pageMeta({
     title: "Brisbane mobile car detailing",
     description:
-      "Squeaky Solutions comes to your Brisbane driveway. Combined visits, exterior or interior. Book morning or afternoon online, Sundays included. Pay on the day.",
+      "Squeaky Solutions comes to your Brisbane driveway. Inside + outside bundles, or exterior / interior only. Book morning or afternoon online, Sundays included. Pay on the day.",
     path: "/",
   }),
   title: {
@@ -103,32 +104,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section-pad mx-auto max-w-6xl">
-        <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-          Three combined visits
-        </h2>
-        <p className="mt-3 max-w-lg text-ink-soft">
-          Good, Better, Best. Exterior-only, interior-only, and a maintenance
-          plan live on the{" "}
-          <Link href="/services" className="font-semibold text-fresh-deep underline">
-            inclusions list
-          </Link>
-          .
-        </p>
-        <div className="price-with-gift">
-          <ul className="salon-menu">
-            {COMBINED_PACKAGES.map((pkg) => (
-              <li key={pkg.id}>
-                <Link href={`/services#${pkg.id}`}>
-                  <span className="name">{pkg.label}</span>
-                  <span className="rule" aria-hidden />
-                  <span className="price">From ${pkg.prices.small}</span>
-                </Link>
-                <p className="blurb">{pkg.blurb}</p>
-              </li>
-            ))}
-          </ul>
-          <GiveBack />
+      <PhotoRibbon />
+
+      <section className="packages-band">
+        <div className="section-pad mx-auto max-w-6xl">
+          <h2 className="font-display text-3xl font-semibold sm:text-4xl">
+            3 package deals
+          </h2>
+          <p className="mt-3 max-w-lg text-paper/70">
+            Good, Better, Best — inside and outside in one visit. Exterior-only,
+            interior-only, and a maintenance plan live on the{" "}
+            <Link href="/services" className="font-semibold text-sun-on-ink underline">
+              inclusions list
+            </Link>
+            .
+          </p>
+          <div className="price-with-gift">
+            <ul className="salon-menu">
+              {COMBINED_PACKAGES.map((pkg) => (
+                <li key={pkg.id}>
+                  <Link href={`/services#${pkg.id}`}>
+                    <span className="copy">
+                      <span className="grade">{pkg.grade}</span>
+                      <span className="name">{pkg.label}</span>
+                    </span>
+                    <span className="rule" aria-hidden />
+                    <span className="price">From ${pkg.prices.small}</span>
+                  </Link>
+                  <p className="blurb">{pkg.blurb}</p>
+                </li>
+              ))}
+            </ul>
+            <GiveBack />
+          </div>
         </div>
       </section>
 
@@ -230,7 +238,7 @@ export default function HomePage() {
           .
         </p>
         <div className="mt-6 max-w-3xl">
-          <FaqList items={FAQS.slice(0, 4)} />
+          <FaqList items={HOME_FAQS} />
         </div>
         <AnimateIn delay={80}>
           <div className="mt-12 flex flex-wrap items-center justify-between gap-4 rounded-[1.15rem] bg-ink px-6 py-7 text-paper">

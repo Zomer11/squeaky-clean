@@ -2,14 +2,14 @@ import { FaqList } from "@/components/FaqList";
 import { JsonLd } from "@/components/JsonLd";
 import { PageMast } from "@/components/PageMast";
 import { RelatedLinks } from "@/components/RelatedLinks";
-import { FAQS } from "@/lib/faq";
+import { FAQ_SECTIONS } from "@/lib/faq";
 import { faqJsonLd } from "@/lib/schema";
 import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
   title: "FAQ",
   description:
-    "Do you come to the house, how do you pay, Sundays, cancel rules, suburbs, and how fast Squeaky Solutions replies in Brisbane.",
+    "Squeaky Solutions FAQ: packages and prices, booking and cancel rules, driveway setup, rain, pay on the day, insurance. Brisbane mobile detailing.",
   path: "/faq",
 });
 
@@ -22,12 +22,12 @@ export default function FaqPage() {
         crumbs={[{ href: "/faq", label: "FAQ" }]}
       >
         <p>
-          Mobile detailing at your Brisbane driveway. If it’s not here, use
-          contact — we aim to reply the same day.
+          Packages, booking, the driveway, pay, and whether we’re insured. If
+          it’s not here, use contact — we aim to reply the same day.
         </p>
       </PageMast>
       <div className="section-pad mx-auto max-w-3xl !pt-10">
-        <FaqList items={FAQS} />
+        <FaqList sections={FAQ_SECTIONS} />
         <RelatedLinks
           links={[
             {

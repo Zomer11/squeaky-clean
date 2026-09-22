@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { DetailPhotos } from "@/components/DetailPhotos";
 import { FaqList } from "@/components/FaqList";
 import { GiveBack } from "@/components/GiveBack";
 import { PackageCard } from "@/components/PackageCard";
@@ -39,7 +38,8 @@ export default function ServicesPage() {
         width="wide"
       >
         <p>
-          Three combined visits, or exterior / interior on their own. Small,
+          Three inside + outside bundles, or exterior / interior on their own.
+          Small,
           medium, large. Interior Basic from ${fromPrice}. {PRICING.gstNote}
         </p>
         <p className="mt-3 text-sm">{PRICING.priceNote}</p>
@@ -55,10 +55,11 @@ export default function ServicesPage() {
         <div className="price-with-gift mt-12">
           <div>
             <h2 className="font-display text-3xl font-semibold">
-              Combined visits
+              Inside + outside bundles
             </h2>
             <p className="mt-2 max-w-xl text-sm text-ink-soft">
-              Good, Better, Best. This is the card we want most people on.
+              Both sides in one visit. Good, Better, Best — you pick the quality.
+              This is the card we want most people on.
             </p>
           </div>
           <GiveBack />
@@ -70,8 +71,12 @@ export default function ServicesPage() {
         </div>
 
         <h2 className="font-display mt-16 text-3xl font-semibold">
-          Exterior or interior only
+          One side only
         </h2>
+        <p className="mt-2 max-w-xl text-sm text-ink-soft">
+          Just the outside, or just the inside. Not a bundle — pick the side,
+          then Basic or Premium.
+        </p>
         <div className="mt-8 grid gap-5 lg:grid-cols-2">
           {[...EXTERIOR_PACKAGES, ...INTERIOR_PACKAGES].map((p) => (
             <PackageCard key={p.id} packageId={p.id} />
@@ -148,8 +153,6 @@ export default function ServicesPage() {
             ))}
           </div>
         </section>
-
-        <DetailPhotos />
 
         <section className="mt-16 max-w-3xl">
           <h2 className="font-display text-3xl font-semibold">Package questions</h2>

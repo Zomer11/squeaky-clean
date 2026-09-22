@@ -11,6 +11,29 @@ export type ThanksPayload = {
   suburb?: string;
 };
 
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
+
+export function formatVisitDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  return `${WEEKDAYS[weekday]}, ${d} ${MONTHS[m - 1]}`;
+}
+
 export function mapsSearchUrl(query: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }

@@ -65,6 +65,34 @@ function dayLabel(date: string): string {
   return `${WEEKDAYS[weekday]}, ${d} ${MONTHS[m - 1]}`;
 }
 
+function PackageButton({
+  title,
+  blurb,
+  selected,
+  onPick,
+}: {
+  title: string;
+  blurb: string;
+  selected: boolean;
+  onPick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onPick}
+      className={`choice rounded-2xl border-2 p-3 text-left ${
+        selected
+          ? "border-fresh bg-fresh/10"
+          : "border-line bg-paper hover:border-ink/40"
+      }`}
+    >
+      <span className="block text-sm font-bold">{title}</span>
+      <span className="text-xs text-ink-soft">{blurb}</span>
+    </button>
+  );
+}
+
 export function BookingForm({
   initialSlots,
   initialSuburb = "",
@@ -125,6 +153,7 @@ export function BookingForm({
   }
 
   const price = estimatePrice(packageId, vehicle, frequency);
+  const pickedFamily = PACKAGES.find((p) => p.id === packageId)?.family;
   const selectedDay = date ? openDates.find(([d]) => d === date)?.[1] : undefined;
 
   useEffect(() => {
@@ -156,6 +185,11 @@ export function BookingForm({
     if (!suburb) {
       setError("Choose a suburb from the list.");
       document.getElementById("suburb")?.focus();
+      return;
+    }
+    if (phone.replace(/\D/g, "").length < 8) {
+      setError("Phone needs a real number — at least 8 digits.");
+      document.getElementById("phone")?.focus();
       return;
     }
     if (!agreed) {
@@ -220,7 +254,7 @@ export function BookingForm({
       <div className="card noise p-6 md:p-8">
         <p className="chip">Booking #{successId}</p>
         <h2 className="font-display mt-3 text-3xl font-semibold text-ink">
-          You’re on the run.
+          You’re booked.
         </h2>
         <p className="mt-3 max-w-lg text-ink-soft">
           We’ll roll up on {date}{" "}
@@ -256,7 +290,11 @@ export function BookingForm({
     <form onSubmit={onSubmit} className="card noise space-y-7 p-5 md:p-8">
       <section>
         <h2 className="font-display text-xl font-semibold">1. Size & package</h2>
-        <fieldset className="mt-3">
+        <p className="book-split-lead">
+          Two different jobs. A bundle is inside and outside together. The other
+          path is one side only — paint, or cabin, not both.
+        </p>
+        <fieldset className="mt-4">
           <legend className="label">Vehicle size</legend>
           <div className="grid gap-2 sm:grid-cols-3">
             {SIZES.map((v) => (
@@ -277,43 +315,114 @@ export function BookingForm({
             ))}
           </div>
         </fieldset>
-        {(
-          [
-            ["Combined visit", COMBINED_PACKAGES],
-            ["Exterior only", EXTERIOR_PACKAGES],
-            ["Interior only", INTERIOR_PACKAGES],
-            ["Keep it going", PACKAGES.filter((p) => p.family === "maintenance")],
-          ] as const
-        ).map(([heading, list]) => (
-          <fieldset key={heading} className="mt-4">
-            <legend className="label">{heading}</legend>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {list.map((p) => (
-                <button
+
+        <div
+          className={`book-path book-path--bundle ${
+            pickedFamily === "combined" ? "is-picked" : ""
+          }`}
+        >
+          <p className="book-path-kicker">The whole car</p>
+          <h3 className="book-path-title">Inside + outside bundle</h3>
+          <p className="book-path-lead">
+            Both sides in one visit. You only pick the quality — Good, Better,
+            or Best.
+          </p>
+          <fieldset>
+            <legend className="sr-only">Inside + outside bundle</legend>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {COMBINED_PACKAGES.map((p) => (
+                <PackageButton
                   key={p.id}
-                  type="button"
-                  aria-pressed={packageId === p.id}
-                  onClick={() => {
+                  title={`${p.grade} · ${p.label}`}
+                  blurb={p.blurb}
+                  selected={packageId === p.id}
+                  onPick={() => {
                     setPackageId(p.id);
-                    setFrequency(
-                      p.id === "maintenance" ? "fortnightly" : "one-off",
-                    );
+                    setFrequency("one-off");
                   }}
-                  className={`choice rounded-2xl border-2 p-3 text-left ${
-                    packageId === p.id
-                      ? "border-fresh bg-fresh/10"
-                      : "border-line bg-paper hover:border-ink/40"
-                  }`}
-                >
-                  <span className="block text-sm font-bold">
-                    {p.grade} · {p.label}
-                  </span>
-                  <span className="text-xs text-ink-soft">{p.blurb}</span>
-                </button>
+                />
               ))}
             </div>
           </fieldset>
-        ))}
+        </div>
+
+        <div
+          className={`book-path book-path--side ${
+            pickedFamily === "exterior" || pickedFamily === "interior"
+              ? "is-picked"
+              : ""
+          }`}
+        >
+          <p className="book-path-kicker">Or just one side</p>
+          <h3 className="book-path-title">Exterior or interior — not both</h3>
+          <p className="book-path-lead">
+            Only the outside, or only the inside. Pick the side, then Basic or
+            Premium.
+          </p>
+          <fieldset>
+            <legend className="label">Outside only</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {EXTERIOR_PACKAGES.map((p) => (
+                <PackageButton
+                  key={p.id}
+                  title={p.grade}
+                  blurb={p.blurb}
+                  selected={packageId === p.id}
+                  onPick={() => {
+                    setPackageId(p.id);
+                    setFrequency("one-off");
+                  }}
+                />
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="mt-3">
+            <legend className="label">Inside only</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {INTERIOR_PACKAGES.map((p) => (
+                <PackageButton
+                  key={p.id}
+                  title={p.grade}
+                  blurb={p.blurb}
+                  selected={packageId === p.id}
+                  onPick={() => {
+                    setPackageId(p.id);
+                    setFrequency("one-off");
+                  }}
+                />
+              ))}
+            </div>
+          </fieldset>
+        </div>
+
+        <div
+          className={`book-path book-path--plan ${
+            pickedFamily === "maintenance" ? "is-picked" : ""
+          }`}
+        >
+          <p className="book-path-kicker">Already detailed?</p>
+          <h3 className="book-path-title">Keep it going</h3>
+          <p className="book-path-lead">
+            A standing slot after a proper job — not a substitute for a bundle.
+          </p>
+          <fieldset>
+            <legend className="sr-only">Maintenance plan</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {PACKAGES.filter((p) => p.family === "maintenance").map((p) => (
+                <PackageButton
+                  key={p.id}
+                  title={p.label}
+                  blurb={p.blurb}
+                  selected={packageId === p.id}
+                  onPick={() => {
+                    setPackageId(p.id);
+                    setFrequency("fortnightly");
+                  }}
+                />
+              ))}
+            </div>
+          </fieldset>
+        </div>
         {isMaintenance(packageId) ? (
           <fieldset className="mt-4">
             <legend className="label">How often</legend>

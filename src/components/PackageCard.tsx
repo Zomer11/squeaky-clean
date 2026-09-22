@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   MAINTENANCE_PRICES,
@@ -12,6 +13,13 @@ import {
   type PackageId,
 } from "@/lib/constants";
 
+/** Combined packages only — each image used once site-wide. */
+const PACKAGE_COVER: Partial<Record<PackageId, string>> = {
+  good: "/media/foam-wash.jpg",
+  better: "/media/foam-corvette.jpg",
+  best: "/media/foam-pexels.jpg",
+};
+
 type Props = {
   packageId: PackageId;
 };
@@ -22,9 +30,21 @@ export function PackageCard({ packageId }: Props) {
   if (!pkg) return null;
 
   const from = estimatePrice(pkg.id, "small", "one-off");
+  const cover = PACKAGE_COVER[pkg.id];
 
   return (
     <article id={pkg.id} className="pkg-card card flex flex-col overflow-hidden">
+      {cover ? (
+        <div className="relative aspect-[16/10] w-full bg-ink">
+          <Image
+            src={cover}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 33vw, 100vw"
+            className="object-cover"
+          />
+        </div>
+      ) : null}
       <div className="flex items-start justify-between gap-3 p-5 pb-0">
         <div>
           <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-soft">

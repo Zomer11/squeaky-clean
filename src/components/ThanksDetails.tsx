@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { THANKS_STORAGE_KEY, type ThanksPayload } from "@/lib/thanks";
+import {
+  THANKS_STORAGE_KEY,
+  formatVisitDate,
+  type ThanksPayload,
+} from "@/lib/thanks";
 
 export function ThanksDetails({ kind }: { kind: "booking" | "inquiry" }) {
   const [payload, setPayload] = useState<ThanksPayload | null>(null);
@@ -18,62 +22,102 @@ export function ThanksDetails({ kind }: { kind: "booking" | "inquiry" }) {
     }
   }, [kind]);
 
+  const when = payload?.date ? formatVisitDate(payload.date) : null;
+  const slotLabel =
+    payload?.slot === "am"
+      ? "Morning"
+      : payload?.slot === "pm"
+        ? "Afternoon"
+        : null;
+  const job = [payload?.package, payload?.vehicle].filter(Boolean).join(" · ");
+
   if (kind === "inquiry") {
     return (
-      <p className="mt-3 text-ink-soft">
-        We’ll call or email the same day if we can. If it’s urgent, use the
-        number on the site.
-      </p>
-    );
-  }
-
-  if (!payload) {
-    return (
-      <p className="mt-3 text-ink-soft">
-        You’re on the run. Leave the car in the driveway with keys sorted.
-        Pay on the day.
-      </p>
+      <article className="thanks-card card noise">
+        <div className="thanks-kicker">
+          <p className="chip chip-ok">Inquiry sent</p>
+        </div>
+        <h1 className="thanks-title">Got it.</h1>
+        <p className="thanks-lead">
+          We’ll call or email the same day if we can. If it’s urgent, use the
+          number on the site.
+        </p>
+        <div className="thanks-actions">
+          <Link href="/" className="btn btn-ghost">
+            Back home
+          </Link>
+          <Link href="/book" className="btn btn-accent">
+            Or just book a slot
+          </Link>
+        </div>
+      </article>
     );
   }
 
   return (
-    <>
-      <p className="mt-3 text-ink-soft">
-        We’ll roll up
-        {payload.date ? ` on ${payload.date}` : ""}
-        {payload.slot ? ` ${payload.slot === "am" ? "morning" : "afternoon"}` : ""}
-        . Leave the car home. Pay when we finish.
+    <article className="thanks-card card noise">
+      <div className="thanks-kicker">
+        <p className="chip chip-ok">
+          <span className="thanks-check" aria-hidden>
+            ✓
+          </span>
+          Booked
+        </p>
+        {payload?.id ? (
+          <p className="thanks-ref">#{payload.id}</p>
+        ) : null}
+      </div>
+      <h1 className="thanks-title">You’re booked.</h1>
+      {when ? (
+        <div className="thanks-when">
+          <p className="thanks-when-date">{when}</p>
+          {slotLabel ? <p className="thanks-when-slot">{slotLabel}</p> : null}
+        </div>
+      ) : null}
+      <p className="thanks-lead">
+        We’ll come to the driveway. Leave the car there, keys sorted. Pay when
+        we finish.
       </p>
-      <ul className="mt-5 space-y-2 text-sm text-ink">
-        {payload.id ? (
-          <li>
-            <strong>Booking:</strong> #{payload.id}
-          </li>
-        ) : null}
-        {payload.price ? (
-          <li>
-            <strong>Estimate:</strong> ${payload.price} for this visit
-          </li>
-        ) : null}
-        {payload.package || payload.vehicle ? (
-          <li>
-            <strong>Job:</strong>{" "}
-            {[payload.package, payload.vehicle].filter(Boolean).join(" · ")}
-          </li>
-        ) : null}
-        {payload.suburb ? (
-          <li>
-            <strong>Suburb:</strong> {payload.suburb}
-          </li>
-        ) : null}
-      </ul>
-      <p className="mt-4 text-sm text-ink-soft">
+      {payload && (job || payload.suburb || payload.price) ? (
+        <dl className="thanks-facts">
+          {job ? (
+            <div className="thanks-fact">
+              <dt>Job</dt>
+              <dd>{job}</dd>
+            </div>
+          ) : null}
+          {payload.suburb ? (
+            <div className="thanks-fact">
+              <dt>Suburb</dt>
+              <dd>{payload.suburb}</dd>
+            </div>
+          ) : null}
+          {payload.price ? (
+            <div className="thanks-fact thanks-fact--price">
+              <dt>Estimate</dt>
+              <dd>
+                <span className="thanks-price">${payload.price}</span>
+                <span className="thanks-price-note">this visit · pay on the day</span>
+              </dd>
+            </div>
+          ) : null}
+        </dl>
+      ) : null}
+      <p className="thanks-note">
         Free cancel until 6pm the day before —{" "}
         <Link href="/refunds" className="font-semibold text-fresh-deep underline">
           refunds
         </Link>
         .
       </p>
-    </>
+      <div className="thanks-actions">
+        <Link href="/" className="btn btn-ghost">
+          Back home
+        </Link>
+        <Link href="/book" className="btn btn-primary">
+          Book another
+        </Link>
+      </div>
+    </article>
   );
 }
