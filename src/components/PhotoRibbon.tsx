@@ -6,7 +6,7 @@ import Image from "next/image";
  */
 const RIBBON = [
   { src: "/media/foam-wheel.jpg", alt: "" },
-  { src: "/media/foam-lane.jpg", alt: "" },
+  { src: "/media/driveway.jpg", alt: "" },
 ] as const;
 
 export function PhotoRibbon() {

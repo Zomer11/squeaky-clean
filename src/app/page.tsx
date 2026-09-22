@@ -200,7 +200,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-line bg-paper/60">
+      <section className="border-y border-white/10">
         <div className="section-pad mx-auto max-w-6xl !py-16">
           <h2 className="font-display text-3xl font-semibold sm:text-4xl">
             Typical driveway jobs

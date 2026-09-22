@@ -84,30 +84,24 @@ h3 {
 }
 
 .legal-prose a {
-  color: var(--fresh-deep);
+  color: var(--sun-on-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 body {
   position: relative;
-  background-color: #e8e4dc;
-  background-image:
-    linear-gradient(180deg, #efece5 0%, #e8e4dc 12%, #e2ddd4 100%);
-  color: var(--ink);
+  background-color: #12151a;
+  background-image: linear-gradient(180deg, #0c1014 0%, #12151a 38%, #161a21 100%);
+  background-attachment: fixed;
+  color: var(--paper);
   font-family: var(--font-body), system-ui, sans-serif;
   min-height: 100%;
 }
 
 /* Asphalt grit â€” quiet, not decorative AI mist */
 body::before {
-  content: "";
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.28;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.07 0 0 0 0 0.08 0 0 0 0 0.09 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  content: none;
 }
 
 body > * {
@@ -358,14 +352,43 @@ body > * {
 }
 
 .packages-band {
-  background:
-    linear-gradient(
-      180deg,
-      #0c1014 0%,
-      #12151a 38%,
-      #161a21 100%
-    );
+  background: transparent;
   color: var(--paper);
+}
+
+/* Page canvas is the packages enamel. Light cards keep dark type. */
+main .text-ink {
+  color: var(--paper);
+}
+
+main .text-ink-soft {
+  color: color-mix(in srgb, var(--paper) 72%, transparent);
+}
+
+main .text-fresh-deep,
+main .text-sun-deep {
+  color: var(--sun-on-ink);
+}
+
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) {
+  color: var(--ink);
+}
+
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) .text-ink {
+  color: var(--ink);
+}
+
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) .text-ink-soft,
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) .label {
+  color: var(--ink-soft);
+}
+
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) .text-fresh-deep {
+  color: var(--fresh-deep);
+}
+
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) .text-sun-deep {
+  color: var(--sun-deep);
 }
 
 .packages-band .salon-menu {
@@ -844,6 +867,24 @@ a {
   background: #06080b;
 }
 
+main .btn-primary {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+main .btn-primary:hover {
+  background: #ffffff;
+}
+
+main .card .btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+main .card .btn-primary:hover {
+  background: #06080b;
+}
+
 .btn-accent {
   background: var(--sun);
   color: var(--ink);
@@ -858,11 +899,21 @@ a {
 
 .btn-ghost {
   background: transparent;
+  border-color: rgba(197, 205, 212, 0.32);
+  color: var(--paper);
+}
+
+.btn-ghost:hover {
+  border-color: var(--paper);
+  background: rgba(248, 250, 252, 0.08);
+}
+
+.card .btn-ghost {
   border-color: var(--line);
   color: var(--ink);
 }
 
-.btn-ghost:hover {
+.card .btn-ghost:hover {
   border-color: var(--ink);
   background: rgba(248, 250, 252, 0.75);
 }
