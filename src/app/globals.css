@@ -4,17 +4,17 @@
   --ease-lux: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-reveal: 1.15s;
   --dur-micro: 0.55s;
-  --cream: #e4e0d8;
-  --cream-deep: #d2ccc0;
-  --ink: #12151a;
-  --ink-soft: #4a524c;
-  --sun: #3d9bc8;
-  --sun-deep: #1a6a94;
-  --sun-on-ink: #8ecae6;
-  --fresh: #2f7fa8;
-  --fresh-deep: #1a4f6e;
-  --paper: #f3f1ec;
-  --line: #c4beb4;
+  --cream: #ebe4d6;
+  --cream-deep: #ddd4c4;
+  --ink: #2a241c;
+  --ink-soft: #6e6759;
+  --sun: #8a6230;
+  --sun-deep: #6e4c22;
+  --sun-on-ink: #d4b483;
+  --fresh: #8a6230;
+  --fresh-deep: #6e4c22;
+  --paper: #f4efe4;
+  --line: #c9c0b0;
   --danger: #b42318;
   --chrome: #b8b4ac;
   --shadow: 0 24px 48px -28px rgba(18, 21, 26, 0.45);
@@ -91,10 +91,9 @@ h3 {
 
 body {
   position: relative;
-  background-color: #12151a;
-  background-image: linear-gradient(180deg, #0c1014 0%, #12151a 38%, #161a21 100%);
-  background-attachment: fixed;
-  color: var(--paper);
+  background-color: #ebe4d6;
+  background-image: none;
+  color: var(--ink);
   font-family: var(--font-body), system-ui, sans-serif;
   min-height: 100%;
 }
@@ -127,7 +126,7 @@ body > * {
 .greek-rail {
   height: 9px;
   background-color: var(--ink);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='9' viewBox='0 0 40 9'%3E%3Cpath fill='none' stroke='%2347a9da' stroke-width='1.15' d='M0 7.2h6V1.8h4V7.2h8V1.8h4V7.2h8V1.8h4V7.2H40'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='9' viewBox='0 0 40 9'%3E%3Cpath fill='none' stroke='%238a6230' stroke-width='1.15' d='M0 7.2h6V1.8h4V7.2h8V1.8h4V7.2h8V1.8h4V7.2H40'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
   background-size: 40px 9px;
 }
@@ -353,21 +352,7 @@ body > * {
 
 .packages-band {
   background: transparent;
-  color: var(--paper);
-}
-
-/* Page canvas is the packages enamel. Light cards keep dark type. */
-main .text-ink {
-  color: var(--paper);
-}
-
-main .text-ink-soft {
-  color: color-mix(in srgb, var(--paper) 72%, transparent);
-}
-
-main .text-fresh-deep,
-main .text-sun-deep {
-  color: var(--sun-on-ink);
+  color: var(--ink);
 }
 
 main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) {
@@ -391,33 +376,8 @@ main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) .text-sun-deep {
   color: var(--sun-deep);
 }
 
-.packages-band .salon-menu {
-  border-top-color: rgba(197, 205, 212, 0.16);
-}
-
-.packages-band .salon-menu li {
-  border-bottom-color: rgba(197, 205, 212, 0.16);
-}
-
-.packages-band .salon-menu .name,
-.packages-band .salon-menu .blurb {
-  color: color-mix(in srgb, var(--paper) 64%, transparent);
-}
-
-.packages-band .salon-menu .price {
-  color: var(--sun-on-ink);
-}
-
-.packages-band .salon-menu .rule {
-  background-image: repeating-linear-gradient(
-    90deg,
-    rgba(197, 205, 212, 0.38) 0 3px,
-    transparent 3px 7px
-  );
-}
-
 .packages-band .salon-menu a:hover .grade {
-  color: var(--sun-on-ink);
+  color: var(--sun-deep);
 }
 
 .price-with-gift {
@@ -672,7 +632,7 @@ footer {
   padding: 1.75rem 1.5rem;
   border-radius: calc(var(--radius) + 0.35rem);
   background:
-    radial-gradient(80% 80% at 100% 0%, rgba(71, 169, 218, 0.18), transparent 50%),
+    radial-gradient(80% 80% at 100% 0%, rgba(138, 98, 48, 0.28), transparent 50%),
     var(--ink);
   color: var(--paper);
   box-shadow: var(--shadow);

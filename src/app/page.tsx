@@ -111,10 +111,10 @@ export default function HomePage() {
           <h2 className="font-display text-3xl font-semibold sm:text-4xl">
             3 package deals
           </h2>
-          <p className="mt-3 max-w-lg text-paper/70">
+          <p className="mt-3 max-w-lg text-ink-soft">
             Good, Better, Best — inside and outside in one visit. Exterior-only,
             interior-only, and a maintenance plan live on the{" "}
-            <Link href="/services" className="font-semibold text-sun-on-ink underline">
+            <Link href="/services" className="font-semibold text-fresh-deep underline">
               inclusions list
             </Link>
             .
