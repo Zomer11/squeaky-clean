@@ -29,16 +29,12 @@ export default async function BookPage({
       <NextAvailableStrip />
       <PageMast title="Book a driveway detail" crumbs={[{ href: "/book", label: "Book" }]}>
         <p>
-          Pick the size, then a bundle (inside + outside) or one side only, and
-          an open slot. {BUSINESS.payNote} Free
+          Pick the job, then a morning or afternoon. {BUSINESS.payNote} Free
           cancel until 6pm the day before —{" "}
-          <Link href="/refunds">refunds</Link>. Confirmations are instant; we
-          don’t sit on the booking. Regulars:{" "}
-          <Link href="/#regulars">fifth exterior on us</Link> — put it in the
-          notes.
+          <Link href="/refunds">refunds</Link>.
         </p>
       </PageMast>
-      <div className="section-pad mx-auto max-w-3xl !pt-10">
+      <div className="section-pad mx-auto max-w-4xl !pt-10">
         <BookingForm
           initialSlots={slots}
           initialSuburb={suburb}

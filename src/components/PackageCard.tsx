@@ -15,9 +15,9 @@ import {
 
 /** Combined packages only — each image used once site-wide. */
 const PACKAGE_COVER: Partial<Record<PackageId, string>> = {
-  good: "/media/foam-wash.jpg",
-  better: "/media/foam-corvette.jpg",
-  best: "/media/foam-pexels.jpg",
+  good: "/media/foam-front.jpg",
+  better: "/media/foam-close.jpg",
+  best: "/media/suds-black.jpg",
 };
 
 type Props = {
@@ -33,9 +33,12 @@ export function PackageCard({ packageId }: Props) {
   const cover = PACKAGE_COVER[pkg.id];
 
   return (
-    <article id={pkg.id} className="pkg-card card flex flex-col overflow-hidden">
+    <article
+      id={pkg.id}
+      className={`pkg-card pkg-card--${pkg.id} card flex h-full flex-col overflow-hidden`}
+    >
       {cover ? (
-        <div className="relative aspect-[16/10] w-full bg-ink">
+        <div className="pkg-cover relative w-full bg-ink">
           <Image
             src={cover}
             alt=""
@@ -45,12 +48,12 @@ export function PackageCard({ packageId }: Props) {
           />
         </div>
       ) : null}
-      <div className="flex items-start justify-between gap-3 p-5 pb-0">
+      <div className="pkg-card-head">
         <div>
           <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-soft">
             {pkg.grade} · {pkg.time}
           </p>
-          <h2 className="font-display mt-1 text-3xl font-semibold">{pkg.label}</h2>
+          <h2 className="font-display mt-1 font-semibold">{pkg.label}</h2>
         </div>
         <p className="text-right">
           <span className="block text-[0.65rem] font-bold uppercase tracking-[0.12em] text-ink-soft">
@@ -59,8 +62,8 @@ export function PackageCard({ packageId }: Props) {
           <span className="font-display text-4xl font-semibold">${from}</span>
         </p>
       </div>
-      <p className="px-5 pt-3 text-sm text-ink-soft">{pkg.blurb}</p>
-      <p className="px-5 pt-2 text-xs font-semibold text-fresh-deep">{pkg.who}</p>
+      <p className="pkg-card-blurb">{pkg.blurb}</p>
+      <p className="pkg-card-who">{pkg.who}</p>
 
       {isMaintenance(pkg.id) ? (
         <div className="mt-4 px-5">
@@ -92,22 +95,17 @@ export function PackageCard({ packageId }: Props) {
           </table>
         </div>
       ) : (
-        <ul className="mt-4 space-y-1.5 px-5 text-sm text-ink">
+        <ul className="pkg-sizes">
           {SIZES.map((v) => (
-            <li
-              key={v.id}
-              className="flex justify-between gap-3 border-b border-line/70 py-1.5 last:border-0"
-            >
+            <li key={v.id}>
               <span>{v.label}</span>
-              <span className="font-semibold">
-                ${estimatePrice(pkg.id, v.id, "one-off")}
-              </span>
+              <strong>${estimatePrice(pkg.id, v.id, "one-off")}</strong>
             </li>
           ))}
         </ul>
       )}
 
-      <div className="px-5 pt-3">
+      <div className="mt-auto px-5 pt-3">
         <button
           type="button"
           className="pkg-toggle"
@@ -139,7 +137,7 @@ export function PackageCard({ packageId }: Props) {
         </div>
       </div>
 
-      <div className="mt-auto p-5 pt-4">
+      <div className="p-5 pt-4">
         <Link href={`/book?package=${pkg.id}`} className="btn btn-primary w-full">
           Book {pkg.label.toLowerCase()}
         </Link>

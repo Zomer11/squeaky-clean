@@ -5,8 +5,11 @@ import Image from "next/image";
  * Array is doubled for seamless scroll; those are the same slots looping.
  */
 const RIBBON = [
-  { src: "/media/foam-wheel.jpg", alt: "" },
-  { src: "/media/driveway.jpg", alt: "" },
+  { src: "/media/suds-white.jpg", alt: "" },
+  { src: "/media/cloth-hood.jpg", alt: "" },
+  { src: "/media/foam-macro.jpg", alt: "" },
+  { src: "/media/suds-interior.jpg", alt: "" },
+  { src: "/media/suds-pink.jpg", alt: "" },
 ] as const;
 
 export function PhotoRibbon() {

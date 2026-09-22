@@ -1,32 +1,18 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { AnimateIn } from "@/components/AnimateIn";
 import { FaqList } from "@/components/FaqList";
 import { GiveBack } from "@/components/GiveBack";
 import { HeroCrest } from "@/components/HeroCrest";
 import { NextAvailableStrip } from "@/components/NextAvailableStrip";
-import { PhotoRibbon } from "@/components/PhotoRibbon";
+import { PhotoReel } from "@/components/PhotoReel";
 import { RegularsOffer } from "@/components/RegularsOffer";
 import { BUSINESS, COMBINED_PACKAGES, PRICING, estimatePrice } from "@/lib/constants";
 import { HOME_FAQS } from "@/lib/faq";
 import { TYPICAL_JOBS } from "@/lib/jobs";
 import { pageMeta } from "@/lib/site";
 
-const DetailBeforeAfter = dynamic(
-  () =>
-    import("@/components/DetailBeforeAfter").then((m) => m.DetailBeforeAfter),
-  {
-    loading: () => (
-      <div className="card min-h-[220px] animate-pulse bg-paper" aria-hidden />
-    ),
-  },
-);
-
-const DetailCar3D = dynamic(
-  () => import("@/components/DetailCar3D").then((m) => m.DetailCar3D),
-  { loading: () => <div className="h-20" aria-hidden /> },
-);
 
 export const metadata: Metadata = {
   ...pageMeta({
@@ -103,8 +89,7 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-
-      <PhotoRibbon />
+      <PhotoReel />
 
       <section className="packages-band">
         <div className="section-pad mx-auto max-w-6xl">
@@ -140,26 +125,27 @@ export default function HomePage() {
         </div>
       </section>
 
+      <figure className="wash-plate">
+        <Image
+          src="/media/suds-white.jpg"
+          alt="White coupe foamed on an outdoor apron"
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+      </figure>
+
       <RegularsOffer />
 
       <section className="section-pad mx-auto max-w-6xl !pt-0">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <AnimateIn>
-            <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-              How a booking works
-            </h2>
-            <p className="mt-3 max-w-lg text-ink-soft">
-              Book a slot. Leave the car home. We wash it where it sits.
-            </p>
-          </AnimateIn>
-          <AnimateIn delay={100} variant="scale">
-            <div className="flex items-end gap-1" aria-hidden>
-              <DetailCar3D vehicle="hatch" size="sm" />
-              <DetailCar3D vehicle="sedan" size="sm" />
-              <DetailCar3D vehicle="suv" size="sm" />
-            </div>
-          </AnimateIn>
-        </div>
+        <AnimateIn>
+          <h2 className="font-display text-3xl font-semibold sm:text-4xl">
+            How a booking works
+          </h2>
+          <p className="mt-3 max-w-lg text-ink-soft">
+            Book a slot. Leave the car home. We wash it where it sits.
+          </p>
+        </AnimateIn>
         <div className="mt-10 grid gap-8 border-t border-line pt-8 md:grid-cols-3 md:gap-0" role="list">
           {[
             {
@@ -192,11 +178,6 @@ export default function HomePage() {
               </div>
             </AnimateIn>
           ))}
-        </div>
-        <div className="mt-12 max-w-xl">
-          <AnimateIn>
-            <DetailBeforeAfter />
-          </AnimateIn>
         </div>
       </section>
 
@@ -241,18 +222,25 @@ export default function HomePage() {
           <FaqList items={HOME_FAQS} />
         </div>
         <AnimateIn delay={80}>
-          <div className="mt-12 flex flex-wrap items-center justify-between gap-4 rounded-[1.15rem] bg-ink px-6 py-7 text-paper">
-            <div>
+          <div className="cabin-close">
+            <Image
+              src="/media/suds-interior.jpg"
+              alt="Foam on the windscreen, seen from the driver’s seat"
+              fill
+              sizes="(min-width: 72rem) 72rem, 100vw"
+              className="object-cover"
+            />
+            <div className="cabin-close-copy">
               <p className="font-display text-2xl font-semibold">
                 Ready when the car is.
               </p>
-              <p className="mt-1 text-sm text-paper/70">
+              <p className="mt-1 text-sm text-paper/80">
                 Live calendar · 7 days · AM/PM · Greater Brisbane
               </p>
+              <Link href="/book" className="btn btn-accent mt-5">
+                Open calendar
+              </Link>
             </div>
-            <Link href="/book" className="btn btn-accent">
-              Open calendar
-            </Link>
           </div>
         </AnimateIn>
       </section>

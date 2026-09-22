@@ -3,11 +3,53 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { mapsDirectionsUrl, mapsSearchUrl } from "@/lib/thanks";
-import { REGIONS, SUBURBS, type Region } from "@/lib/suburbs";
+import {
+  FEATURED_SUBURB_NAMES,
+  REGIONS,
+  SUBURBS,
+  type Region,
+  type Suburb,
+} from "@/lib/suburbs";
+
+function SuburbTile({ s }: { s: Suburb }) {
+  return (
+    <li className="rounded-xl border border-line bg-paper px-3 py-2.5">
+      <span className="font-semibold text-ink">{s.name}</span>
+      <span className="mt-0.5 block text-xs text-ink-soft">
+        {s.region} · {s.postcode}
+      </span>
+      <span className="mt-2 flex flex-wrap gap-3 text-xs font-semibold">
+        <Link
+          href={`/book?suburb=${encodeURIComponent(s.name)}`}
+          className="text-fresh-deep underline"
+        >
+          Book
+        </Link>
+        <a
+          href={mapsSearchUrl(`${s.name} QLD ${s.postcode}`)}
+          target="_blank"
+          rel="noreferrer"
+          className="text-fresh-deep underline"
+        >
+          Map
+        </a>
+        <a
+          href={mapsDirectionsUrl(`${s.name} QLD ${s.postcode}`)}
+          target="_blank"
+          rel="noreferrer"
+          className="text-fresh-deep underline"
+        >
+          Directions
+        </a>
+      </span>
+    </li>
+  );
+}
 
 export function SuburbExplorer() {
   const [q, setQ] = useState("");
   const [region, setRegion] = useState<Region | "All">("All");
+  const [open, setOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -15,11 +57,21 @@ export function SuburbExplorer() {
       if (region !== "All" && s.region !== region) return false;
       if (!needle) return true;
       return (
-        s.name.toLowerCase().includes(needle) ||
-        s.postcode.includes(needle)
+        s.name.toLowerCase().includes(needle) || s.postcode.includes(needle)
       );
     });
   }, [q, region]);
+
+  const searching = q.trim().length > 0 || region !== "All";
+  const featured = useMemo(
+    () =>
+      FEATURED_SUBURB_NAMES.map((name) =>
+        SUBURBS.find((s) => s.name === name),
+      ).filter((s): s is Suburb => Boolean(s)),
+    [],
+  );
+  const shown = searching || open ? filtered : featured;
+  const hidden = searching ? 0 : Math.max(0, filtered.length - featured.length);
 
   return (
     <div>
@@ -46,55 +98,43 @@ export function SuburbExplorer() {
             value={region}
             onChange={(e) => setRegion(e.target.value as Region | "All")}
           >
-          <option value="All">All regions</option>
-          {REGIONS.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
+            <option value="All">All regions</option>
+            {REGIONS.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
           </select>
         </div>
       </div>
       <p className="mt-3 text-sm text-ink-soft">
-        {filtered.length} suburb{filtered.length === 1 ? "" : "s"}
+        {searching || open
+          ? `${filtered.length} suburb${filtered.length === 1 ? "" : "s"}`
+          : `${featured.length} well-known stops · ${filtered.length} on the run`}
       </p>
       <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((s) => (
-          <li
-            key={`${s.name}-${s.postcode}`}
-            className="rounded-xl border border-line bg-paper px-3 py-2.5"
-          >
-            <span className="font-semibold text-ink">{s.name}</span>
-            <span className="mt-0.5 block text-xs text-ink-soft">
-              {s.region} · {s.postcode}
-            </span>
-            <span className="mt-2 flex flex-wrap gap-3 text-xs font-semibold">
-              <Link
-                href={`/book?suburb=${encodeURIComponent(s.name)}`}
-                className="text-fresh-deep underline"
-              >
-                Book
-              </Link>
-              <a
-                href={mapsSearchUrl(`${s.name} QLD ${s.postcode}`)}
-                target="_blank"
-                rel="noreferrer"
-                className="text-fresh-deep underline"
-              >
-                Map
-              </a>
-              <a
-                href={mapsDirectionsUrl(`${s.name} QLD ${s.postcode}`)}
-                target="_blank"
-                rel="noreferrer"
-                className="text-fresh-deep underline"
-              >
-                Directions
-              </a>
-            </span>
-          </li>
+        {shown.map((s) => (
+          <SuburbTile key={`${s.name}-${s.postcode}`} s={s} />
         ))}
       </ul>
+      {!searching && hidden > 0 && !open && (
+        <button
+          type="button"
+          className="see-more"
+          onClick={() => setOpen(true)}
+        >
+          See more · {hidden} suburbs
+        </button>
+      )}
+      {!searching && open && (
+        <button
+          type="button"
+          className="see-more"
+          onClick={() => setOpen(false)}
+        >
+          Show the nine
+        </button>
+      )}
       {filtered.length === 0 && (
         <p className="mt-6 rounded-xl bg-cream-deep p-4 text-sm">
           Not listed?{" "}

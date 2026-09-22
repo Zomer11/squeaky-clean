@@ -38,6 +38,8 @@ type Props = {
   initialPackage?: string;
 };
 
+type Step = "job" | "when" | "driveway";
+
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 const MONTHS = [
   "Jan",
@@ -54,9 +56,56 @@ const MONTHS = [
   "Dec",
 ] as const;
 
+const STEPS: { id: Step; label: string }[] = [
+  { id: "job", label: "The job" },
+  { id: "when", label: "The day" },
+  { id: "driveway", label: "You" },
+];
+
+const SIZE_HINT: Record<VehicleId, string> = {
+  small: "Corolla, Mazda2",
+  medium: "Camry, CX-5",
+  large: "Prado, Ranger",
+};
+
+const JOB_PATHS = [
+  {
+    id: "combined" as const,
+    title: "Inside + outside",
+    blurb: "Both sides, one visit.",
+  },
+  {
+    id: "exterior" as const,
+    title: "Outside only",
+    blurb: "Paint, glass, wheels.",
+  },
+  {
+    id: "interior" as const,
+    title: "Inside only",
+    blurb: "Cabin, seats, glass.",
+  },
+  {
+    id: "maintenance" as const,
+    title: "Maintenance",
+    blurb: "Keep a detail from sliding.",
+  },
+];
+
 function matchSuburb(raw: string): string {
   const needle = raw.trim().toLowerCase();
   return SUBURBS.find((s) => s.name.toLowerCase() === needle)?.name ?? "";
+}
+
+function addDays(date: string, n: number): string {
+  const [y, m, d] = date.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d + n));
+  return dt.toISOString().slice(0, 10);
+}
+
+function sundayOf(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  return addDays(date, -weekday);
 }
 
 function dayLabel(date: string): string {
@@ -65,14 +114,35 @@ function dayLabel(date: string): string {
   return `${WEEKDAYS[weekday]}, ${d} ${MONTHS[m - 1]}`;
 }
 
+function weekRangeLabel(start: string): string {
+  const end = addDays(start, 6);
+  const [, ms, ds] = start.split("-").map(Number);
+  const [, me, de] = end.split("-").map(Number);
+  if (ms === me) return `${ds}–${de} ${MONTHS[ms - 1]}`;
+  return `${ds} ${MONTHS[ms - 1]} – ${de} ${MONTHS[me - 1]}`;
+}
+
+function scrollSheet(step: Step) {
+  const reduce =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.getElementById("book-sheet")?.scrollIntoView({
+    block: "start",
+    behavior: reduce ? "auto" : "smooth",
+  });
+  document.getElementById(`book-step-${step}`)?.focus();
+}
+
 function PackageButton({
   title,
   blurb,
+  meta,
   selected,
   onPick,
 }: {
   title: string;
   blurb: string;
+  meta: string;
   selected: boolean;
   onPick: () => void;
 }) {
@@ -87,8 +157,11 @@ function PackageButton({
           : "border-line bg-paper hover:border-ink/40"
       }`}
     >
-      <span className="block text-sm font-bold">{title}</span>
-      <span className="text-xs text-ink-soft">{blurb}</span>
+      <span className="flex items-start justify-between gap-3">
+        <span className="block text-sm font-bold">{title}</span>
+        <span className="book-pkg-meta">{meta}</span>
+      </span>
+      <span className="mt-1 block text-xs text-ink-soft">{blurb}</span>
     </button>
   );
 }
@@ -100,6 +173,8 @@ export function BookingForm({
 }: Props) {
   const router = useRouter();
   const [slots, setSlots] = useState(initialSlots);
+  const [step, setStep] = useState<Step>("job");
+  const [weekAnchor, setWeekAnchor] = useState<string | null>(null);
   const [vehicle, setVehicle] = useState<VehicleId>("medium");
   const [packageId, setPackageId] = useState<PackageId>(() =>
     resolvePackageId(initialPackage),
@@ -136,6 +211,16 @@ export function BookingForm({
     return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   }, [slots]);
 
+  const dayMap = useMemo(() => new Map(openDates), [openDates]);
+
+  const weekStart = weekAnchor ?? (openDates[0] ? sundayOf(openDates[0][0]) : "");
+  const weekDays = weekStart
+    ? Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+    : [];
+  const weekEnd = weekStart ? addDays(weekStart, 6) : "";
+  const hasPrevWeek = openDates.some(([d]) => d < weekStart);
+  const hasNextWeek = openDates.some(([d]) => d > weekEnd);
+
   const suggestions = useMemo(() => {
     const q = suburbQuery.trim().toLowerCase();
     if (!q) return [];
@@ -146,26 +231,77 @@ export function BookingForm({
     setActiveSug(0);
   }, [suggestions]);
 
-  function pickSuburb(name: string) {
-    setSuburb(name);
-    setSuburbQuery(name);
+  function pickSuburb(picked: string) {
+    setSuburb(picked);
+    setSuburbQuery(picked);
     setShowSuggestions(false);
   }
 
   const price = estimatePrice(packageId, vehicle, frequency);
-  const pickedFamily = PACKAGES.find((p) => p.id === packageId)?.family;
-  const selectedDay = date ? openDates.find(([d]) => d === date)?.[1] : undefined;
+  const pickedFamily = PACKAGES.find((p) => p.id === packageId)?.family ?? "combined";
+  const jobPath =
+    pickedFamily === "exterior" ||
+    pickedFamily === "interior" ||
+    pickedFamily === "maintenance"
+      ? pickedFamily
+      : "combined";
+  const pathPackages =
+    jobPath === "combined"
+      ? COMBINED_PACKAGES
+      : jobPath === "exterior"
+        ? EXTERIOR_PACKAGES
+        : jobPath === "interior"
+          ? INTERIOR_PACKAGES
+          : PACKAGES.filter((p) => p.family === "maintenance");
+  const selectedDay = date ? dayMap.get(date) : undefined;
+  const canOpenDriveway = Boolean(date && slot);
+
+  function go(next: Step) {
+    if (next === "driveway" && !canOpenDriveway) {
+      setError("Pick a day and morning or afternoon first.");
+      setStep("when");
+      queueMicrotask(() => scrollSheet("when"));
+      return;
+    }
+    if (next === "when" && openDates.length === 0) {
+      setError("No open slots right now — send an inquiry.");
+      return;
+    }
+    setError(null);
+    setStep(next);
+    queueMicrotask(() => scrollSheet(next));
+  }
+
+  function pickPath(id: (typeof JOB_PATHS)[number]["id"]) {
+    if (id === "combined") {
+      setPackageId("good");
+      setFrequency("one-off");
+      return;
+    }
+    if (id === "exterior") {
+      setPackageId("exterior-basic");
+      setFrequency("one-off");
+      return;
+    }
+    if (id === "interior") {
+      setPackageId("interior-basic");
+      setFrequency("one-off");
+      return;
+    }
+    setPackageId("maintenance");
+    setFrequency("fortnightly");
+  }
 
   useEffect(() => {
     if (!date) return;
-    const day = openDates.find(([d]) => d === date)?.[1];
+    const day = dayMap.get(date);
     if (!day) {
       setDate("");
       setSlot("");
       return;
     }
     if (slot && !day[slot]?.open) setSlot("");
-  }, [date, openDates, slot]);
+  }, [date, dayMap, slot]);
 
   async function refreshSlots() {
     const start = new Date().toISOString().slice(0, 10);
@@ -176,10 +312,14 @@ export function BookingForm({
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (step !== "driveway") {
+      go(step === "job" ? "when" : "driveway");
+      return;
+    }
     setError(null);
     if (!slot || !date) {
       setError("Pick a date and a morning or afternoon slot.");
-      document.getElementById("slot-heading")?.focus();
+      go("when");
       return;
     }
     if (!suburb) {
@@ -278,6 +418,7 @@ export function BookingForm({
           onClick={() => {
             setSuccessId(null);
             setNotes("");
+            setStep("job");
           }}
         >
           Book another
@@ -286,418 +427,436 @@ export function BookingForm({
     );
   }
 
+  const slotLine = date && slot
+    ? `${dayLabel(date)}, ${slot === "am" ? "morning" : "afternoon"}`
+    : "Pick a day";
+
   return (
-    <form onSubmit={onSubmit} className="card noise space-y-7 p-5 md:p-8">
-      <section>
-        <h2 className="font-display text-xl font-semibold">1. Size & package</h2>
-        <p className="book-split-lead">
-          Two different jobs. A bundle is inside and outside together. The other
-          path is one side only — paint, or cabin, not both.
-        </p>
-        <fieldset className="mt-4">
-          <legend className="label">Vehicle size</legend>
-          <div className="grid gap-2 sm:grid-cols-3">
-            {SIZES.map((v) => (
-              <button
-                key={v.id}
-                type="button"
-                aria-pressed={vehicle === v.id}
-                onClick={() => setVehicle(v.id)}
-                className={`choice rounded-2xl border-2 p-3 text-left transition ${
-                  vehicle === v.id
-                    ? "border-ink bg-cream"
-                    : "border-line bg-paper hover:border-ink/40"
+    <form
+      id="book-sheet"
+      onSubmit={onSubmit}
+      className="book-sheet card noise space-y-6 p-5 md:p-8"
+    >
+      <p className="book-ticket">
+        <span className="book-ticket-copy">
+          <b>
+            {vehicleLabel(vehicle)} · {packageLabel(packageId)}
+          </b>
+          <span>{slotLine}</span>
+          {suburb ? <span>{suburb}</span> : null}
+          <span>Pay on the day</span>
+        </span>
+        <strong>${price}</strong>
+      </p>
+
+      <div className="book-steps" role="navigation" aria-label="Booking steps">
+        {STEPS.map((item) => {
+          const locked = item.id === "driveway" && !canOpenDriveway && step !== "driveway";
+          return (
+            <button
+              key={item.id}
+              type="button"
+              aria-current={step === item.id ? "step" : undefined}
+              disabled={locked}
+              onClick={() => go(item.id)}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {step === "job" ? (
+        <section>
+          <h2
+            id="book-step-job"
+            tabIndex={-1}
+            className="font-display text-xl font-semibold"
+          >
+            What are we washing?
+          </h2>
+          <p className="book-split-lead">Tap a size, then what’s getting done.</p>
+          <fieldset className="mt-4">
+            <legend className="label">Vehicle size</legend>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {SIZES.map((v) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  aria-pressed={vehicle === v.id}
+                  onClick={() => setVehicle(v.id)}
+                  className={`choice rounded-2xl border-2 p-3 text-left transition ${
+                    vehicle === v.id
+                      ? "border-ink bg-cream"
+                      : "border-line bg-paper hover:border-ink/40"
+                  }`}
+                >
+                  <span className="block text-sm font-bold">{v.label}</span>
+                  <span className="text-xs text-ink-soft">{SIZE_HINT[v.id]}</span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="mt-5">
+            <legend className="label">The job</legend>
+            <div className="book-paths">
+              {JOB_PATHS.map((path) => (
+                <button
+                  key={path.id}
+                  type="button"
+                  aria-pressed={jobPath === path.id}
+                  onClick={() => pickPath(path.id)}
+                  className={`choice rounded-2xl border-2 p-3 text-left ${
+                    jobPath === path.id
+                      ? "border-ink bg-cream"
+                      : "border-line bg-paper hover:border-ink/40"
+                  }`}
+                >
+                  <span className="block text-sm font-bold">{path.title}</span>
+                  <span className="text-xs text-ink-soft">{path.blurb}</span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          {jobPath === "maintenance" ? (
+            <fieldset className="mt-5">
+              <legend className="label">How often</legend>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {FREQUENCIES.filter((f) => f.id !== "one-off").map((f) => (
+                  <label
+                    key={f.id}
+                    className={`flex cursor-pointer items-start gap-2 rounded-2xl border-2 p-3 ${
+                      frequency === f.id
+                        ? "border-sun bg-sun/15"
+                        : "border-line bg-paper"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="frequency"
+                      className="mt-1 h-4 w-4 accent-sun-deep"
+                      checked={frequency === f.id}
+                      onChange={() => setFrequency(f.id)}
+                    />
+                    <span>
+                      <span className="flex items-baseline justify-between gap-2">
+                        <span className="block text-sm font-bold">{f.label}</span>
+                        <span className="book-pkg-meta">
+                          ${estimatePrice("maintenance", vehicle, f.id)}
+                        </span>
+                      </span>
+                      <span className="text-xs text-ink-soft">{f.blurb}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : (
+            <fieldset className="mt-5">
+              <legend className="label">Which one</legend>
+              <div
+                className={`grid gap-2 ${
+                  pathPackages.length > 2 ? "sm:grid-cols-3" : "sm:grid-cols-2"
                 }`}
               >
-                <span className="block text-sm font-bold">{v.label}</span>
-                <span className="text-xs text-ink-soft">{v.blurb}</span>
-              </button>
-            ))}
-          </div>
-        </fieldset>
-
-        <div
-          className={`book-path book-path--bundle ${
-            pickedFamily === "combined" ? "is-picked" : ""
-          }`}
-        >
-          <p className="book-path-kicker">The whole car</p>
-          <h3 className="book-path-title">Inside + outside bundle</h3>
-          <p className="book-path-lead">
-            Both sides in one visit. You only pick the quality — Good, Better,
-            or Best.
-          </p>
-          <fieldset>
-            <legend className="sr-only">Inside + outside bundle</legend>
-            <div className="grid gap-2 sm:grid-cols-3">
-              {COMBINED_PACKAGES.map((p) => (
-                <PackageButton
-                  key={p.id}
-                  title={`${p.grade} · ${p.label}`}
-                  blurb={p.blurb}
-                  selected={packageId === p.id}
-                  onPick={() => {
-                    setPackageId(p.id);
-                    setFrequency("one-off");
-                  }}
-                />
-              ))}
-            </div>
-          </fieldset>
-        </div>
-
-        <div
-          className={`book-path book-path--side ${
-            pickedFamily === "exterior" || pickedFamily === "interior"
-              ? "is-picked"
-              : ""
-          }`}
-        >
-          <p className="book-path-kicker">Or just one side</p>
-          <h3 className="book-path-title">Exterior or interior — not both</h3>
-          <p className="book-path-lead">
-            Only the outside, or only the inside. Pick the side, then Basic or
-            Premium.
-          </p>
-          <fieldset>
-            <legend className="label">Outside only</legend>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {EXTERIOR_PACKAGES.map((p) => (
-                <PackageButton
-                  key={p.id}
-                  title={p.grade}
-                  blurb={p.blurb}
-                  selected={packageId === p.id}
-                  onPick={() => {
-                    setPackageId(p.id);
-                    setFrequency("one-off");
-                  }}
-                />
-              ))}
-            </div>
-          </fieldset>
-          <fieldset className="mt-3">
-            <legend className="label">Inside only</legend>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {INTERIOR_PACKAGES.map((p) => (
-                <PackageButton
-                  key={p.id}
-                  title={p.grade}
-                  blurb={p.blurb}
-                  selected={packageId === p.id}
-                  onPick={() => {
-                    setPackageId(p.id);
-                    setFrequency("one-off");
-                  }}
-                />
-              ))}
-            </div>
-          </fieldset>
-        </div>
-
-        <div
-          className={`book-path book-path--plan ${
-            pickedFamily === "maintenance" ? "is-picked" : ""
-          }`}
-        >
-          <p className="book-path-kicker">Already detailed?</p>
-          <h3 className="book-path-title">Keep it going</h3>
-          <p className="book-path-lead">
-            A standing slot after a proper job — not a substitute for a bundle.
-          </p>
-          <fieldset>
-            <legend className="sr-only">Maintenance plan</legend>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {PACKAGES.filter((p) => p.family === "maintenance").map((p) => (
-                <PackageButton
-                  key={p.id}
-                  title={p.label}
-                  blurb={p.blurb}
-                  selected={packageId === p.id}
-                  onPick={() => {
-                    setPackageId(p.id);
-                    setFrequency("fortnightly");
-                  }}
-                />
-              ))}
-            </div>
-          </fieldset>
-        </div>
-        {isMaintenance(packageId) ? (
-          <fieldset className="mt-4">
-            <legend className="label">How often</legend>
-            <div className="grid gap-2 sm:grid-cols-3">
-              {FREQUENCIES.filter((f) => f.id !== "one-off").map((f) => (
-                <label
-                  key={f.id}
-                  className={`flex cursor-pointer items-start gap-2 rounded-2xl border-2 p-3 ${
-                    frequency === f.id
-                      ? "border-sun bg-sun/15"
-                      : "border-line bg-paper"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="frequency"
-                    className="mt-1 h-4 w-4 accent-sun-deep"
-                    checked={frequency === f.id}
-                    onChange={() => setFrequency(f.id)}
+                {pathPackages.map((p) => (
+                  <PackageButton
+                    key={p.id}
+                    title={p.label}
+                    blurb={p.blurb}
+                    meta={`$${estimatePrice(p.id, vehicle)} · ${p.time}`}
+                    selected={packageId === p.id}
+                    onPick={() => {
+                      setPackageId(p.id);
+                      setFrequency("one-off");
+                    }}
                   />
-                  <span>
-                    <span className="block text-sm font-bold">{f.label}</span>
-                    <span className="text-xs text-ink-soft">{f.blurb}</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-        ) : (
-          <p className="mt-3 text-sm text-ink-soft">
-            One visit. Standing slots live on the maintenance plan.
-          </p>
-        )}
-        <p className="mt-3 text-sm font-semibold text-ink">
-          Estimate: ${price}{" "}
-          <span className="font-normal text-ink-soft">
-            for this visit · pay on the day
-          </span>
-        </p>
-      </section>
-
-      <section>
-        <h2
-          id="slot-heading"
-          tabIndex={-1}
-          className="font-display text-xl font-semibold"
-        >
-          2. Pick a slot
-        </h2>
-        <p className="mt-1 text-sm text-ink-soft">
-          Morning or afternoon, every day including Sunday. We come to your
-          driveway — not a shop drop-off.
-        </p>
-        {openDates.length === 0 ? (
-          <p className="mt-3 rounded-xl bg-cream-deep p-4 text-sm">
-            No open slots right now.{" "}
-            <a href="/contact" className="font-semibold text-fresh-deep underline">
-              Send an inquiry
-            </a>
-            .
-          </p>
-        ) : (
-          <div className="mt-3 grid max-h-56 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
-            {openDates.map(([d, day], i) => {
-              const selected = date === d;
-              return (
-                <button
-                  key={d}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => {
-                    setDate(d);
-                    setSlot("");
-                  }}
-                  className={`cal-chip rounded-xl border-2 px-2 py-3 text-center text-sm font-semibold transition hover:-translate-y-0.5 ${
-                    selected
-                      ? "border-sun bg-sun/20"
-                      : "border-line bg-paper hover:border-sun/50"
-                  }`}
-                  style={{ animationDelay: `${Math.min(i, 24) * 28}ms` }}
-                >
-                  {dayLabel(d)}
-                  <span className="mt-1 block text-[0.65rem] font-medium text-ink-soft">
-                    {[day.am && "AM", day.pm && "PM"].filter(Boolean).join(" · ")}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-        {selectedDay && (
-          <div className="mt-3 flex gap-2">
-            {(["am", "pm"] as Slot[]).map((s) => {
-              const info = selectedDay[s];
-              const disabled = !info?.open;
-              return (
-                <button
-                  key={s}
-                  type="button"
-                  disabled={disabled}
-                  aria-pressed={slot === s}
-                  onClick={() => setSlot(s)}
-                  className={`choice flex-1 rounded-xl border-2 px-3 py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40 ${
-                    slot === s
-                      ? "border-ink bg-ink text-paper"
-                      : "border-line bg-paper"
-                  }`}
-                >
-                  {s === "am" ? "Morning" : "Afternoon"}
-                  {info?.open && (
-                    <span className="mt-1 block text-[0.65rem] font-medium opacity-80">
-                      {info.remaining} left
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="font-display text-xl font-semibold">3. Your driveway</h2>
-        <div className="relative">
-          <label className="label" htmlFor="suburb">
-            Suburb
-          </label>
-          <input
-            id="suburb"
-            name="suburb"
-            className="field"
-            value={suburbQuery || suburb}
-            onChange={(e) => {
-              setSuburbQuery(e.target.value);
-              setSuburb("");
-              setShowSuggestions(true);
-            }}
-            onFocus={() => setShowSuggestions(true)}
-            onKeyDown={(e) => {
-              if (!showSuggestions || suggestions.length === 0) return;
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                setActiveSug((i) => (i + 1) % suggestions.length);
-              } else if (e.key === "ArrowUp") {
-                e.preventDefault();
-                setActiveSug((i) => (i - 1 + suggestions.length) % suggestions.length);
-              } else if (e.key === "Enter") {
-                e.preventDefault();
-                pickSuburb(suggestions[activeSug].name);
-              } else if (e.key === "Escape") {
-                setShowSuggestions(false);
-              }
-            }}
-            placeholder="e.g. West End…"
-            autoComplete="off"
-            role="combobox"
-            aria-autocomplete="list"
-            aria-expanded={showSuggestions && suggestions.length > 0}
-            aria-controls="suburb-list"
-            aria-activedescendant={
-              showSuggestions && suggestions[activeSug]
-                ? `suburb-opt-${suggestions[activeSug].name}`
-                : undefined
-            }
-            required
-          />
-          {showSuggestions && suggestions.length > 0 && (
-            <ul
-              id="suburb-list"
-              role="listbox"
-              className="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-xl border border-line bg-paper shadow-lg"
-            >
-              {suggestions.map((s, i) => (
-                <li key={s.name} role="presentation">
-                  <button
-                    id={`suburb-opt-${s.name}`}
-                    type="button"
-                    role="option"
-                    aria-selected={i === activeSug}
-                    className={`w-full px-3 py-2 text-left text-sm ${
-                      i === activeSug ? "bg-cream" : "hover:bg-cream"
-                    }`}
-                    onClick={() => pickSuburb(s.name)}
-                  >
-                    {s.name}{" "}
-                    <span className="text-ink-soft">
-                      · {s.region} {s.postcode}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+                ))}
+              </div>
+            </fieldset>
           )}
-        </div>
-        <div>
-          <label className="label" htmlFor="address">
-            Street address
-          </label>
-          <input
-            id="address"
-            name="address"
-            className="field"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            autoComplete="street-address"
-            required
-            placeholder="e.g. 12 Example St…"
-          />
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <label className="label" htmlFor="name">
-              Name
+        </section>
+      ) : null}
+
+      {step === "when" ? (
+        <section>
+          <h2
+            id="book-step-when"
+            tabIndex={-1}
+            className="font-display text-xl font-semibold"
+          >
+            When should we come?
+          </h2>
+          <p className="mt-1 text-sm text-ink-soft">
+            Morning or afternoon, seven days. We come to your driveway.
+          </p>
+          {openDates.length === 0 ? (
+            <p className="mt-3 rounded-xl bg-cream-deep p-4 text-sm">
+              No open slots right now.{" "}
+              <a href="/contact" className="font-semibold text-fresh-deep underline">
+                Send an inquiry
+              </a>
+              .
+            </p>
+          ) : (
+            <>
+              <div className="book-week-nav">
+                <button
+                  type="button"
+                  className="book-week-shift"
+                  disabled={!hasPrevWeek}
+                  onClick={() => setWeekAnchor(addDays(weekStart, -7))}
+                >
+                  Earlier
+                </button>
+                <strong>{weekRangeLabel(weekStart)}</strong>
+                <button
+                  type="button"
+                  className="book-week-shift"
+                  disabled={!hasNextWeek}
+                  onClick={() => setWeekAnchor(addDays(weekStart, 7))}
+                >
+                  Later
+                </button>
+              </div>
+              <div className="book-week">
+                {weekDays.map((d) => {
+                  const day = dayMap.get(d);
+                  const [y, m, dayNum] = d.split("-").map(Number);
+                  const weekday = new Date(Date.UTC(y, m - 1, dayNum)).getUTCDay();
+                  const open = Boolean(day?.am?.open || day?.pm?.open);
+                  const selected = date === d;
+                  return (
+                    <button
+                      key={d}
+                      type="button"
+                      disabled={!open}
+                      aria-pressed={selected}
+                      onClick={() => {
+                        setDate(d);
+                        setSlot("");
+                        setError(null);
+                      }}
+                      className="book-day"
+                    >
+                      <span className="book-day-name">{WEEKDAYS[weekday]}</span>
+                      <span className="book-day-num">{dayNum}</span>
+                      <span className="book-day-slots">
+                        {open
+                          ? [day?.am && "AM", day?.pm && "PM"].filter(Boolean).join(" · ")
+                          : "—"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+          {selectedDay ? (
+            <div className="mt-3 flex gap-2">
+              {(["am", "pm"] as Slot[]).map((s) => {
+                const info = selectedDay[s];
+                const disabled = !info?.open;
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    disabled={disabled}
+                    aria-pressed={slot === s}
+                    onClick={() => {
+                      setSlot(s);
+                      setError(null);
+                    }}
+                    className={`choice flex-1 rounded-xl border-2 px-3 py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40 ${
+                      slot === s
+                        ? "border-ink bg-ink text-paper"
+                        : "border-line bg-paper"
+                    }`}
+                  >
+                    {s === "am" ? "Morning" : "Afternoon"}
+                    {info?.open && (
+                      <span className="mt-1 block text-[0.65rem] font-medium opacity-80">
+                        {info.remaining} left
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ) : openDates.length > 0 ? (
+            <p className="mt-3 text-sm text-ink-soft">Tap a day, then morning or afternoon.</p>
+          ) : null}
+        </section>
+      ) : null}
+
+      {step === "driveway" ? (
+        <section className="space-y-3">
+          <h2
+            id="book-step-driveway"
+            tabIndex={-1}
+            className="font-display text-xl font-semibold"
+          >
+            Where’s the driveway?
+          </h2>
+          <p className="mt-1 text-sm text-ink-soft">
+            Phone is how we find you if the street’s fussy. Pay on the day.
+          </p>
+          <div className="relative">
+            <label className="label" htmlFor="suburb">
+              Suburb
             </label>
             <input
-              id="name"
-              name="name"
+              id="suburb"
+              name="suburb"
               className="field"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="name"
+              value={suburbQuery || suburb}
+              onChange={(e) => {
+                setSuburbQuery(e.target.value);
+                setSuburb("");
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              onKeyDown={(e) => {
+                if (!showSuggestions || suggestions.length === 0) return;
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setActiveSug((i) => (i + 1) % suggestions.length);
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setActiveSug((i) => (i - 1 + suggestions.length) % suggestions.length);
+                } else if (e.key === "Enter") {
+                  e.preventDefault();
+                  pickSuburb(suggestions[activeSug].name);
+                } else if (e.key === "Escape") {
+                  setShowSuggestions(false);
+                }
+              }}
+              placeholder="e.g. West End…"
+              autoComplete="off"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={showSuggestions && suggestions.length > 0}
+              aria-controls="suburb-list"
+              aria-activedescendant={
+                showSuggestions && suggestions[activeSug]
+                  ? `suburb-opt-${suggestions[activeSug].name}`
+                  : undefined
+              }
               required
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <ul
+                id="suburb-list"
+                role="listbox"
+                className="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-xl border border-line bg-paper shadow-lg"
+              >
+                {suggestions.map((s, i) => (
+                  <li key={s.name} role="presentation">
+                    <button
+                      id={`suburb-opt-${s.name}`}
+                      type="button"
+                      role="option"
+                      aria-selected={i === activeSug}
+                      className={`w-full px-3 py-2 text-left text-sm ${
+                        i === activeSug ? "bg-cream" : "hover:bg-cream"
+                      }`}
+                      onClick={() => pickSuburb(s.name)}
+                    >
+                      {s.name}{" "}
+                      <span className="text-ink-soft">
+                        · {s.region} {s.postcode}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div>
+            <label className="label" htmlFor="address">
+              Street address
+            </label>
+            <input
+              id="address"
+              name="address"
+              className="field"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              autoComplete="street-address"
+              required
+              placeholder="e.g. 12 Example St…"
+            />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="label" htmlFor="name">
+                Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                className="field"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                required
+              />
+            </div>
+            <div>
+              <label className="label" htmlFor="phone">
+                Phone
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                className="field"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          <div>
+            <label className="label" htmlFor="email">
+              Email <span className="font-normal">(optional)</span>
+            </label>
+            <input
+              id="email"
+              name="email"
+              className="field"
+              type="email"
+              autoComplete="email"
+              spellCheck={false}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div>
-            <label className="label" htmlFor="phone">
-              Phone
+            <label className="label" htmlFor="notes">
+              Notes{" "}
+              <span className="font-normal">(car, colour, dogs, hose tap)</span>
             </label>
-            <input
-              id="phone"
-              name="phone"
-              className="field"
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              required
+            <textarea
+              id="notes"
+              name="notes"
+              className="field min-h-24"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="White Camry, hose at the side…"
             />
           </div>
-        </div>
-        <div>
-          <label className="label" htmlFor="email">
-            Email <span className="font-normal">(optional)</span>
-          </label>
-          <input
-            id="email"
-            name="email"
-            className="field"
-            type="email"
-            autoComplete="email"
-            spellCheck={false}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+          <FormConsent
+            id="book-consent"
+            checked={agreed}
+            onChange={setAgreed}
           />
-        </div>
-        <div>
-          <label className="label" htmlFor="notes">
-            Notes{" "}
-            <span className="font-normal">(car make, colour, dogs, hose tap)</span>
-          </label>
-          <textarea
-            id="notes"
-            name="notes"
-            className="field min-h-24"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-          />
-        </div>
-        <FormConsent
-          id="book-consent"
-          checked={agreed}
-          onChange={setAgreed}
-        />
-      </section>
+        </section>
+      ) : null}
 
       {error && (
         <p
@@ -709,9 +868,37 @@ export function BookingForm({
         </p>
       )}
 
-      <button type="submit" className="btn btn-primary w-full" disabled={submitting}>
-        {submitting ? "Booking…" : "Confirm booking"}
-      </button>
+      <div className="book-actions">
+        {step !== "job" ? (
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => go(step === "driveway" ? "when" : "job")}
+          >
+            Back
+          </button>
+        ) : null}
+        {step === "job" ? (
+          <button type="button" className="btn btn-primary" onClick={() => go("when")}>
+            Pick a day
+          </button>
+        ) : null}
+        {step === "when" ? (
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={!canOpenDriveway}
+            onClick={() => go("driveway")}
+          >
+            Your details
+          </button>
+        ) : null}
+        {step === "driveway" ? (
+          <button type="submit" className="btn btn-primary" disabled={submitting}>
+            {submitting ? "Booking…" : "Confirm booking"}
+          </button>
+        ) : null}
+      </div>
     </form>
   );
 }

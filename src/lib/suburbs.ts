@@ -158,3 +158,16 @@ export const REGIONS: Region[] = [
   "East",
   "West",
 ];
+
+/** Best-known stops — shown first on /areas. Names must exist in SUBURBS. */
+export const FEATURED_SUBURB_NAMES = [
+  "Brisbane City",
+  "South Brisbane",
+  "West End",
+  "Fortitude Valley",
+  "New Farm",
+  "Paddington",
+  "Toowong",
+  "Carindale",
+  "Chermside",
+] as const;

@@ -28,7 +28,6 @@ export const metadata = pageMeta({
 export default function ServicesPage() {
   const fromPrice = estimatePrice("interior-basic", "small", "one-off");
   const extrasNow = EXTRAS.filter((e) => !e.soon);
-  const extrasSoon = EXTRAS.filter((e) => e.soon);
 
   return (
     <>
@@ -64,7 +63,7 @@ export default function ServicesPage() {
           </div>
           <GiveBack />
         </div>
-        <div className="mt-8 grid gap-5 lg:grid-cols-3">
+        <div className="mt-8 grid items-stretch gap-5 md:grid-cols-3">
           {COMBINED_PACKAGES.map((p) => (
             <PackageCard key={p.id} packageId={p.id} />
           ))}
@@ -114,21 +113,6 @@ export default function ServicesPage() {
                   <span className="ml-2 text-sm text-ink-soft">{extra.note}</span>
                 </span>
                 <span className="font-semibold">{extra.price}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-8 text-sm font-semibold">Coming soon — not bookable yet</p>
-          <ul className="mt-3 divide-y divide-line border-y border-line">
-            {extrasSoon.map((extra) => (
-              <li
-                key={extra.label}
-                className="flex flex-wrap items-baseline justify-between gap-2 py-3 text-ink-soft"
-              >
-                <span>
-                  <span className="font-semibold text-ink">{extra.label}</span>
-                  <span className="ml-2 text-sm">{extra.note}</span>
-                </span>
-                <span>{extra.price}</span>
               </li>
             ))}
           </ul>
