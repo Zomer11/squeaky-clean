@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AnimateIn } from "@/components/AnimateIn";
 import { FaqList } from "@/components/FaqList";
 import { GiveBack } from "@/components/GiveBack";
+import { GoogleReviews } from "@/components/GoogleReviews";
 import { HeroCrest } from "@/components/HeroCrest";
 import { NextAvailableStrip } from "@/components/NextAvailableStrip";
 import { PhotoReel } from "@/components/PhotoReel";
@@ -206,6 +207,8 @@ export default function HomePage() {
           </ul>
         </div>
       </section>
+
+      <GoogleReviews />
 
       <section className="section-pad mx-auto max-w-6xl">
         <h2 className="font-display text-3xl font-semibold sm:text-4xl">

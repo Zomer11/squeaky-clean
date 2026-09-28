@@ -143,7 +143,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
       },
       {
         q: "Can I see before and after photos?",
-        a: "The homepage has a before → after of the work, and typical jobs are written up so you can see how a visit usually goes. Named customer photos go up once we have permission to use them — we don’t fake reviews to fill the gap.",
+        a: "The homepage has a before → after of the work, and typical jobs are written up so you can see how a visit usually goes. Named customer photos go up once we have permission to use them. Google reviews (when the Business Profile is live) sit on the homepage — we only paste real quotes, we don’t invent ratings.",
       },
       {
         q: "Where does the ten percent go?",

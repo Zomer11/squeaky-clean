@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BrandMark } from "@/components/BrandMark";
 import { IconMark } from "@/components/IconMark";
 import { BUSINESS } from "@/lib/constants";
+import { hasGoogleMapsLink, hasGoogleReviewLink } from "@/lib/reviews";
 import { isPublishedAbn } from "@/lib/site";
 
 export function Footer() {
@@ -40,6 +41,30 @@ export function Footer() {
                 {BUSINESS.email}
               </a>
             </li>
+            {hasGoogleMapsLink() ? (
+              <li>
+                <a
+                  href={BUSINESS.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-sun-on-ink"
+                >
+                  Google Business
+                </a>
+              </li>
+            ) : null}
+            {hasGoogleReviewLink() ? (
+              <li>
+                <a
+                  href={BUSINESS.googleReviewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-sun-on-ink"
+                >
+                  Leave a Google review
+                </a>
+              </li>
+            ) : null}
             {isPublishedAbn(BUSINESS.abn) ? (
               <li className="text-paper/80">ABN {BUSINESS.abn}</li>
             ) : null}

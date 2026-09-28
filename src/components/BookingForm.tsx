@@ -21,14 +21,12 @@ import {
 } from "@/lib/constants";
 import { FormConsent } from "@/components/FormConsent";
 import { SUBURBS } from "@/lib/suburbs";
+import { parseAuMobile, maskMobile } from "@/lib/phone";
 import { THANKS_STORAGE_KEY } from "@/lib/thanks";
 
 type SlotInfo = {
   date: string;
   slot: Slot;
-  capacity: number;
-  booked: number;
-  remaining: number;
   open: boolean;
 };
 
@@ -327,8 +325,8 @@ export function BookingForm({
       document.getElementById("suburb")?.focus();
       return;
     }
-    if (phone.replace(/\D/g, "").length < 8) {
-      setError("Phone needs a real number — at least 8 digits.");
+    if (!parseAuMobile(phone)) {
+      setError("Need an Australian mobile — we text the confirmation.");
       document.getElementById("phone")?.focus();
       return;
     }
@@ -354,6 +352,7 @@ export function BookingForm({
           date,
           slot,
           notes,
+          consent: true,
         }),
       });
       const data = await res.json();
@@ -363,6 +362,7 @@ export function BookingForm({
         return;
       }
       setSuccessId(data.id);
+      const e164 = parseAuMobile(phone);
       try {
         sessionStorage.setItem(
           THANKS_STORAGE_KEY,
@@ -375,6 +375,8 @@ export function BookingForm({
             vehicle: vehicleLabel(vehicle),
             package: packageLabel(packageId),
             suburb,
+            phone: e164 ? maskMobile(e164) : undefined,
+            smsSent: Boolean(data.smsSent),
           }),
         );
       } catch {
@@ -678,7 +680,7 @@ export function BookingForm({
                     {s === "am" ? "Morning" : "Afternoon"}
                     {info?.open && (
                       <span className="mt-1 block text-[0.65rem] font-medium opacity-80">
-                        {info.remaining} left
+                        Open
                       </span>
                     )}
                   </button>
@@ -701,7 +703,7 @@ export function BookingForm({
             Where’s the driveway?
           </h2>
           <p className="mt-1 text-sm text-ink-soft">
-            Phone is how we find you if the street’s fussy. Pay on the day.
+            Mobile is required — we text the confirmation. Pay on the day.
           </p>
           <div className="relative">
             <label className="label" htmlFor="suburb">
@@ -806,7 +808,7 @@ export function BookingForm({
             </div>
             <div>
               <label className="label" htmlFor="phone">
-                Phone
+                Mobile
               </label>
               <input
                 id="phone"
@@ -815,6 +817,7 @@ export function BookingForm({
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
+                placeholder="0412 345 678"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required

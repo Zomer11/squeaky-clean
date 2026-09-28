@@ -29,7 +29,7 @@ export function ContactForm() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, suburb, message }),
+        body: JSON.stringify({ name, phone, email, suburb, message, consent: true }),
       });
       const data = await res.json();
       if (!res.ok) {

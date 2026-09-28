@@ -1822,7 +1822,7 @@ main .card .btn-primary:hover {
   filter: saturate(0.55) brightness(0.78);
 }
 
-/* -- Palestine donation popup -- */
+/* -- Give-back notice -- */
 .giveback-pop {
   position: fixed;
   inset: 0;
@@ -1835,34 +1835,29 @@ main .card .btn-primary:hover {
 .giveback-pop-scrim {
   position: absolute;
   inset: 0;
-  border: 0;
+  background: rgb(42 36 28 / 0.42);
   cursor: pointer;
-  background: rgba(10, 12, 14, 0.62);
   opacity: 0;
-  transition: opacity 0.55s var(--ease-lux);
+  transition: opacity 0.45s var(--ease-lux);
 }
 
 .giveback-pop-card {
   position: relative;
   z-index: 1;
-  width: min(100%, 24rem);
-  padding: 1.7rem 1.5rem 1.5rem;
-  border-radius: 1.25rem;
-  border: 1px solid color-mix(in srgb, var(--chrome) 45%, #007a3d 22%);
-  background:
-    linear-gradient(
-      155deg,
-      color-mix(in srgb, var(--paper) 78%, #007a3d) 0%,
-      var(--paper) 45%,
-      color-mix(in srgb, var(--paper) 88%, #ce1126) 100%
-    );
-  box-shadow: 0 32px 64px -28px rgba(0, 0, 0, 0.55);
+  width: min(100%, 22.5rem);
+  padding: 2rem 1.65rem 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: 0 22px 48px -18px rgba(42, 36, 28, 0.48);
   text-align: center;
   opacity: 0;
-  transform: translateY(-10vh);
+  transform: translateY(1.1rem);
+  filter: blur(8px);
   transition:
-    opacity 0.6s var(--ease-lux),
-    transform 0.85s var(--ease-lux);
+    opacity 0.5s var(--ease-lux),
+    transform 0.7s var(--ease-lux),
+    filter 0.7s var(--ease-lux);
 }
 
 .giveback-pop.is-in .giveback-pop-scrim {
@@ -1871,107 +1866,118 @@ main .card .btn-primary:hover {
 
 .giveback-pop.is-in .giveback-pop-card {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
+  filter: none;
+}
+
+.giveback-pop-x {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.giveback-pop-x svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: square;
+}
+
+.giveback-pop-x:hover {
+  color: var(--ink);
+}
+
+.giveback-pop-x:focus-visible {
+  outline: 3px solid rgba(138, 98, 48, 0.45);
+  outline-offset: 2px;
+}
+
+.giveback-pop-heading {
+  margin: 0;
+}
+
+.giveback-pop-word {
+  display: block;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(3.1rem, 10vw, 3.75rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--ink);
+}
+
+.giveback-pop-of {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.giveback-pop-from {
+  margin: 0.25rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: var(--ink-soft);
+}
+
+.giveback-pop-places {
+  margin: 1.15rem 0 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
 }
 
 .giveback-pop-flags {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .giveback-pop-flag {
-  height: 2.35rem;
+  height: 1.35rem;
   width: auto;
   display: block;
   overflow: hidden;
-  border-radius: 0.28rem;
-  box-shadow:
-    0 0 0 1px rgba(18, 21, 26, 0.2),
-    0 14px 28px -14px rgba(18, 21, 26, 0.55);
-  animation: giveback-flag-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  border-radius: 0.12rem;
+  box-shadow: 0 1px 0 rgba(42, 36, 28, 0.18);
 }
 
-.giveback-pop-flag:nth-child(1) {
-  animation-delay: 0.1s;
-}
-
-.giveback-pop-flag:nth-child(2) {
-  animation-delay: 0.16s;
-}
-
-.giveback-pop-flag:nth-child(3) {
-  animation-delay: 0.22s;
-}
-
-.giveback-pop-word {
-  margin: 0.95rem 0 0;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(2.35rem, 7vw, 3rem);
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: #0d3b24;
-}
-
-.giveback-pop-hook {
-  margin: 0 0 0.7rem;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1.85rem, 6.4vw, 2.5rem);
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  white-space: nowrap;
-  color: #0d3b24;
-}
-
-.giveback-pop-title {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: baseline;
-  gap: 0.35rem 0.55rem;
-  margin: 0.7rem 0 0;
-}
-
-.giveback-pop-pct {
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1.55rem, 4vw, 1.85rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  color: #0d3b24;
-}
-
-.giveback-pop-of {
-  font-size: 1.02rem;
-  font-weight: 600;
-  color: var(--ink);
+.giveback-pop-lead {
+  margin: 1.15rem auto 0;
+  max-width: 28ch;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
 }
 
 .giveback-pop-btn {
-  margin-top: 1.15rem;
+  margin-top: 1.25rem;
   min-width: 8.5rem;
-}
-
-@keyframes giveback-flag-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.7) rotate(-6deg);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .giveback-pop-scrim,
   .giveback-pop-card,
-  .giveback-pop-flag,
   .thanks-card {
     transition: none;
     animation: none;
+    filter: none;
   }
 }
 

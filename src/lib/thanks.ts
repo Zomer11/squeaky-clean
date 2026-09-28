@@ -9,6 +9,8 @@ export type ThanksPayload = {
   vehicle?: string;
   package?: string;
   suburb?: string;
+  phone?: string;
+  smsSent?: boolean;
 };
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;

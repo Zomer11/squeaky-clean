@@ -7,6 +7,8 @@ import {
   formatVisitDate,
   type ThanksPayload,
 } from "@/lib/thanks";
+import { GoogleReviews } from "@/components/GoogleReviews";
+import { hasGoogleReviewLink } from "@/lib/reviews";
 
 export function ThanksDetails({ kind }: { kind: "booking" | "inquiry" }) {
   const [payload, setPayload] = useState<ThanksPayload | null>(null);
@@ -75,6 +77,9 @@ export function ThanksDetails({ kind }: { kind: "booking" | "inquiry" }) {
         </div>
       ) : null}
       <p className="thanks-lead">
+        {payload?.smsSent
+          ? `We texted ${payload.phone ?? "your mobile"}. This page is a copy.`
+          : `We’ll text or call ${payload?.phone ?? "the mobile you booked with"}. This page is your confirmation until that lands.`}{" "}
         We’ll come to the driveway. Leave the car there, keys sorted. Pay when
         we finish.
       </p>
@@ -110,6 +115,11 @@ export function ThanksDetails({ kind }: { kind: "booking" | "inquiry" }) {
         </Link>
         .
       </p>
+      {hasGoogleReviewLink() ? (
+        <div className="mt-4">
+          <GoogleReviews variant="compact" />
+        </div>
+      ) : null}
       <div className="thanks-actions">
         <Link href="/" className="btn btn-ghost">
           Back home

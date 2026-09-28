@@ -15,6 +15,7 @@ export const bookings = sqliteTable("bookings", {
   notes: text("notes"),
   status: text("status").notNull().default("confirmed"), // confirmed|cancelled
   createdAt: text("created_at").notNull(),
+  consentedAt: text("consented_at"),
 });
 
 export const blockedDates = sqliteTable("blocked_dates", {
@@ -36,4 +37,5 @@ export const inquiries = sqliteTable("inquiries", {
   suburb: text("suburb"),
   message: text("message").notNull(),
   createdAt: text("created_at").notNull(),
+  consentedAt: text("consented_at"),
 });

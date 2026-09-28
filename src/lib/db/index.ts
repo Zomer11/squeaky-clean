@@ -6,11 +6,31 @@ import fs from "fs";
 import path from "path";
 import * as schema from "./schema";
 
-const dataDir = path.join(process.cwd(), "data");
-const dbPath = path.join(dataDir, "binbus.db");
+function resolveDbPath(): string {
+  const fromEnv = process.env.DATABASE_PATH?.trim();
+  if (fromEnv) {
+    return path.isAbsolute(fromEnv)
+      ? fromEnv
+      : path.join(process.cwd(), fromEnv);
+  }
+  return path.join(process.cwd(), "data", "binbus.db");
+}
+
+const dbPath = resolveDbPath();
+const dataDir = path.dirname(dbPath);
 
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
+}
+
+if (
+  process.env.NODE_ENV === "production" &&
+  process.env.VERCEL &&
+  !process.env.DATABASE_PATH?.trim()
+) {
+  console.warn(
+    "[db] Vercel filesystem is ephemeral and DATABASE_PATH is unset. Bookings will be lost on redeploy. Use Turso/Postgres or a host with a persistent volume.",
+  );
 }
 
 const sqlite = new Database(dbPath);
@@ -31,7 +51,8 @@ sqlite.exec(`
     slot TEXT NOT NULL,
     notes TEXT,
     status TEXT NOT NULL DEFAULT 'confirmed',
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    consented_at TEXT
   );
 
   CREATE TABLE IF NOT EXISTS blocked_dates (
@@ -52,16 +73,23 @@ sqlite.exec(`
     email TEXT,
     suburb TEXT,
     message TEXT NOT NULL,
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    consented_at TEXT
   );
 `);
 
-const bookingCols = sqlite.prepare("PRAGMA table_info(bookings)").all() as {
-  name: string;
-}[];
-if (!bookingCols.some((c) => c.name === "vehicle")) {
-  sqlite.exec("ALTER TABLE bookings ADD COLUMN vehicle TEXT");
+function ensureColumn(table: string, column: string, ddl: string) {
+  const cols = sqlite.prepare(`PRAGMA table_info(${table})`).all() as {
+    name: string;
+  }[];
+  if (!cols.some((c) => c.name === column)) {
+    sqlite.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+  }
 }
+
+ensureColumn("bookings", "vehicle", "vehicle TEXT");
+ensureColumn("bookings", "consented_at", "consented_at TEXT");
+ensureColumn("inquiries", "consented_at", "consented_at TEXT");
 
 const defaults = [
   ["capacity_am", "8"],
@@ -70,11 +98,9 @@ const defaults = [
 
 for (const [key, value] of defaults) {
   sqlite
-    .prepare(
-      "INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)",
-    )
+    .prepare("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)")
     .run(key, value);
 }
 
 export const db = drizzle(sqlite, { schema });
-export { sqlite };
+export { sqlite, dbPath };

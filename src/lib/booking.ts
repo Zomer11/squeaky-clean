@@ -1,8 +1,9 @@
 import "server-only";
 
-import { and, count, eq, gte, ne } from "drizzle-orm";
-import { db } from "./db";
-import { blockedDates, bookings, settings } from "./db/schema";
+import { and, count, desc, eq, gte, ne } from "drizzle-orm";
+import { db, sqlite } from "./db";
+import { parseAuMobile } from "./phone";
+import { blockedDates, bookings, inquiries, settings } from "./db/schema";
 import {
   MAINTENANCE_FREQUENCIES,
   PACKAGE_IDS,
@@ -24,12 +25,27 @@ export type SlotAvailability = {
   open: boolean;
 };
 
-function todayISO(): string {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+/** Public calendar payload — no occupancy counts (avoids volume leakage). */
+export type PublicSlot = {
+  date: string;
+  slot: Slot;
+  open: boolean;
+};
+
+const BRISBANE = "Australia/Brisbane";
+
+/** Calendar day in Brisbane business timezone (not the host's local TZ). */
+export function todayISO(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: BRISBANE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+export function toPublicSlots(slots: SlotAvailability[]): PublicSlot[] {
+  return slots.map(({ date, slot, open }) => ({ date, slot, open }));
 }
 
 export function isBookableWeekday(_dateStr: string): boolean {
@@ -135,6 +151,8 @@ export type CreateBookingInput = {
   date: string;
   slot: Slot;
   notes?: string;
+  /** ISO timestamp when the customer agreed to privacy/terms. */
+  consentedAt: string;
 };
 
 export type BookingResult =
@@ -145,12 +163,21 @@ export async function createBooking(
   input: CreateBookingInput,
 ): Promise<BookingResult> {
   const name = input.name.trim();
-  const phone = input.phone.trim();
+  const phone = parseAuMobile(input.phone);
   const suburb = input.suburb.trim();
   const address = input.address.trim();
 
-  if (!name || !phone || !suburb || !address) {
+  if (!name || !suburb || !address) {
     return { ok: false, error: "Name, phone, suburb and address are required." };
+  }
+  if (!phone) {
+    return {
+      ok: false,
+      error: "Need an Australian mobile — we text the confirmation.",
+    };
+  }
+  if ((input.notes?.trim().length ?? 0) > 500) {
+    return { ok: false, error: "Notes are too long. Keep it under 500 characters." };
   }
   if (!(SIZE_IDS as readonly string[]).includes(input.vehicle)) {
     return { ok: false, error: "Pick a vehicle size." };
@@ -198,32 +225,38 @@ export async function createBooking(
 
   const caps = await getCapacities();
   const capacity = input.slot === "am" ? caps.am : caps.pm;
-  const booked = bookedCount(input.date, input.slot);
-  if (booked >= capacity) {
-    return { ok: false, error: "That slot just filled up. Pick another." };
-  }
-
   const createdAt = new Date().toISOString();
-  const result = db
-    .insert(bookings)
-    .values({
-      name,
-      phone,
-      email: input.email?.trim() || null,
-      suburb,
-      address,
-      binTypes: JSON.stringify([input.packageId]),
-      vehicle: input.vehicle,
-      frequency: input.frequency,
-      date: input.date,
-      slot: input.slot,
-      notes: input.notes?.trim() || null,
-      status: "confirmed",
-      createdAt,
-    })
-    .run();
 
-  return { ok: true, id: Number(result.lastInsertRowid) };
+  try {
+    const commit = sqlite.transaction(() => {
+      if (bookedCount(input.date, input.slot) >= capacity) {
+        return { ok: false as const, error: "That slot just filled up. Pick another." };
+      }
+      const result = db
+        .insert(bookings)
+        .values({
+          name,
+          phone,
+          email: input.email?.trim() || null,
+          suburb,
+          address,
+          binTypes: JSON.stringify([input.packageId]),
+          vehicle: input.vehicle,
+          frequency: input.frequency,
+          date: input.date,
+          slot: input.slot,
+          notes: input.notes?.trim() || null,
+          status: "confirmed",
+          createdAt,
+          consentedAt: input.consentedAt,
+        })
+        .run();
+      return { ok: true as const, id: Number(result.lastInsertRowid) };
+    });
+    return commit();
+  } catch {
+    return { ok: false, error: "Couldn’t save that booking. Try again." };
+  }
 }
 
 export async function listUpcomingBookings() {
@@ -244,9 +277,18 @@ export async function listAllRecentBookings(limit = 100) {
   return db
     .select()
     .from(bookings)
-    .all()
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, limit);
+    .orderBy(desc(bookings.createdAt))
+    .limit(limit)
+    .all();
+}
+
+export async function listRecentInquiries(limit = 100) {
+  return db
+    .select()
+    .from(inquiries)
+    .orderBy(desc(inquiries.createdAt))
+    .limit(limit)
+    .all();
 }
 
 export async function cancelBooking(id: number): Promise<boolean> {

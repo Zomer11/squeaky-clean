@@ -2,7 +2,7 @@ import Link from "next/link";
 import { BookingForm } from "@/components/BookingForm";
 import { NextAvailableStrip } from "@/components/NextAvailableStrip";
 import { PageMast } from "@/components/PageMast";
-import { getAvailabilityForRange } from "@/lib/booking";
+import { getAvailabilityForRange, todayISO, toPublicSlots } from "@/lib/booking";
 import { BUSINESS } from "@/lib/constants";
 import { pageMeta } from "@/lib/site";
 
@@ -20,8 +20,8 @@ export default async function BookPage({
 }: {
   searchParams: Promise<{ suburb?: string; package?: string }>;
 }) {
-  const start = new Date().toISOString().slice(0, 10);
-  const slots = await getAvailabilityForRange(start, 42);
+  const start = todayISO();
+  const slots = toPublicSlots(await getAvailabilityForRange(start, 42));
   const { suburb, package: packageId } = await searchParams;
 
   return (
@@ -29,9 +29,9 @@ export default async function BookPage({
       <NextAvailableStrip />
       <PageMast title="Book a driveway detail" crumbs={[{ href: "/book", label: "Book" }]}>
         <p>
-          Pick the job, then a morning or afternoon. {BUSINESS.payNote} Free
-          cancel until 6pm the day before —{" "}
-          <Link href="/refunds">refunds</Link>.
+          Pick the job, then a morning or afternoon. Mobile is required — we
+          text the confirmation. {BUSINESS.payNote} Free cancel until 6pm the
+          day before — <Link href="/refunds">refunds</Link>.
         </p>
       </PageMast>
       <div className="section-pad mx-auto max-w-4xl !pt-10">

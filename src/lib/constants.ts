@@ -6,6 +6,17 @@ export const BUSINESS = {
   abn: "00 000 000 000",
   hours: "7 days · Morning & afternoon · Sundays too",
   payNote: "Pay on the day — cash or card. No online payment needed.",
+  /**
+   * Google Business Profile links. Paste from business.google.com after
+   * the listing is verified. Leave empty until then — the UI hides CTAs.
+   * Review link: Share profile → "Get more reviews" / g.page/r/...
+   * Maps link: Share → copy link (maps.app.goo.gl or google.com/maps/place/...).
+   */
+  googleReviewUrl: "",
+  googleMapsUrl: "",
+  /** Public rating from Google — only set once real reviews exist. */
+  googleRating: 0,
+  googleReviewCount: 0,
 } as const;
 
 export const SIZES = [

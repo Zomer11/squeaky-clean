@@ -3,9 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { DONATION } from "@/lib/constants";
 
-const STORAGE_KEY = "sq-giveback-seen-v6";
+const STORAGE_KEY = "sq-giveback-seen-v8";
 
-/** Official flags from Wikimedia Commons. */
 const FLAGS = [
   { src: "/media/flags/palestine.svg", alt: "Flag of Palestine" },
   { src: "/media/flags/sudan.svg", alt: "Flag of Sudan" },
@@ -98,28 +97,34 @@ export function GiveBackPopup() {
       aria-modal="true"
       aria-labelledby={titleId}
     >
-      <button
-        type="button"
+      <div
         className="giveback-pop-scrim"
-        aria-label="Close"
+        aria-hidden="true"
         onClick={dismiss}
       />
       <div className="giveback-pop-card">
-        <p className="giveback-pop-hook">Make a difference</p>
-        <CauseFlags />
-        <h2 id={titleId} className="giveback-pop-word">
-          Donation
+        <button
+          type="button"
+          className="giveback-pop-x"
+          aria-label="Close"
+          onClick={dismiss}
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M3 3l10 10M13 3L3 13" />
+          </svg>
+        </button>
+        <h2 id={titleId} className="giveback-pop-heading">
+          <span className="giveback-pop-word">{DONATION.percent}%</span>
+          <span className="giveback-pop-of">donation</span>
         </h2>
-        <p className="giveback-pop-title">
-          <span className="giveback-pop-pct">{DONATION.percent}%</span>
-          <span className="giveback-pop-of">
-            of every job → Palestine, Sudan & Lebanon
-          </span>
-        </p>
+        <p className="giveback-pop-from">from every job</p>
+        <p className="giveback-pop-places">Palestine · Sudan · Lebanon</p>
+        <CauseFlags />
+        <p className="giveback-pop-lead">{DONATION.lead}</p>
         <button
           ref={closeRef}
           type="button"
-          className="btn btn-accent giveback-pop-btn"
+          className="btn btn-primary giveback-pop-btn"
           onClick={dismiss}
         >
           Got it

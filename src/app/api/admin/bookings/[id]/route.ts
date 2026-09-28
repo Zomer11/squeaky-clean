@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { cancelBooking } from "@/lib/booking";
+import { isTrustedOrigin } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -8,6 +9,9 @@ export async function DELETE(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  if (!isTrustedOrigin(_request)) {
+    return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+  }
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

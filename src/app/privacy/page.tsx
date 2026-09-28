@@ -20,32 +20,54 @@ export default function PrivacyPage() {
       <h2>What we collect</h2>
       <p>When you book:</p>
       <ul>
-        <li>Name and phone (so we can find you and confirm)</li>
+        <li>Name and Australian mobile (required — we text the booking confirmation and may call)</li>
         <li>Street address and suburb (so we turn up at the right driveway)</li>
         <li>Vehicle type, package, frequency, date and slot</li>
         <li>Optional email and notes (make, colour, dogs, hose tap)</li>
+        <li>A record that you agreed to this notice and our terms (timestamp)</li>
       </ul>
       <p>
-        When you inquire: name, phone, message, and optional email / suburb.
+        When you inquire: name, phone, message, optional email / suburb, and
+        the same consent timestamp.
       </p>
       <p>
         We do not ask for card numbers on this site. Payment is on the day.
       </p>
       <h2>Why we keep it</h2>
       <p>
-        To run the booking, contact you about the slot, and keep a simple job
-        history. Admin access is password-protected.
+        To run the booking, text you a confirmation, email the job to our desk,
+        and keep a simple job history. Admin access is password-protected. We
+        don’t sell the number or put it on a marketing list.
       </p>
-      <h2>Where it lives</h2>
+      <h2>Where it lives and who helps us</h2>
       <p>
         Bookings and inquiries sit in our business database on the server that
-        hosts this site. We don’t send them to a marketing list or an overseas
-        ad network.
+        hosts this site. To run the service we also use:
       </p>
-      <h2>Cookies and tracking</h2>
+      <ul>
+        <li>
+          <strong>Twilio</strong> — sends your booking confirmation SMS. Your
+          mobile number and a short confirmation message go to Twilio (a
+          US-linked processor).
+        </li>
+        <li>
+          <strong>Google (Gmail SMTP)</strong> — emails the job or inquiry to
+          our desk inbox. Name, contact details, address, and notes go in that
+          email.
+        </li>
+      </ul>
+      <p>
+        We don’t send your details to a marketing list or an advertising
+        network. Hosting and those two processors are the only places this
+        operational data goes.
+      </p>
+      <h2>Cookies and browser storage</h2>
       <p>
         No analytics or ad cookies. The only cookie we set is an admin login
-        session if someone uses the ops desk. Details:{" "}
+        session if someone uses the ops desk. After you book, your browser may
+        briefly keep a confirmation summary in session storage (masked mobile,
+        slot, suburb) so the thanks page can show it — that stays on your
+        device and clears when the tab session ends. Details:{" "}
         <Link href="/cookies">cookies</Link>.
       </p>
       <h2>Your choices</h2>
@@ -57,8 +79,8 @@ export default function PrivacyPage() {
       </p>
       <p>
         Forms ask you to tick that you’ve read this page and the{" "}
-        <Link href="/terms">terms</Link>. That’s so we have a clear yes, not
-        so we can bury extra uses.
+        <Link href="/terms">terms</Link>. The server will not accept a booking
+        or inquiry without that yes, and we store when you agreed.
       </p>
     </LegalPage>
   );

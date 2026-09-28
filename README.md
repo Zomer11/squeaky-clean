@@ -22,8 +22,10 @@ Default password is in `.env.local` (`ADMIN_PASSWORD`).
 
 ## Notes
 
-- SQLite file: `data/binbus.db` (gitignored)
+- SQLite file: `data/binbus.db` (gitignored). Override with `DATABASE_PATH` for a persistent volume.
+- **Do not** rely on Vercel’s ephemeral filesystem for production bookings. Use Railway/Fly with disk, or Turso/Postgres.
+- Nightly backup: `npm run db:backup` (writes `data/backups/`). Schedule it on the host.
 - Brand, phone, email, ABN, and prices: `src/lib/constants.ts`
-- Duck mascot: `src/components/SqueakyDuck.tsx`
 - Suburbs list: `src/lib/suburbs.ts`
-- Vercel filesystem is ephemeral — for production use Railway/Fly with disk, or Turso
+- Admin: set **different** `ADMIN_PASSWORD` (≥16 chars) and `ADMIN_SECRET` (≥32 random chars) in `.env.local`
+- Google reviews: create a [Google Business Profile](https://business.google.com), then paste `googleReviewUrl` / `googleMapsUrl` (and rating counts) into `src/lib/constants.ts`. Curated quotes go in `src/lib/reviews.ts`.

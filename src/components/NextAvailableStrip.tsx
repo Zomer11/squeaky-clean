@@ -13,10 +13,8 @@ export async function NextAvailableStrip() {
           </span>
           {next ? (
             <>
-              {formatDateLabel(next.date)} · {formatSlotLabel(next.slot)} ·{" "}
-              {next.remaining === 1
-                ? "1 spot left"
-                : `${next.remaining} spots left`}
+              {formatDateLabel(next.date)} · {formatSlotLabel(next.slot)} · slot
+              open
             </>
           ) : (
             <>No open slots in the next 6 weeks — send an inquiry.</>

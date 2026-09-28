@@ -1,5 +1,6 @@
 import { BUSINESS, PACKAGES, PRICING, estimatePrice } from "@/lib/constants";
 import { FAQS } from "@/lib/faq";
+import { hasPublishedRating } from "@/lib/reviews";
 import { siteUrl } from "@/lib/site";
 
 export function localBusinessJsonLd() {
@@ -18,6 +19,20 @@ export function localBusinessJsonLd() {
     priceRange: `$${low}–$${high}`,
     currenciesAccepted: "AUD",
     paymentAccepted: "Cash, Credit Card",
+    ...(hasPublishedRating()
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: BUSINESS.googleRating,
+            reviewCount: BUSINESS.googleReviewCount,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
+    ...(BUSINESS.googleMapsUrl.trim()
+      ? { sameAs: [BUSINESS.googleMapsUrl.trim()] }
+      : {}),
     areaServed: {
       "@type": "City",
       name: "Brisbane",

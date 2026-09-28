@@ -22,11 +22,22 @@ type Booking = {
 
 type Blocked = { id: number; date: string; reason: string | null };
 
+type Inquiry = {
+  id: number;
+  name: string;
+  phone: string;
+  email: string | null;
+  suburb: string | null;
+  message: string;
+  createdAt: string;
+};
+
 export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
   const [authed, setAuthed] = useState(initiallyAuthed);
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [blocked, setBlocked] = useState<Blocked[]>([]);
   const [am, setAm] = useState(8);
   const [pm, setPm] = useState(8);
@@ -38,10 +49,11 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [bRes, blRes, sRes] = await Promise.all([
+      const [bRes, blRes, sRes, iRes] = await Promise.all([
         fetch("/api/admin/bookings"),
         fetch("/api/admin/blocked"),
         fetch("/api/admin/settings"),
+        fetch("/api/admin/inquiries"),
       ]);
       if (bRes.status === 401) {
         setAuthed(false);
@@ -50,10 +62,12 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
       const bData = await bRes.json();
       const blData = await blRes.json();
       const sData = await sRes.json();
+      const iData = await iRes.json();
       setBookings(bData.bookings || []);
       setBlocked(blData.dates || []);
       setAm(sData.am ?? 8);
       setPm(sData.pm ?? 8);
+      setInquiries(iData.inquiries || []);
     } finally {
       setLoading(false);
     }
@@ -134,8 +148,8 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
       <form onSubmit={login} className="card mx-auto max-w-md space-y-4 p-6">
         <h1 className="font-display text-2xl font-semibold">Admin login</h1>
         <p className="text-sm text-ink-soft">
-          Password is in <code className="text-xs">.env.local</code> (
-          <code className="text-xs">ADMIN_PASSWORD</code>).
+          Ops desk for the operator only. Contact the site owner if you need
+          access.
         </p>
         <div>
           <label className="label" htmlFor="admin-pass">
@@ -172,7 +186,9 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-3xl font-semibold">Ops desk</h1>
-          <p className="text-sm text-ink-soft">Bookings, blocked days, capacity</p>
+          <p className="text-sm text-ink-soft">
+            Bookings, inquiries, blocked days, capacity
+          </p>
         </div>
         <div className="flex gap-2">
           <button type="button" className="btn btn-ghost" onClick={() => load()}>
@@ -287,6 +303,43 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
                 </ul>
               )}
             </form>
+          </section>
+
+          <section>
+            <h2 className="font-display text-2xl font-semibold">
+              Inquiries ({inquiries.length})
+            </h2>
+            <div className="mt-4 space-y-3">
+              {inquiries.length === 0 ? (
+                <p className="text-sm text-ink-soft">No inquiries yet.</p>
+              ) : (
+                inquiries.slice(0, 40).map((row) => (
+                  <article
+                    key={row.id}
+                    className="rounded-xl border border-line bg-paper p-4 text-sm"
+                  >
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="font-semibold">
+                        #{row.id} · {row.name}
+                      </p>
+                      <p className="text-xs text-ink-soft">
+                        {row.createdAt.slice(0, 16).replace("T", " ")}
+                      </p>
+                    </div>
+                    <p className="mt-1">
+                      <a href={`tel:${row.phone}`} className="text-fresh-deep">
+                        {row.phone}
+                      </a>
+                      {row.email ? ` · ${row.email}` : ""}
+                      {row.suburb ? ` · ${row.suburb}` : ""}
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap text-ink-soft">
+                      {row.message}
+                    </p>
+                  </article>
+                ))
+              )}
+            </div>
           </section>
 
           <section>
