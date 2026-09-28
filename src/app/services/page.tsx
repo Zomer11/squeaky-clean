@@ -10,6 +10,7 @@ import {
   EXTERIOR_PACKAGES,
   EXTRAS,
   INTERIOR_PACKAGES,
+  MAINTENANCE_COPY,
   PACKAGES,
   PRICING,
   SIZES,
@@ -19,9 +20,9 @@ import { PACKAGE_FAQS } from "@/lib/faq";
 import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
-  title: "Detailing packages",
+  title: "Our packages",
   description:
-    "Squeaky Solutions driveway packages: The Essentials, Full Detail and Full Treatment, plus exterior, interior and a maintenance plan. Small, medium, large. Brisbane mobile.",
+    "Squeaky Solutions driveway packages: Good, Better and Best, plus exterior, interior and a maintenance plan. Small, medium, large. Brisbane mobile.",
   path: "/services",
 });
 
@@ -32,14 +33,17 @@ export default function ServicesPage() {
   return (
     <>
       <PageMast
-        title="Detailing packages"
+        title="Our packages"
         crumbs={[{ href: "/services", label: "Packages" }]}
         width="wide"
       >
-        <p>
+        <p className="text-sm font-bold uppercase tracking-[0.14em] text-fresh-deep">
+          Best value · Best quality · Best in the business
+        </p>
+        <p className="mt-3">
           Three inside + outside bundles, or exterior / interior on their own.
-          Small,
-          medium, large. Interior Basic from ${fromPrice}. {PRICING.gstNote}
+          Small, medium, large. Interior Basic from ${fromPrice}.{" "}
+          {PRICING.gstNote}
         </p>
         <p className="mt-3 text-sm">{PRICING.priceNote}</p>
       </PageMast>
@@ -54,11 +58,13 @@ export default function ServicesPage() {
         <div className="price-with-gift mt-12">
           <div>
             <h2 className="font-display text-3xl font-semibold">
-              Inside + outside bundles
+              Good · Better · Best
             </h2>
+            <p className="mt-2 max-w-xl text-sm font-semibold text-ink">
+              Best in the industry, every time.
+            </p>
             <p className="mt-2 max-w-xl text-sm text-ink-soft">
-              Both sides in one visit. Good, Better, Best — you pick the quality.
-              This is the card we want most people on.
+              Inside and outside in one visit. You pick the quality.
             </p>
           </div>
           <GiveBack />
@@ -70,7 +76,7 @@ export default function ServicesPage() {
         </div>
 
         <h2 className="font-display mt-16 text-3xl font-semibold">
-          One side only
+          Other packages we offer
         </h2>
         <p className="mt-2 max-w-xl text-sm text-ink-soft">
           Just the outside, or just the inside. Not a bundle — pick the side,
@@ -82,18 +88,32 @@ export default function ServicesPage() {
           ))}
         </div>
 
-        <h2 className="font-display mt-16 text-3xl font-semibold">
-          Maintenance plan
-        </h2>
-        <p className="mt-2 max-w-xl text-sm text-ink-soft">
-          Standing slot after a proper detail. Weekly, fortnightly or monthly.
-        </p>
-        <div className="mt-8 max-w-2xl">
-          <PackageCard
-            packageId={
-              PACKAGES.find((p) => p.id === "maintenance")?.id ?? "maintenance"
-            }
-          />
+        <div id="maintenance" className="mt-16 scroll-mt-28">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-fresh-deep">
+            {MAINTENANCE_COPY.kicker}
+          </p>
+          <h2 className="font-display mt-2 text-3xl font-semibold">
+            {MAINTENANCE_COPY.title}
+          </h2>
+          <p className="mt-1 text-lg text-ink-soft">
+            {MAINTENANCE_COPY.subtitle}
+          </p>
+          <div className="mt-6 max-w-2xl rounded-2xl border border-line bg-paper p-5">
+            <p className="font-display text-xl font-semibold">
+              {MAINTENANCE_COPY.boxTitle}
+            </p>
+            <p className="mt-2 text-sm text-ink-soft">
+              {MAINTENANCE_COPY.boxBody}
+            </p>
+          </div>
+          <div className="mt-8 max-w-2xl">
+            <PackageCard
+              packageId={
+                PACKAGES.find((p) => p.id === "maintenance")?.id ??
+                "maintenance"
+              }
+            />
+          </div>
         </div>
 
         <section className="mt-16">
@@ -124,7 +144,9 @@ export default function ServicesPage() {
         <RegularsOffer compact />
 
         <section className="mt-16">
-          <h2 className="font-display text-3xl font-semibold">Vehicle size</h2>
+          <h2 className="font-display text-3xl font-semibold">
+            Which size is your car?
+          </h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             {SIZES.map((v) => (
               <div
@@ -139,30 +161,30 @@ export default function ServicesPage() {
         </section>
 
         <section className="mt-16 max-w-3xl">
-          <h2 className="font-display text-3xl font-semibold">Package questions</h2>
+          <h2 className="font-display text-3xl font-semibold">Quick questions</h2>
           <div className="mt-6">
             <FaqList items={PACKAGE_FAQS} />
           </div>
         </section>
 
         <p className="mt-10 max-w-2xl text-sm text-ink-soft">
-          Fleet, boats, or something weirder —{" "}
+          Fleet, boat or something a bit different? Just{" "}
           <Link href="/contact" className="font-semibold text-fresh-deep underline">
             ask
           </Link>
-          . Machine polish and a multi-year ceramic aren’t on this card yet.
+          . We don’t offer machine polishing or long-term ceramic coatings yet.
         </p>
         <RelatedLinks
           links={[
             {
               href: "/book",
-              label: "Open the calendar",
-              blurb: "Morning or afternoon, including Sunday.",
+              label: "Book a time",
+              blurb: "Mornings or arvos. Sundays too.",
             },
             {
               href: "/faq",
-              label: "The rest of the FAQ",
-              blurb: "Dogs, hose, cancel window, suburbs, the ten percent.",
+              label: "More questions",
+              blurb: "Pets, hose access, cancelling, suburbs & our 10% donation.",
             },
           ]}
         />

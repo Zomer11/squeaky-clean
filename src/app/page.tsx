@@ -9,17 +9,21 @@ import { HeroCrest } from "@/components/HeroCrest";
 import { NextAvailableStrip } from "@/components/NextAvailableStrip";
 import { PhotoReel } from "@/components/PhotoReel";
 import { RegularsOffer } from "@/components/RegularsOffer";
-import { BUSINESS, COMBINED_PACKAGES, PRICING, estimatePrice } from "@/lib/constants";
+import {
+  BUSINESS,
+  COMBINED_PACKAGES,
+  MAINTENANCE_COPY,
+  estimatePrice,
+} from "@/lib/constants";
 import { HOME_FAQS } from "@/lib/faq";
 import { TYPICAL_JOBS } from "@/lib/jobs";
 import { pageMeta } from "@/lib/site";
-
 
 export const metadata: Metadata = {
   ...pageMeta({
     title: "Brisbane mobile car detailing",
     description:
-      "Squeaky Solutions comes to your Brisbane driveway. Inside + outside bundles, or exterior / interior only. Book morning or afternoon online, Sundays included. Pay on the day.",
+      "Squeaky Solutions comes to your Brisbane driveway. Want it squeaky clean? Book morning or afternoon online, Sundays included. Pay on the day.",
     path: "/",
   }),
   title: {
@@ -37,13 +41,18 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
           <div className="grid items-center gap-8 md:grid-cols-[1.05fr_0.95fr] md:gap-10">
             <div>
-              <h1 className="font-display hero-headline text-[2.4rem] font-semibold leading-[1.02] tracking-tight text-paper sm:text-5xl lg:text-6xl">
-                Showroom finish.
-                <span className="hero-line2 mt-1 block">Your driveway.</span>
+              <p className="hero-cta text-sm font-semibold uppercase tracking-[0.16em] text-sun-on-ink">
+                Want it squeaky clean?
+              </p>
+              <h1 className="font-display hero-headline mt-3 text-[2.4rem] font-semibold leading-[1.02] tracking-tight text-paper sm:text-5xl lg:text-6xl">
+                Meet {BUSINESS.name}.
+                <span className="hero-line2 mt-1 block">
+                  Reborn your car.
+                </span>
               </h1>
               <p className="hero-cta mt-5 max-w-xl text-lg text-paper/80">
-                {BUSINESS.name} brings the kit to you. Exterior, interior, or a
-                full reset. Sundays included.
+                Your car reborn. At your driveway. Exterior, interior, or a full
+                reset. Sundays included.
               </p>
               <p className="hero-cta mt-3 text-sm font-semibold text-sun-on-ink">
                 Bookings confirm instantly. Inquiries: we aim to reply the same
@@ -57,6 +66,7 @@ export default function HomePage() {
                   See prices
                 </Link>
               </div>
+              {/* Pay-on-day kept for now — prepay / remove is a deferred conflict */}
               <p className="hero-cta mt-4 text-sm text-paper/65">
                 {BUSINESS.payNote}
               </p>
@@ -68,24 +78,14 @@ export default function HomePage() {
         </div>
         <div className="salon-facts">
           {[
-            {
-              title: "We come to you",
-              body: "Hose tap and a bit of driveway space. That’s the setup.",
-            },
-            {
-              title: "Insured local run",
-              body: "One operator, Brisbane suburbs, no franchise script.",
-            },
-            {
-              title: `From $${fromPrice}`,
-              body: `The Essentials, small car. ${PRICING.gstNote}`,
-            },
+            { title: "We come to you" },
+            { title: "Best prices, best results" },
+            { title: `As cheap as $${fromPrice}` },
           ].map((item) => (
             <div key={item.title}>
               <h2 className="font-display text-xl font-semibold text-paper">
                 {item.title}
               </h2>
-              <p className="mt-2 text-sm text-paper/70">{item.body}</p>
             </div>
           ))}
         </div>
@@ -95,13 +95,19 @@ export default function HomePage() {
       <section className="packages-band">
         <div className="section-pad mx-auto max-w-6xl">
           <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-            3 package deals
+            Good · Better · Best
           </h2>
+          <p className="mt-2 text-lg font-semibold text-ink">
+            Best in the industry, every time.
+          </p>
           <p className="mt-3 max-w-lg text-ink-soft">
-            Good, Better, Best — inside and outside in one visit. Exterior-only,
-            interior-only, and a maintenance plan live on the{" "}
-            <Link href="/services" className="font-semibold text-fresh-deep underline">
-              inclusions list
+            Inside and outside in one visit. Exterior-only, interior-only, and a
+            maintenance plan live on{" "}
+            <Link
+              href="/services"
+              className="font-semibold text-fresh-deep underline"
+            >
+              our packages
             </Link>
             .
           </p>
@@ -139,6 +145,29 @@ export default function HomePage() {
       <RegularsOffer />
 
       <section className="section-pad mx-auto max-w-6xl !pt-0">
+        <div className="loyalty-payoff rounded-3xl border border-line bg-paper/80 p-6 md:p-8">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-fresh-deep">
+            {MAINTENANCE_COPY.kicker}
+          </p>
+          <h2 className="font-display mt-2 text-3xl font-semibold sm:text-4xl">
+            {MAINTENANCE_COPY.title}
+          </h2>
+          <p className="mt-1 text-lg text-ink-soft">
+            {MAINTENANCE_COPY.subtitle}
+          </p>
+          <p className="mt-4 max-w-xl text-sm text-ink-soft">
+            {MAINTENANCE_COPY.boxBody}
+          </p>
+          <Link
+            href={MAINTENANCE_COPY.readMoreHref}
+            className="mt-5 inline-flex font-semibold text-fresh-deep underline"
+          >
+            Read more
+          </Link>
+        </div>
+      </section>
+
+      <section className="section-pad mx-auto max-w-6xl !pt-0">
         <AnimateIn>
           <h2 className="font-display text-3xl font-semibold sm:text-4xl">
             How a booking works
@@ -147,7 +176,10 @@ export default function HomePage() {
             Book a slot. Leave the car home. We wash it where it sits.
           </p>
         </AnimateIn>
-        <div className="mt-10 grid gap-8 border-t border-line pt-8 md:grid-cols-3 md:gap-0" role="list">
+        <div
+          className="mt-10 grid gap-8 border-t border-line pt-8 md:grid-cols-3 md:gap-0"
+          role="list"
+        >
           {[
             {
               n: "01",
@@ -174,7 +206,9 @@ export default function HomePage() {
                 <span className="step-num text-xs font-bold tracking-[0.2em] text-sun-deep">
                   {s.n}
                 </span>
-                <h3 className="font-display mt-3 text-xl font-semibold">{s.t}</h3>
+                <h3 className="font-display mt-3 text-xl font-semibold">
+                  {s.t}
+                </h3>
                 <p className="mt-2 text-sm text-ink-soft">{s.d}</p>
               </div>
             </AnimateIn>
@@ -189,7 +223,10 @@ export default function HomePage() {
           </h2>
           <p className="mt-3 max-w-lg text-ink-soft">
             Composite write-ups — not fake reviews.{" "}
-            <Link href="/jobs" className="font-semibold text-fresh-deep underline">
+            <Link
+              href="/jobs"
+              className="font-semibold text-fresh-deep underline"
+            >
               All three
             </Link>
             .
@@ -200,7 +237,9 @@ export default function HomePage() {
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-fresh-deep">
                   {job.suburb}
                 </p>
-                <h3 className="font-display mt-2 text-xl font-semibold">{job.title}</h3>
+                <h3 className="font-display mt-2 text-xl font-semibold">
+                  {job.title}
+                </h3>
                 <p className="mt-2 text-sm text-ink-soft">{job.story}</p>
               </li>
             ))}
@@ -212,14 +251,13 @@ export default function HomePage() {
 
       <section className="section-pad mx-auto max-w-6xl">
         <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-          Before you book
+          Most common questions
         </h2>
         <p className="mt-3 max-w-lg text-ink-soft">
-          Short answers. The rest lives on the{" "}
           <Link href="/faq" className="font-semibold text-fresh-deep underline">
-            FAQ
-          </Link>
-          .
+            Read more
+          </Link>{" "}
+          on the full FAQ.
         </p>
         <div className="mt-6 max-w-3xl">
           <FaqList items={HOME_FAQS} />
@@ -241,7 +279,7 @@ export default function HomePage() {
                 Live calendar · 7 days · AM/PM · Greater Brisbane
               </p>
               <Link href="/book" className="btn btn-accent mt-5">
-                Open calendar
+                Book a time
               </Link>
             </div>
           </div>

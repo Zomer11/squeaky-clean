@@ -125,7 +125,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
       },
       {
         q: "What’s your refund or satisfaction policy?",
-        a: "There’s usually nothing to refund because you pay when we finish. If something we did is obviously unfinished or marked, say so before we leave or the same day — we’ll come back and fix our work. We don’t refund for swirl that was already in the paint, or weather after we leave. If we’ve started and you stop us, we may charge for time and product already used.",
+        a: "There’s usually nothing to refund because you pay when we finish. Spot anything missed, or a mark we left? Tell us as soon as you can — ideally before we leave — and we’ll come back and fix it, free. We can’t fix swirl that was already in the paint, or weather that hits after we’ve gone. If we’ve started and you stop us, we may charge for time and product already used.",
       },
     ],
   },
@@ -135,18 +135,18 @@ export const FAQ_SECTIONS: FaqSection[] = [
     items: [
       {
         q: "Are you insured?",
-        a: "Yes. One operator, insured for driveway work. If you need the certificate in writing, ask.",
+        a: "Ask if you need cover details in writing — we’ll share what’s current. Don’t take a homepage line as a certificate.",
       },
       {
         q: "Do you offer a satisfaction guarantee?",
-        a: "We fix our work. That’s the guarantee. Say so before we leave or the same day and we come back. It isn’t a blank cheque for old swirl, a car that wasn’t as described, or rain after we’ve packed up.",
+        a: "We fix our work. That’s the guarantee. Tell us as soon as you can — ideally before we leave — and we come back. It isn’t a blank cheque for old swirl, a car that wasn’t as described, or rain after we’ve packed up.",
       },
       {
         q: "Can I see before and after photos?",
         a: "The homepage has a before → after of the work, and typical jobs are written up so you can see how a visit usually goes. Named customer photos go up once we have permission to use them. Google reviews (when the Business Profile is live) sit on the homepage — we only paste real quotes, we don’t invent ratings.",
       },
       {
-        q: "Where does the ten percent go?",
+        q: "Where does the 10% donation go?",
         a: "Ten percent of what we take goes towards Palestine, Sudan and Lebanon. It comes out of the job, not as an extra on your bill. We haven’t named a specific charity on this site yet — if you need the recipient in writing, ask.",
       },
     ],
@@ -172,23 +172,23 @@ export const HOME_FAQS: FaqItem[] = [
 
 export const PACKAGE_FAQS: FaqItem[] = [
   {
-    q: "What’s the difference between Good, Better and Best?",
-    a: "The Essentials (Good) is a proper inside-and-out clean. The Full Detail (Better) adds iron decon, ceramic spray, leather, and shampoo. The Full Treatment (Best) adds clay, water spots, stain and odour work. Times are 1–1.5 hrs, 2.5–3.5 hrs, and 4–5 hrs.",
+    q: "Good, Better or Best — what’s the difference?",
+    a: "Good (The Essentials): a proper clean, inside and out. 1–1.5 hrs. Better (The Full Detail): adds brake-dust removal (iron decon), a ceramic spray, leather care and a shampoo. 2.5–3.5 hrs. Best (The Full Treatment): adds a clay treatment, water-spot removal, plus stain and odour work. 4–5 hrs.",
   },
   {
-    q: "Can I just book exterior or interior?",
-    a: "Yes. Exterior Basic or Premium, Interior Basic or Premium — that’s one side only. The inside + outside bundle is cheaper than stacking both sides as separate jobs.",
+    q: "Can I book just the inside or outside?",
+    a: "Yep — Exterior or Interior, Basic or Premium. Doing both? The inside + out bundle costs less than booking them separately.",
   },
   {
     q: "What’s the maintenance plan?",
-    a: "A standing slot: quick exterior wash, tyre shine, interior vacuum and wipe, windows. Weekly, fortnightly or monthly. It’s not a discount on a Full Treatment — it’s a lighter visit to keep a detail from sliding.",
+    a: "A quick, regular top-up after a full detail — exterior wash, tyre shine, vacuum, wipe-down and windows. Weekly, fortnightly or monthly. It keeps your car fresh; it’s not a full detail.",
   },
   {
-    q: "Can I knock something out of a package for a discount?",
-    a: "No. The packages are built to fit a morning or afternoon window. If we skip a step we don’t refund it — we spend that time on the rest of the car.",
+    q: "Can I skip a step to pay less?",
+    a: "Sorry, no — each package is timed to fit a morning or arvo slot. Skip a step and we’ll put that time into the rest of your car instead.",
   },
   {
-    q: "Why do larger cars cost more?",
-    a: "More glass, more wheels, more carpet. Same work, bigger object. Small / medium / large is on the size guide.",
+    q: "Why do bigger cars cost more?",
+    a: "More paint, glass, wheels and carpet = more time. Same standard, bigger car.",
   },
 ];

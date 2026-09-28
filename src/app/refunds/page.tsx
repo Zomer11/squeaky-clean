@@ -4,7 +4,7 @@ import { BUSINESS } from "@/lib/constants";
 import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
-  title: "Refunds & cancellations",
+  title: "Cancellations & refunds",
   description:
     "Cancel a Squeaky Solutions booking for free until 6pm the day before. Pay on the day, so there is usually nothing to refund.",
   path: "/refunds",
@@ -12,46 +12,44 @@ export const metadata = pageMeta({
 
 export default function RefundsPage() {
   return (
-    <LegalPage title="Refunds & cancellations" path="/refunds">
+    <LegalPage title="Cancellations & refunds" path="/refunds">
       <p>
-        {BUSINESS.name} is paid on the day — cash or card when we finish. We
-        don’t take a deposit or an online payment, so there is usually nothing
-        to refund.
+        You pay on the day, once we’re done — cash or card. No deposit, nothing
+        upfront, so there’s usually nothing to refund.
       </p>
-      <h2>Cancelling a booking</h2>
+      <h2>Need to cancel?</h2>
       <p>
-        Cancel for free if you tell us by <strong>6pm the day before</strong>{" "}
-        the job (Brisbane time). Call{" "}
+        Cancel free up to <strong>6pm the day before</strong> (Brisbane time).
+        Call{" "}
         <a href={`tel:${BUSINESS.phone.replace(/\s/g, "")}`}>{BUSINESS.phone}</a>{" "}
         or email{" "}
         <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a>, or use the{" "}
         <Link href="/contact">contact form</Link>.
       </p>
       <p>
-        After 6pm the day before, or if nobody is home / the car isn’t there
-        (a no-show), we release the slot. We don’t charge a cancellation fee
-        because you haven’t paid yet. We just won’t hold that window.
+        Cancelling later, or the car’s not there when we arrive? No fee — we’ll
+        just give your slot to someone else.
       </p>
-      <h2>When we have to move the job</h2>
+      <h2>If we need to reschedule</h2>
       <p>
-        Storms, unsafe access, a blocked drive, a locked gate with no code, or
-        a dog we can’t work around — we reschedule. That’s not a cancellation
-        on you.
+        Storms, unsafe access, a blocked driveway, a locked gate with no code,
+        or a dog we can’t work around — we’ll move your booking. No charge, no
+        penalty.
       </p>
-      <h2>If we started and you stop us</h2>
+      <h2>If you stop us mid-job</h2>
       <p>
-        If we’ve already started washing and you ask us to stop, we may charge
-        for the time and product already used. We’ll tell you before we leave.
+        If you ask us to stop partway through, we may charge for the time and
+        product used — and we’ll tell you the amount before we leave.
       </p>
-      <h2>If we got it wrong</h2>
+      <h2>Not happy with something?</h2>
       <p>
-        If something we did is obviously unfinished or marked, say so before we
-        leave or the same day. We’ll come back and fix our work. We don’t
-        refund for swirl that was already in the paint, or for weather that
-        hits the car after we leave.
+        Spot anything missed, or a mark we left? Tell us as soon as you can —
+        ideally before we leave — and we’ll come back and fix it, free. We can’t
+        fix swirl marks that were already in the paint, or weather that hits
+        after we’ve gone.
       </p>
       <p>
-        Booking rules sit in the <Link href="/terms">terms</Link>.
+        Full booking rules are in our <Link href="/terms">Terms</Link>.
       </p>
     </LegalPage>
   );

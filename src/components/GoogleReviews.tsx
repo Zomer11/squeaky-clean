@@ -77,7 +77,8 @@ export function GoogleReviews({ variant = "section" }: Props) {
             <p className="mt-3 text-sm font-semibold text-ink">
               <Stars rating={BUSINESS.googleRating} />{" "}
               {BUSINESS.googleRating.toFixed(1)} · {BUSINESS.googleReviewCount}{" "}
-              Google review{BUSINESS.googleReviewCount === 1 ? "" : "s"}
+              Google{" "}
+              {Number(BUSINESS.googleReviewCount) === 1 ? "review" : "reviews"}
             </p>
           ) : null}
         </div>

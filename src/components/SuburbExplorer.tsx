@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { mapsDirectionsUrl, mapsSearchUrl } from "@/lib/thanks";
+import { mapsSearchUrl } from "@/lib/thanks";
 import {
   FEATURED_SUBURB_NAMES,
   REGIONS,
@@ -32,14 +32,6 @@ function SuburbTile({ s }: { s: Suburb }) {
           className="text-fresh-deep underline"
         >
           Map
-        </a>
-        <a
-          href={mapsDirectionsUrl(`${s.name} QLD ${s.postcode}`)}
-          target="_blank"
-          rel="noreferrer"
-          className="text-fresh-deep underline"
-        >
-          Directions
         </a>
       </span>
     </li>
@@ -110,7 +102,7 @@ export function SuburbExplorer() {
       <p className="mt-3 text-sm text-ink-soft">
         {searching || open
           ? `${filtered.length} suburb${filtered.length === 1 ? "" : "s"}`
-          : `${featured.length} well-known stops · ${filtered.length} on the run`}
+          : `Showing ${featured.length} popular suburbs · ${filtered.length} covered in total`}
       </p>
       <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {shown.map((s) => (

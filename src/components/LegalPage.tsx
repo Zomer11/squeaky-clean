@@ -21,10 +21,6 @@ export function LegalPage({
       <div className="legal-prose mt-6 space-y-4 text-base leading-relaxed text-ink">
         {children}
       </div>
-      <p className="mt-10 rounded-xl bg-cream-deep px-4 py-3 text-sm text-ink-soft">
-        Starter wording for a local Brisbane service business. Not legal advice.
-        Get a lawyer or accountant to sign off before you rely on it.
-      </p>
     </div>
   );
 }

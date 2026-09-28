@@ -37,6 +37,7 @@ export function GiveBack({ tone = "on-cream" }: Props) {
         <span className="give-back-pct">{DONATION.percent}%</span>
         <span className="give-back-of">donated every job</span>
       </h2>
+      <p className="give-back-tagline">{DONATION.tagline}</p>
       <p className="give-back-lead">{DONATION.lead}</p>
     </aside>
   );

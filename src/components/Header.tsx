@@ -3,9 +3,11 @@ import { BrandMark } from "@/components/BrandMark";
 import { BUSINESS } from "@/lib/constants";
 
 const links = [
+  { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/areas", label: "Areas" },
   { href: "/jobs", label: "Jobs" },
+  { href: "/donation", label: "Give" },
   { href: "/faq", label: "FAQ" },
   { href: "/book", label: "Book" },
   { href: "/contact", label: "Contact" },

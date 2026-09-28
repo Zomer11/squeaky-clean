@@ -91,6 +91,11 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link href="/donation" className="hover:text-sun-on-ink">
+                Donation
+              </Link>
+            </li>
+            <li>
               <Link href="/faq" className="hover:text-sun-on-ink">
                 FAQ
               </Link>

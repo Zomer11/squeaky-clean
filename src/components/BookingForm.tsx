@@ -479,7 +479,7 @@ export function BookingForm({
           </h2>
           <p className="book-split-lead">Tap a size, then what’s getting done.</p>
           <fieldset className="mt-4">
-            <legend className="label">Vehicle size</legend>
+            <legend className="label">Which size is your car?</legend>
             <div className="grid gap-2 sm:grid-cols-3">
               {SIZES.map((v) => (
                 <button

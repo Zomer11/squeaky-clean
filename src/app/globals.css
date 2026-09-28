@@ -565,6 +565,33 @@ main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) .text-sun-deep {
   color: var(--ink-soft);
 }
 
+.give-back-tagline {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.give-back--ink .give-back-tagline {
+  color: var(--paper);
+}
+
+.loyalty-payoff {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      105deg,
+      color-mix(in srgb, var(--paper) 92%, transparent) 0%,
+      color-mix(in srgb, var(--paper) 78%, transparent) 55%,
+      color-mix(in srgb, var(--cream) 70%, transparent) 100%
+    ),
+    url("/media/suds-white.jpg") center / cover no-repeat;
+  box-shadow: var(--shadow);
+}
+
 .give-back--ink {
   border-color: rgba(197, 205, 212, 0.2);
   background:

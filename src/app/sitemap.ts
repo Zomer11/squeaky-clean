@@ -10,6 +10,7 @@ const PATHS = [
   "/about",
   "/faq",
   "/jobs",
+  "/donation",
   "/privacy",
   "/terms",
   "/cookies",

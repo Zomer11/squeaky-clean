@@ -23,17 +23,17 @@ export const SIZES = [
   {
     id: "small" as const,
     label: "Small",
-    blurb: "Hatchbacks and small sedans — Toyota Corolla, Mazda2.",
+    blurb: "Hatchbacks & small sedans. Think Corolla or Mazda2.",
   },
   {
     id: "medium" as const,
     label: "Medium",
-    blurb: "Mid-size sedans, wagons, small SUVs — Toyota Camry, Mazda CX-5.",
+    blurb: "Mid-size sedans, wagons & small SUVs. Think Camry or CX-5.",
   },
   {
     id: "large" as const,
     label: "Large",
-    blurb: "Large SUVs, utes, 7-seaters, vans — Toyota Prado, Ford Ranger.",
+    blurb: "Big SUVs, utes, 7-seaters & vans. Think Prado or Ranger.",
   },
 ];
 
@@ -48,7 +48,7 @@ export const PACKAGES = [
     label: "The Essentials",
     tier: "Combined",
     time: "1–1.5 hrs",
-    blurb: "A proper clean, inside and out. The one we start people on.",
+    blurb: "More than your everyday wash — a proper detail, inside and out.",
     who: "Weekly dust, a sale tidy, or the car just looks tired.",
     includes: [
       "Full exterior foam wash",
@@ -100,7 +100,8 @@ export const PACKAGES = [
     label: "The Full Treatment",
     tier: "Combined",
     time: "4–5 hrs",
-    blurb: "Everything in Better, plus decontamination and serious protection.",
+    blurb:
+      "Everything in Better, plus decontamination and serious protection. The rebirth of your ride.",
     who: "Presale, neglected daily, or you want it to feel new — not just tidy.",
     includes: [
       "Everything in The Full Detail",
@@ -295,11 +296,31 @@ export const LOYALTY = {
   paidBeforeFree: 4,
   freeOn: 5,
   freePackage: "exterior-basic" as PackageId,
-  title: "The regulars card",
-  lead: "Same idea as the café stamp card. Four paid Exterior Basics, the fifth is on us — same size car.",
+  title: "We don’t only take care of your car",
+  lead: "We take care of you too. Stick with us — every detail unlocks a new discount.",
   how: "We mark it against the phone you book with. Put “regulars card” in the notes. We confirm on the drive.",
   limit:
     "Exterior Basic only for the free one. Doesn’t stack with the maintenance plan. One card per number.",
+  punchTitle: "The regulars card",
+  punchFoot: "Fifth exterior on us · a little goes to a good cause",
+} as const;
+
+export const MAINTENANCE_COPY = {
+  kicker: "Loyalty pays off",
+  title: "First impressions last",
+  subtitle: "Keep yours sharp",
+  boxTitle: "Make an entrance. Turn heads.",
+  boxBody:
+    "First impressions last — be ready for any moment. Weekly, fortnightly or monthly top-ups so the detail doesn’t slide.",
+  readMoreHref: "/services#maintenance",
+} as const;
+
+export const DONATION = {
+  percent: 10,
+  cause: "Palestine",
+  title: "10%",
+  tagline: "Your detail, their meal.",
+  lead: "That's a donation from us — taken out of the job total, not an extra tip on your bill.",
 } as const;
 
 export const EXTRAS = [
@@ -311,13 +332,6 @@ export const EXTRAS = [
   { label: "Paint correction / machine polish", price: "Coming soon", note: "No DA polisher yet", soon: true },
   { label: "Headlight restoration", price: "Coming soon", note: "Add-on later", soon: true },
 ] as const;
-
-export const DONATION = {
-  percent: 10,
-  cause: "Palestine",
-  title: "10%",
-  lead: "That's a donation from us — taken out of the job total, not an extra tip on your bill.",
-} as const;
 
 const OLD_PACKAGE_ALIASES: Record<string, PackageId> = {
   exterior: "exterior-basic",
