@@ -36,6 +36,7 @@ export default function ServicesPage() {
         title="Our packages"
         crumbs={[{ href: "/services", label: "Packages" }]}
         width="wide"
+        scene="services"
       >
         <p className="text-sm font-bold uppercase tracking-[0.14em] text-fresh-deep">
           Best value · Best quality · Best in the business
@@ -58,7 +59,7 @@ export default function ServicesPage() {
         <div className="price-with-gift mt-12">
           <div>
             <h2 className="font-display text-3xl font-semibold">
-              Good · Better · Best
+              Good Better Best
             </h2>
             <p className="mt-2 max-w-xl text-sm font-semibold text-ink">
               Best in the industry, every time.

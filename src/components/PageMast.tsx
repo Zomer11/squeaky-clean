@@ -1,10 +1,22 @@
 import { Breadcrumbs, type Crumb } from "@/components/Breadcrumbs";
 
+export type MastScene =
+  | "book"
+  | "areas"
+  | "services"
+  | "jobs"
+  | "faq"
+  | "about"
+  | "contact"
+  | "donation";
+
 type Props = {
   title: string;
   crumbs: Crumb[];
   children?: React.ReactNode;
   width?: "narrow" | "wide";
+  /** Unique hero still for this page mast. */
+  scene?: MastScene;
 };
 
 export function PageMast({
@@ -12,9 +24,12 @@ export function PageMast({
   crumbs,
   children,
   width = "narrow",
+  scene,
 }: Props) {
   return (
-    <header className="page-mast">
+    <header
+      className={`page-mast${scene ? ` page-mast--${scene}` : ""}`}
+    >
       <div
         className={`mx-auto px-4 py-12 md:px-6 md:py-16 ${
           width === "wide" ? "max-w-6xl" : "max-w-3xl"
@@ -30,7 +45,6 @@ export function PageMast({
           </div>
         ) : null}
       </div>
-      <div className="greek-rail" aria-hidden />
     </header>
   );
 }

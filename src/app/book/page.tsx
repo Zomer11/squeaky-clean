@@ -27,7 +27,11 @@ export default async function BookPage({
   return (
     <>
       <NextAvailableStrip />
-      <PageMast title="Book a driveway detail" crumbs={[{ href: "/book", label: "Book" }]}>
+      <PageMast
+        title="Book a driveway detail"
+        crumbs={[{ href: "/book", label: "Book" }]}
+        scene="book"
+      >
         <p>
           Pick the job, then a morning or afternoon. Mobile is required — we
           text the confirmation. {BUSINESS.payNote} Free cancel until 6pm the

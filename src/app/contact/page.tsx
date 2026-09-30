@@ -15,13 +15,17 @@ export const metadata = pageMeta({
 export default function ContactPage() {
   return (
     <>
-      <PageMast title="Contact" crumbs={[{ href: "/contact", label: "Contact" }]}>
+      <PageMast
+        title="Contact"
+        crumbs={[{ href: "/contact", label: "Contact" }]}
+        scene="contact"
+      >
         <p>
           Bookings confirm on the calendar. For everything else we aim to reply
           the same day — seven days, not “business hours only”.
         </p>
       </PageMast>
-      <div className="section-pad mx-auto max-w-3xl !pt-10">
+      <div className="section-pad contact-shell mx-auto max-w-3xl !pt-10">
         <ul className="grid gap-6 border-y border-line py-6 sm:grid-cols-3 sm:gap-0">
           <li className="sm:pr-6">
             <IconMark name="phone" />
@@ -66,7 +70,7 @@ export default function ContactPage() {
             {
               href: "/faq",
               label: "FAQ",
-              blurb: "Cancel window, hose tap, suburbs.",
+              blurb: "Most common questions",
             },
           ]}
         />

@@ -50,10 +50,12 @@ export function PackageCard({ packageId }: Props) {
       ) : null}
       <div className="pkg-card-head">
         <div>
-          <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-soft">
-            {pkg.grade} · {pkg.time}
+          <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+            {pkg.grade}
+          </h2>
+          <p className="mt-1 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-soft">
+            {pkg.label} · {pkg.time}
           </p>
-          <h2 className="font-display mt-1 font-semibold">{pkg.label}</h2>
         </div>
         <p className="text-right">
           <span className="block text-[0.65rem] font-bold uppercase tracking-[0.12em] text-ink-soft">

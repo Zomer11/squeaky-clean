@@ -41,7 +41,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
       },
       {
         q: "Is there a loyalty or recurring plan?",
-        a: `Two things, and they don’t stack. Regulars card: four paid Exterior Basics, the fifth Exterior Basic is free — same size car, marked against the phone you book with. Put “regulars card” in the notes. Maintenance plan: a standing weekly, fortnightly or monthly slot (from $${from.plan} fortnightly, small) so a detail doesn’t slide. It’s a lighter visit, not a discount on a Full Treatment.`,
+        a: `Two things, and they don’t stack. Loyalty card: stamp 2 is 20% off Exterior Basic, stamp 4 is 50% off — same size car, stamped against your member phone. Put “loyalty card” in the notes. Register as a member (free for now) so we can track it. Maintenance plan: a standing weekly, fortnightly or monthly slot (from $${from.plan} fortnightly, small) so a detail doesn’t slide. It’s a lighter visit, not a discount on a Full Treatment.`,
       },
     ],
   },

@@ -17,9 +17,10 @@ export default function JobsPage() {
   return (
     <>
       <PageMast
-        title="Typical jobs, not testimonials"
+        title="Typical jobs, and testimonials"
         crumbs={[{ href: "/jobs", label: "Typical jobs" }]}
         width="wide"
+        scene="jobs"
       >
         <p>
           These are composite Sunday-style jobs so you can see the work — not
@@ -27,6 +28,7 @@ export default function JobsPage() {
           have permission to use them.
         </p>
       </PageMast>
+      <div className="page-ink-band">
       <div className="section-pad mx-auto max-w-6xl !pt-10">
         <div className="grid gap-8 lg:grid-cols-3">
           {TYPICAL_JOBS.map((job) => (
@@ -69,6 +71,7 @@ export default function JobsPage() {
             },
           ]}
         />
+      </div>
       </div>
     </>
   );

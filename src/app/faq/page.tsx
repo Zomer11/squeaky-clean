@@ -20,6 +20,7 @@ export default function FaqPage() {
       <PageMast
         title="Questions before you book"
         crumbs={[{ href: "/faq", label: "FAQ" }]}
+        scene="faq"
       >
         <p>
           Packages, booking, the driveway, pay, and whether we’re insured. If

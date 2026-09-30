@@ -7,7 +7,7 @@ const links = [
   { href: "/services", label: "Services" },
   { href: "/areas", label: "Areas" },
   { href: "/jobs", label: "Jobs" },
-  { href: "/donation", label: "Give" },
+  { href: "/donation", label: "Donations" },
   { href: "/faq", label: "FAQ" },
   { href: "/book", label: "Book" },
   { href: "/contact", label: "Contact" },
@@ -69,7 +69,6 @@ export function Header() {
           </Link>
         ))}
       </nav>
-      <div className="greek-rail" aria-hidden />
     </header>
   );
 }

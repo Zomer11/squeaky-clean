@@ -16,6 +16,7 @@ export default function AboutPage() {
       <PageMast
         title="It started with more than cars"
         crumbs={[{ href: "/about", label: "Our Story" }]}
+        scene="about"
       >
         <p>
           Three people, a shared passion for cars, and a belief that a small

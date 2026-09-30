@@ -14,6 +14,14 @@ export const metadata = pageMeta({
   path: "/areas",
 });
 
+const REGION_LABELS: Record<(typeof REGIONS)[number], string> = {
+  "Inner Brisbane": "Inner Brisbane",
+  Northside: "North side",
+  Southside: "South side",
+  East: "East side",
+  West: "West side",
+};
+
 const REGION_QUERIES: Record<(typeof REGIONS)[number], string> = {
   "Inner Brisbane": "Inner Brisbane QLD",
   Northside: "Northside Brisbane QLD",
@@ -37,6 +45,7 @@ export default function AreasPage() {
         title="Areas we cover"
         crumbs={[{ href: "/areas", label: "Areas" }]}
         width="wide"
+        scene="areas"
       >
         <p>
           Suburb on the list? <Link href="/book">Book online</Link>. Not on it?
@@ -70,7 +79,7 @@ export default function AreasPage() {
             </li>
             {REGIONS.map((region) => (
               <li key={region} className="card p-4">
-                <p className="font-semibold">{region}</p>
+                <p className="font-semibold">{REGION_LABELS[region]}</p>
                 <p className="mt-1 text-sm text-ink-soft">
                   {REGION_BLURBS[region]}
                 </p>

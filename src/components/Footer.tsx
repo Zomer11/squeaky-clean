@@ -8,7 +8,6 @@ import { isPublishedAbn } from "@/lib/site";
 export function Footer() {
   return (
     <footer className="mt-auto bg-ink text-paper">
-      <div className="greek-rail" aria-hidden />
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:px-6">
         <div>
           <div className="flex items-center gap-3">
@@ -92,7 +91,7 @@ export function Footer() {
             </li>
             <li>
               <Link href="/donation" className="hover:text-sun-on-ink">
-                Donation
+                Donations
               </Link>
             </li>
             <li>

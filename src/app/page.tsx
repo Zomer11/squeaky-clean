@@ -12,7 +12,6 @@ import { RegularsOffer } from "@/components/RegularsOffer";
 import {
   BUSINESS,
   COMBINED_PACKAGES,
-  MAINTENANCE_COPY,
   estimatePrice,
 } from "@/lib/constants";
 import { HOME_FAQS } from "@/lib/faq";
@@ -95,7 +94,7 @@ export default function HomePage() {
       <section className="packages-band">
         <div className="section-pad mx-auto max-w-6xl">
           <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-            Good · Better · Best
+            Good Better Best
           </h2>
           <p className="mt-2 text-lg font-semibold text-ink">
             Best in the industry, every time.
@@ -144,30 +143,8 @@ export default function HomePage() {
 
       <RegularsOffer />
 
-      <section className="section-pad mx-auto max-w-6xl !pt-0">
-        <div className="loyalty-payoff rounded-3xl border border-line bg-paper/80 p-6 md:p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-fresh-deep">
-            {MAINTENANCE_COPY.kicker}
-          </p>
-          <h2 className="font-display mt-2 text-3xl font-semibold sm:text-4xl">
-            {MAINTENANCE_COPY.title}
-          </h2>
-          <p className="mt-1 text-lg text-ink-soft">
-            {MAINTENANCE_COPY.subtitle}
-          </p>
-          <p className="mt-4 max-w-xl text-sm text-ink-soft">
-            {MAINTENANCE_COPY.boxBody}
-          </p>
-          <Link
-            href={MAINTENANCE_COPY.readMoreHref}
-            className="mt-5 inline-flex font-semibold text-fresh-deep underline"
-          >
-            Read more
-          </Link>
-        </div>
-      </section>
-
-      <section className="section-pad mx-auto max-w-6xl !pt-0">
+      <div className="home-ink-band">
+      <section className="section-pad mx-auto max-w-6xl">
         <AnimateIn>
           <h2 className="font-display text-3xl font-semibold sm:text-4xl">
             How a booking works
@@ -285,6 +262,7 @@ export default function HomePage() {
           </div>
         </AnimateIn>
       </section>
+      </div>
     </>
   );
 }

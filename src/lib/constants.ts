@@ -227,7 +227,7 @@ export const PACKAGES = [
     ],
     notIncluded: [
       "Clay / iron / shampoo (book a detail)",
-      "Doesn’t stack with the regulars card",
+      "Doesn’t stack with the loyalty card",
       "One-off visits — pick a bundle or one side only",
     ],
     prices: { small: 60, medium: 70, large: 85 },
@@ -291,28 +291,43 @@ export const MAINTENANCE_PRICES: Record<
   monthly: { small: 75, medium: 90, large: 105 },
 };
 
-/** Punch-card offer. Ahmad marks it against the booking phone — no app. */
+/** Punch-card offer. Member phone on the booking — no app yet. */
 export const LOYALTY = {
-  paidBeforeFree: 4,
-  freeOn: 5,
-  freePackage: "exterior-basic" as PackageId,
+  stampCount: 4,
+  /** stamp number → percent off Exterior Basic */
+  discounts: { 2: 20, 4: 50 } as Record<number, number>,
+  discountPackage: "exterior-basic" as PackageId,
+  kicker: "Loyalty Card",
   title: "We don’t only take care of your car",
-  lead: "We take care of you too. Stick with us — every detail unlocks a new discount.",
-  how: "We mark it against the phone you book with. Put “regulars card” in the notes. We confirm on the drive.",
+  leadLines: [
+    "We take care of you too.",
+    "stick with us, and it shows",
+    "Every detail unlocks a new discount.",
+  ] as const,
+  how: "We stamp against the phone you registered with. Put “loyalty card” in the notes. We confirm on the drive.",
+  offerTitle: "Second wash 20% · fourth wash 50%",
+  offerBody:
+    "Exterior Basic discounts on the card. Same size car. One card per member.",
+  punchTitle: "Loyalty Card",
+  punchFoot: "Goes to a good cause",
+  punchCause: "Part of every stamped wash helps fund meals where it matters.",
+  memberTitle: "Join our family",
+  memberLead:
+    "Become a member for free so its easier to stamp and once were big we can charge like 5 dollars a month per member",
+  memberCta: "Register as a member",
   limit:
-    "Exterior Basic only for the free one. Doesn’t stack with the maintenance plan. One card per number.",
-  punchTitle: "The regulars card",
-  punchFoot: "Fifth exterior on us · a little goes to a good cause",
+    "Discounts are Exterior Basic only. Doesn’t stack with the maintenance plan. One card per member.",
 } as const;
 
 export const MAINTENANCE_COPY = {
   kicker: "Loyalty pays off",
-  title: "First impressions last",
-  subtitle: "Keep yours sharp",
-  boxTitle: "Make an entrance. Turn heads.",
+  title: "Maximise your value",
+  subtitle: "Weekly, fortnightly or monthly",
+  boxTitle: "Maximise your value",
   boxBody:
-    "First impressions last — be ready for any moment. Weekly, fortnightly or monthly top-ups so the detail doesn’t slide.",
+    "Maximise ur value through our getting continuous discounts on a weekly, fortnightly or monthly basis",
   readMoreHref: "/services#maintenance",
+  readMoreLabel: "Read more",
 } as const;
 
 export const DONATION = {

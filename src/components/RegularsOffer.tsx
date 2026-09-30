@@ -1,8 +1,19 @@
 import Link from "next/link";
-import { MiniWreath } from "@/components/LaurelField";
+import { BrandMark } from "@/components/BrandMark";
 import { BUSINESS, LOYALTY, MAINTENANCE_COPY } from "@/lib/constants";
 
-const STAMPS = Array.from({ length: LOYALTY.freeOn }, (_, i) => i + 1);
+const STAMPS = Array.from({ length: LOYALTY.stampCount }, (_, i) => i + 1);
+
+function stampLabel(n: number) {
+  const pct = LOYALTY.discounts[n];
+  return pct ? `${pct}%` : String(n);
+}
+
+function stampClass(n: number) {
+  if (LOYALTY.discounts[n] === 50) return "punch-pip is-deal is-deal-big";
+  if (LOYALTY.discounts[n]) return "punch-pip is-deal";
+  return "punch-pip";
+}
 
 type Props = {
   compact?: boolean;
@@ -12,59 +23,81 @@ export function RegularsOffer({ compact = false }: Props) {
   return (
     <section
       id="regulars"
-      className={compact ? "mt-16" : "section-pad mx-auto max-w-6xl"}
+      className={compact ? "regulars-section regulars-section--compact" : "regulars-section"}
     >
-      <div className="regulars-board">
+      <div className={compact ? "regulars-board" : "regulars-board section-pad mx-auto max-w-6xl"}>
         <div className="regulars-copy">
+          <p className="regulars-kicker">{LOYALTY.kicker}</p>
           <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             {LOYALTY.title}
           </h2>
-          <p className="mt-3 max-w-md text-paper/88">{LOYALTY.lead}</p>
-          <p className="mt-3 max-w-md text-sm text-sun-on-ink">{LOYALTY.how}</p>
+          <div className="regulars-lead">
+            {LOYALTY.leadLines.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
+          <p className="regulars-how">{LOYALTY.how}</p>
+
           <ul className="regulars-offers">
             <li>
-              <strong>Fifth Exterior Basic free</strong>
-              <span>After four paid washes. Same vehicle size.</span>
-            </li>
-            <li>
-              <strong>{MAINTENANCE_COPY.kicker}</strong>
-              <span>
-                Weekly, fortnightly or monthly — continuous value without the
-                full-detail price each time.
-              </span>
+              <strong>{LOYALTY.offerTitle}</strong>
+              <span>{LOYALTY.offerBody}</span>
             </li>
           </ul>
-          <p className="mt-4 max-w-md text-xs text-paper/65">{LOYALTY.limit}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/book" className="btn btn-accent">
-              Book a visit
-            </Link>
+
+          <div className="regulars-plan">
+            <p className="regulars-plan-kicker">{MAINTENANCE_COPY.kicker}</p>
+            <h3 className="font-display text-xl font-semibold sm:text-2xl">
+              {MAINTENANCE_COPY.title}
+            </h3>
+            <p className="regulars-body">{MAINTENANCE_COPY.boxBody}</p>
             <Link
               href={MAINTENANCE_COPY.readMoreHref}
-              className="btn btn-ghost"
+              className="regulars-link"
             >
-              Read more
+              {MAINTENANCE_COPY.readMoreLabel}
             </Link>
+          </div>
+
+          <div className="regulars-join">
+            <h3 className="font-display text-xl font-semibold sm:text-2xl">
+              {LOYALTY.memberTitle}
+            </h3>
+            <p className="regulars-body">{LOYALTY.memberLead}</p>
+            <p className="regulars-limit">{LOYALTY.limit}</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href="/contact" className="btn btn-accent">
+                {LOYALTY.memberCta}
+              </Link>
+              <Link href="/book" className="btn btn-ghost">
+                Book a visit
+              </Link>
+            </div>
           </div>
         </div>
 
         <div className="punch-card" aria-hidden>
-          <MiniWreath className="punch-laurel" />
+          <div className="punch-card-shine" />
+          <BrandMark size={52} className="punch-logo" />
           <p className="punch-brand">{BUSINESS.name}</p>
           <p className="punch-sub">{LOYALTY.punchTitle}</p>
+          <p className="punch-member">Member · free to join</p>
+
           <ol className="punch-row">
             {STAMPS.map((n) => (
-              <li
-                key={n}
-                className={
-                  n === LOYALTY.freeOn ? "punch-pip is-free" : "punch-pip"
-                }
-              >
-                {n === LOYALTY.freeOn ? "Free" : n}
+              <li key={n} className={stampClass(n)}>
+                <span className="punch-pip-num">{stampLabel(n)}</span>
+                <span className="punch-pip-cap">
+                  {LOYALTY.discounts[n] ? "off" : "wash"}
+                </span>
               </li>
             ))}
           </ol>
-          <p className="punch-foot">{LOYALTY.punchFoot}</p>
+
+          <div className="punch-cause">
+            <p className="punch-foot">{LOYALTY.punchFoot}</p>
+            <p className="punch-cause-note">{LOYALTY.punchCause}</p>
+          </div>
         </div>
       </div>
     </section>
