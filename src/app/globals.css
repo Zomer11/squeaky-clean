@@ -92,10 +92,10 @@ h3 {
 
 body {
   position: relative;
-  /* Same gold as the loyalty screenshot page field */
-  background-color: #b5905b;
-  background-image: none;
-  color: var(--ink);
+  background:
+    radial-gradient(90% 56% at 100% 0%, rgba(181, 144, 91, 0.1), transparent 58%),
+    #0e0c0a;
+  color: var(--paper);
   font-family: var(--font-body), system-ui, sans-serif;
   min-height: 100%;
 }
@@ -633,11 +633,11 @@ main :is(.card, [class*="bg-paper"], [class*="bg-cream"]) .text-sun-deep {
   background:
     linear-gradient(
       105deg,
-      color-mix(in srgb, var(--paper) 92%, transparent) 0%,
-      color-mix(in srgb, var(--paper) 78%, transparent) 55%,
-      color-mix(in srgb, var(--cream) 70%, transparent) 100%
-    ),
-    url("/media/suds-white.jpg") center / cover no-repeat;
+      rgba(14, 12, 10, 0.94) 0%,
+      rgba(14, 12, 10, 0.78) 52%,
+      rgba(14, 12, 10, 0.28) 100%
+      ),
+      url("https://images.unsplash.com/photo-1754296577179-0e14f78a1262?auto=format&fit=crop&fm=jpg&q=85&w=1800") center / cover no-repeat;
   box-shadow: var(--shadow);
 }
 
@@ -2599,4 +2599,577 @@ main .card .btn-primary:hover {
 
 .pkg-card--best img {
   object-position: 18% 72%;
+}
+
+/* ---- Photo mast per page ---- */
+.page-mast::before {
+  background-image: var(--mast-photo, url("/media/suds-grey.jpg"));
+  background-position: var(--mast-pos, center 48%);
+  inset: 0;
+  animation: none;
+  transform: none;
+}
+
+/* Keep every page on the dark site field while preserving light content cards. */
+main {
+  color: var(--paper);
+}
+
+main .text-ink {
+  color: var(--paper);
+}
+
+main .text-ink-soft {
+  color: rgba(244, 239, 228, 0.8);
+}
+
+main .text-fresh-deep,
+main .text-sun-deep {
+  color: var(--sun-on-ink);
+}
+
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"], .give-back) {
+  color: var(--ink);
+}
+
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"], .give-back) .text-ink {
+  color: var(--ink);
+}
+
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"], .give-back) .text-ink-soft {
+  color: var(--ink-soft);
+}
+
+main :is(.card, [class*="bg-paper"], [class*="bg-cream"], .give-back) :is(.text-fresh-deep, .text-sun-deep) {
+  color: var(--fresh-deep);
+}
+
+.services-content {
+  position: relative;
+  width: 100%;
+  max-width: none !important;
+  padding: 0 !important;
+  isolation: isolate;
+}
+
+.services-showcase {
+  background:
+    linear-gradient(180deg, rgba(14, 12, 10, 0.76) 0%, rgba(14, 12, 10, 0.9) 72%, rgba(14, 12, 10, 0.96) 100%),
+    url("/media/services/yellow-lines.jpg") center top / cover no-repeat;
+  padding-bottom: 3rem;
+}
+
+.services-showcase > :not(.price-with-gift),
+.services-content > :not(.services-showcase) {
+  width: min(100% - 2rem, 72rem);
+  margin-inline: auto;
+}
+
+.services-content .service-package-intro {
+  align-self: stretch;
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+.services-content .price-with-gift {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-top: 0;
+  margin-left: 0;
+  padding: 3rem max(1rem, calc((100vw - 72rem) / 2));
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.services-content .price-with-gift > * {
+  position: relative;
+  z-index: 1;
+}
+
+.services-content .service-package-promises {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(224, 200, 150, 0.3);
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sun-on-ink);
+  text-align: center;
+}
+
+.services-content .service-package-intro > :is(p, .give-back) {
+  margin-inline: auto;
+}
+
+.services-content .service-package-intro .give-back {
+  width: min(100%, 58rem);
+  margin-top: 2rem;
+  padding: 1.15rem 1.3rem 1.2rem;
+  text-align: left;
+  border-radius: 0.85rem;
+}
+
+.services-content .service-package-intro .give-back-flags {
+  margin-top: 0.55rem;
+}
+
+.services-content .service-package-intro .give-back-causes {
+  margin-top: 0.45rem;
+}
+
+.services-content .service-package-intro .give-back-title {
+  gap: 0.2rem;
+  margin-top: 0.8rem;
+  padding-top: 0.75rem;
+}
+
+.services-content .service-package-intro .give-back-pct {
+  font-size: clamp(3.1rem, 6vw, 4rem);
+}
+
+.services-content .service-package-intro .give-back-tagline {
+  margin-top: 0.65rem;
+}
+
+.services-content .service-package-intro .give-back-lead {
+  margin-top: 0.35rem;
+}
+
+@media (min-width: 640px) {
+  .services-content .service-package-intro .give-back {
+    display: grid;
+    grid-template-columns: minmax(11rem, 0.7fr) minmax(0, 1.3fr);
+    column-gap: 2rem;
+    align-items: center;
+    text-align: left;
+  }
+
+  .services-content .service-package-intro .give-back-tag,
+  .services-content .service-package-intro .give-back-flags,
+  .services-content .service-package-intro .give-back-causes {
+    grid-column: 1;
+  }
+
+  .services-content .service-package-intro .give-back-title {
+    display: flex;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    gap: 0.65rem;
+    align-items: baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .services-content .service-package-intro .give-back-pct {
+    font-size: clamp(2.7rem, 4.5vw, 3.55rem);
+  }
+
+  .services-content .service-package-intro .give-back-of {
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+  }
+
+  .services-content .service-package-intro .give-back-tagline,
+  .services-content .service-package-intro .give-back-lead {
+    grid-column: 2;
+    max-width: none;
+  }
+}
+
+.jobs-mast-lead {
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+@media (min-width: 768px) {
+  .services-content .price-with-gift {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    align-items: stretch;
+    padding: 2.75rem 3rem;
+  }
+
+  .services-content .service-package-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+  }
+}
+
+.maintenance-feature {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.maintenance-feature-intro {
+  max-width: 60rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* Keep the shared loyalty panel identical to its Home-page treatment. */
+.maintenance-feature-intro.loyalty-payoff {
+  text-align: left;
+}
+
+.maintenance-feature-intro > div {
+  text-align: left;
+}
+
+.maintenance-plan-card {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .maintenance-plan-card .pkg-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(22rem, 0.9fr);
+    grid-template-rows: auto auto auto auto;
+    align-items: start;
+    column-gap: 2rem;
+    padding: 1.75rem;
+  }
+
+  .maintenance-plan-card .pkg-card-head {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .maintenance-plan-card .pkg-card-blurb {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 0;
+    padding: 1.25rem 0 0;
+  }
+
+  .maintenance-plan-card .pkg-card-who {
+    grid-column: 1;
+    grid-row: 3;
+    min-height: 0;
+    padding: 1rem 0 0;
+  }
+
+  .maintenance-plan-card .pkg-card > div:nth-of-type(2) {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    align-self: center;
+    padding: 0;
+  }
+
+  .maintenance-plan-card .pkg-card > div:nth-of-type(3) {
+    grid-column: 1;
+    grid-row: 4;
+    margin-top: 1.75rem;
+    padding: 0;
+  }
+
+  .maintenance-plan-card .pkg-card > div:nth-of-type(4) {
+    grid-column: 2;
+    grid-row: 4;
+    align-self: end;
+    padding: 0;
+  }
+}
+
+.pkg-card-head {
+  min-height: 6.8rem;
+}
+
+.pkg-card-head h2 {
+  font-size: 1.9rem;
+}
+
+.pkg-card-blurb {
+  min-height: 3.6rem;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.pkg-card-who {
+  min-height: 2.9rem;
+  font-size: 0.82rem;
+}
+
+.pkg-sizes li {
+  font-size: 0.85rem;
+}
+
+.pkg-sizes strong {
+  font-size: 1.05rem;
+}
+
+.page-mast .mast-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sun-on-ink);
+}
+
+.page-mast .mast-kicker::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+}
+
+/* ---- Film grain: kills the flat-vector look ---- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fresh-deep);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+}
+
+/* ---- Craft mosaic ---- */
+.craft-band {
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(138, 98, 48, 0.1), transparent 60%),
+    var(--cream-deep);
+  border-bottom: 1px solid var(--line);
+}
+
+.craft-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+}
+
+.craft-grid {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 2.25rem;
+  list-style: none;
+  padding: 0;
+}
+
+@media (min-width: 48rem) {
+  .craft-grid {
+    grid-template-columns: 1.35fr 1fr 1fr;
+    grid-template-rows: 15rem 15rem;
+  }
+  .craft-tile--1 { grid-row: span 2; }
+  .craft-tile--4 { grid-column: span 2; }
+}
+
+.craft-tile,
+.craft-tile > li {
+  position: relative;
+  height: 100%;
+}
+
+.craft-tile > li {
+  min-height: 15rem;
+  overflow: hidden;
+  border-radius: calc(var(--radius) * 1.2);
+  box-shadow: var(--shadow);
+  isolation: isolate;
+}
+
+.craft-tile img {
+  transition: transform 1.2s var(--ease-lux);
+}
+
+.craft-tile > li:hover img {
+  transform: scale(1.05);
+}
+
+.craft-tile > li::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(185deg, transparent 30%, rgba(18, 21, 26, 0.86) 100%);
+}
+
+.craft-copy {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+  padding: 1.25rem 1.35rem;
+  color: var(--paper);
+}
+
+.craft-copy p {
+  margin-top: 0.3rem;
+  max-width: 26rem;
+  font-size: 0.875rem;
+  color: rgba(244, 239, 228, 0.78);
+}
+
+.craft-num {
+  display: inline-block;
+  margin-bottom: 0.4rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid rgba(212, 180, 131, 0.55);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--sun-on-ink);
+  backdrop-filter: blur(6px);
+}
+
+.photo-credit {
+  margin-top: 0.9rem;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+}
+
+.photo-credit a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---- How it works split ---- */
+.how-split {
+  display: grid;
+  gap: 1.5rem;
+  align-items: end;
+}
+
+@media (min-width: 48rem) {
+  .how-split {
+    grid-template-columns: 1fr 26rem;
+  }
+}
+
+.how-photo {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: calc(var(--radius) * 1.2);
+  box-shadow: var(--shadow);
+}
+
+.how-photo figcaption {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 1;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(18, 21, 26, 0.72);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--paper);
+  backdrop-filter: blur(6px);
+}
+
+/* ---- Job cards ---- */
+.job-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) * 1.2);
+  background: var(--paper);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, var(--shadow);
+  transition: transform var(--dur-micro) var(--ease-lux);
+}
+
+.job-card:hover {
+  transform: translateY(-4px);
+}
+
+.job-card-photo {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+
+.job-card-pin {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: var(--paper);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fresh-deep);
+}
+
+.job-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.job-card-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--line);
+  font-size: 0.78rem;
+}
+
+.job-card-body p + .job-card-meta {
+  margin-top: 1rem;
+}
+
+.job-card-meta dt {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.job-card-meta dd {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .craft-tile img,
+  .job-card {
+    transition: none;
+  }
+}
+.faq-summary::-webkit-details-marker {
+  display: none;
 }

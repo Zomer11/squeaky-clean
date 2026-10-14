@@ -43,6 +43,9 @@ export default function AreasPage() {
     <>
       <PageMast
         title="Areas we cover"
+        kicker="Greater Brisbane · mobile"
+        photo="/media/masts/areas.jpg"
+        photoPos="center 55%"
         crumbs={[{ href: "/areas", label: "Areas" }]}
         width="wide"
         scene="areas"

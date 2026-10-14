@@ -17,15 +17,16 @@ export default function JobsPage() {
   return (
     <>
       <PageMast
-        title="Typical jobs, and testimonials"
+        title="Proof of our work"
+         kicker="Driveway write-ups"
+         photo="/media/masts/jobs.jpg"
+         photoPos="center 50%"
         crumbs={[{ href: "/jobs", label: "Typical jobs" }]}
         width="wide"
         scene="jobs"
       >
-        <p>
-          These are composite Sunday-style jobs so you can see the work — not
-          named customers, not star ratings. Real phone photos go here once we
-          have permission to use them.
+        <p className="jobs-mast-lead">
+          See the difference. Skip the doubt.
         </p>
       </PageMast>
       <div className="page-ink-band">

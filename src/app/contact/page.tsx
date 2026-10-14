@@ -19,6 +19,9 @@ export default function ContactPage() {
         title="Contact"
         crumbs={[{ href: "/contact", label: "Contact" }]}
         scene="contact"
+         kicker="Same-day replies"
+         photo="/media/masts/contact.jpg"
+         photoPos="center 40%"
       >
         <p>
           Bookings confirm on the calendar. For everything else we aim to reply

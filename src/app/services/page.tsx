@@ -34,6 +34,9 @@ export default function ServicesPage() {
     <>
       <PageMast
         title="Our packages"
+        kicker="Menu · priced by size"
+        photo="/media/masts/services.jpg"
+        photoPos="center 60%"
         crumbs={[{ href: "/services", label: "Packages" }]}
         width="wide"
         scene="services"
@@ -49,65 +52,75 @@ export default function ServicesPage() {
         <p className="mt-3 text-sm">{PRICING.priceNote}</p>
       </PageMast>
 
-      <div className="section-pad mx-auto max-w-6xl !pt-10">
-        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold uppercase tracking-[0.12em] text-fresh-deep">
-          <li>We come to you</li>
-          <li>Pay on the day</li>
-          <li>No shop drop-off</li>
-        </ul>
-
-        <div className="price-with-gift mt-12">
-          <div>
-            <h2 className="font-display text-3xl font-semibold">
-              Good Better Best
-            </h2>
-            <p className="mt-2 max-w-xl text-sm font-semibold text-ink">
-              Best in the industry, every time.
-            </p>
-            <p className="mt-2 max-w-xl text-sm text-ink-soft">
-              Inside and outside in one visit. You pick the quality.
-            </p>
+      <div className="services-content section-pad mx-auto max-w-6xl !pt-10">
+        <section className="services-showcase">
+          <div className="price-with-gift mt-10">
+            <div className="service-package-intro">
+              <h2 className="font-display text-4xl font-semibold sm:text-5xl">
+                Good Better Best
+              </h2>
+              <p className="mt-3 max-w-xl text-xl font-semibold text-ink">
+                Best in the industry, every time.
+              </p>
+              <p className="mt-2 max-w-xl text-lg text-ink-soft">
+                Inside and outside in one visit. You pick the quality.
+              </p>
+              <ul className="service-package-promises">
+                <li>We come to you</li>
+                <li>Pay on the day</li>
+                <li>Showroom finish</li>
+              </ul>
+              <GiveBack />
+            </div>
           </div>
-          <GiveBack />
-        </div>
-        <div className="mt-8 grid items-stretch gap-5 md:grid-cols-3">
-          {COMBINED_PACKAGES.map((p) => (
-            <PackageCard key={p.id} packageId={p.id} />
-          ))}
-        </div>
+          <div className="mt-8 grid items-stretch gap-5 md:grid-cols-3">
+            {COMBINED_PACKAGES.map((p) => (
+              <PackageCard key={p.id} packageId={p.id} />
+            ))}
+          </div>
 
-        <h2 className="font-display mt-16 text-3xl font-semibold">
-          Other packages we offer
-        </h2>
-        <p className="mt-2 max-w-xl text-sm text-ink-soft">
-          Just the outside, or just the inside. Not a bundle — pick the side,
-          then Basic or Premium.
-        </p>
-        <div className="mt-8 grid gap-5 lg:grid-cols-2">
-          {[...EXTERIOR_PACKAGES, ...INTERIOR_PACKAGES].map((p) => (
-            <PackageCard key={p.id} packageId={p.id} />
-          ))}
-        </div>
-
-        <div id="maintenance" className="mt-16 scroll-mt-28">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-fresh-deep">
-            {MAINTENANCE_COPY.kicker}
-          </p>
-          <h2 className="font-display mt-2 text-3xl font-semibold">
-            {MAINTENANCE_COPY.title}
+          <h2 className="font-display mt-16 text-3xl font-semibold">
+            Other packages we offer
           </h2>
-          <p className="mt-1 text-lg text-ink-soft">
-            {MAINTENANCE_COPY.subtitle}
+          <p className="mt-3 max-w-2xl text-base text-ink-soft sm:text-lg">
+            Just the outside, or just the inside. Not a bundle — pick the side,
+            then Basic or Premium.
           </p>
-          <div className="mt-6 max-w-2xl rounded-2xl border border-line bg-paper p-5">
-            <p className="font-display text-xl font-semibold">
-              {MAINTENANCE_COPY.boxTitle}
+          <div className="mt-8 grid gap-5 lg:grid-cols-2">
+            {EXTERIOR_PACKAGES.map((p) => (
+              <PackageCard key={p.id} packageId={p.id} />
+            ))}
+          </div>
+        </section>
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-2">
+          {INTERIOR_PACKAGES.map((p) => (
+            <PackageCard key={p.id} packageId={p.id} />
+          ))}
+        </div>
+
+        <section id="maintenance" className="maintenance-feature mt-16 scroll-mt-28">
+          <div className="maintenance-feature-intro loyalty-payoff rounded-3xl border border-line bg-paper/80 p-6 md:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-fresh-deep">
+              {MAINTENANCE_COPY.kicker}
             </p>
-            <p className="mt-2 text-sm text-ink-soft">
+            <h2 className="font-display mt-2 text-3xl font-semibold sm:text-4xl">
+              {MAINTENANCE_COPY.title}
+            </h2>
+            <p className="mt-1 text-lg text-ink-soft">
+              {MAINTENANCE_COPY.subtitle}
+            </p>
+            <p className="mt-4 max-w-xl text-sm text-ink-soft">
               {MAINTENANCE_COPY.boxBody}
             </p>
+            <Link
+              href={MAINTENANCE_COPY.readMoreHref}
+              className="mt-5 inline-flex font-semibold text-fresh-deep underline"
+            >
+              Read more
+            </Link>
           </div>
-          <div className="mt-8 max-w-2xl">
+          <div className="maintenance-plan-card mt-8">
             <PackageCard
               packageId={
                 PACKAGES.find((p) => p.id === "maintenance")?.id ??
@@ -115,7 +128,7 @@ export default function ServicesPage() {
               }
             />
           </div>
-        </div>
+        </section>
 
         <section className="mt-16">
           <h2 className="font-display text-3xl font-semibold">Add-ons</h2>
@@ -137,9 +150,6 @@ export default function ServicesPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-sm text-ink-soft">
-            Window tinting is a separate trade. We don’t do it.
-          </p>
         </section>
 
         <RegularsOffer compact />

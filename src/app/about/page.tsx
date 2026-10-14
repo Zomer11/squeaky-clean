@@ -15,6 +15,9 @@ export default function AboutPage() {
     <>
       <PageMast
         title="It started with more than cars"
+        kicker="Our story"
+        photo="/media/masts/about.jpg"
+        photoPos="42% 40%"
         crumbs={[{ href: "/about", label: "Our Story" }]}
         scene="about"
       >

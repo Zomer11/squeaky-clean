@@ -31,6 +31,8 @@ export default async function BookPage({
         title="Book a driveway detail"
         crumbs={[{ href: "/book", label: "Book" }]}
         scene="book"
+         kicker="Live calendar · AM / PM"
+         photo="/media/masts/book.jpg"
       >
         <p>
           Pick the job, then a morning or afternoon. Mobile is required — we

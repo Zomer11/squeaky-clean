@@ -19,6 +19,9 @@ export default function FaqPage() {
       <JsonLd data={faqJsonLd()} />
       <PageMast
         title="Questions before you book"
+        kicker="Straight answers"
+        photo="/media/masts/faq.jpg"
+        photoPos="center 50%"
         crumbs={[{ href: "/faq", label: "FAQ" }]}
         scene="faq"
       >

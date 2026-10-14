@@ -8,7 +8,7 @@ function Items({ items }: { items: FaqItem[] }) {
           key={item.q}
           className="group border-b border-line px-0 py-4 first:pt-0"
         >
-          <summary className="cursor-pointer list-none font-semibold text-ink [&::-webkit-details-marker]:hidden">
+          <summary className="faq-summary cursor-pointer list-none font-semibold text-ink">
             <span className="flex items-start justify-between gap-3">
               {item.q}
               <span

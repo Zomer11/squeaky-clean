@@ -19,6 +19,9 @@ export default function DonationPage() {
         title="Your detail, their meal."
         crumbs={[{ href: "/donation", label: "Donations" }]}
         scene="donation"
+         kicker="10% of every job"
+         photo="/media/masts/donation.jpg"
+         photoPos="center 45%"
       >
         <p>
           {DONATION.percent}% of what we take goes toward Palestine, Sudan and

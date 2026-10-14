@@ -9,6 +9,7 @@ export type TypicalJob = {
   title: string;
   story: string;
   window: string;
+  photo: string;
 };
 
 /**
@@ -26,6 +27,7 @@ export const TYPICAL_JOBS: TypicalJob[] = [
     story:
       "City runabout, pollen on the paint, crumbs in the rails. The Essentials on a Sunday morning: foam wash, wheels, vacuum, wipe-down. Car left on the drive with the tap on.",
     window: "Sunday morning",
+    photo: "/media/foam-front.jpg",
   },
   {
     id: "carindale-suv",
@@ -37,6 +39,7 @@ export const TYPICAL_JOBS: TypicalJob[] = [
     story:
       "School run dust and weekend sports film. Exterior Basic — foam wash, glass, tyre shine — then a maintenance slot so it doesn’t go grey between washes.",
     window: "Saturday afternoon",
+    photo: "/media/rim-brush.jpg",
   },
   {
     id: "wynnum-ute",
@@ -48,5 +51,6 @@ export const TYPICAL_JOBS: TypicalJob[] = [
     story:
       "Dual-cab that lives on job sites. Interior Basic: vacuum, mats, dash, inside glass. Tray stays as-is unless you ask. Notes said the dog goes inside before we start.",
     window: "Thursday morning",
+    photo: "/media/interior-steam.jpg",
   },
 ];

@@ -1,7 +1,7 @@
 export const BUSINESS = {
   name: "Squeaky Solutions",
   tagline: "Showroom finish. Brisbane driveways.",
-  phone: "0400 000 000",
+  phone: "0420 828 120",
   email: "hello@squeakysolutions.au",
   abn: "00 000 000 000",
   hours: "7 days · Morning & afternoon · Sundays too",
