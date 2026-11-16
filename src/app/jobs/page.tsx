@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { DetailCar3D } from "@/components/DetailCar3D";
 import { PageMast } from "@/components/PageMast";
 import { RelatedLinks } from "@/components/RelatedLinks";
 import { TYPICAL_JOBS } from "@/lib/jobs";
@@ -34,8 +34,14 @@ export default function JobsPage() {
         <div className="grid gap-8 lg:grid-cols-3">
           {TYPICAL_JOBS.map((job) => (
             <article key={job.id} className="flex flex-col border-t border-line pt-5">
-              <div className="flex justify-center py-2" aria-hidden>
-                <DetailCar3D vehicle={job.vehicle} size="md" />
+              <div className="job-shot">
+                <Image
+                  src={job.photo}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 30vw, 100vw"
+                  className="object-cover"
+                />
               </div>
               <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-fresh-deep">
                 {job.suburb} · {job.region}

@@ -73,7 +73,7 @@ export const PACKAGES = [
     label: "The Full Detail",
     tier: "Combined",
     time: "2.5–3.5 hrs",
-    blurb: "Everything in Good, plus a deeper clean and real protection.",
+    blurb: "Everything in The Essentials, plus a deeper clean and real protection.",
     who: "Most popular. The reset when the daily has been living a life.",
     includes: [
       "Everything in The Essentials",
@@ -101,7 +101,7 @@ export const PACKAGES = [
     tier: "Combined",
     time: "4–5 hrs",
     blurb:
-      "Everything in Better, plus decontamination and serious protection. The rebirth of your ride.",
+      "Everything in The Full Detail, plus decontamination and serious protection. The rebirth of your ride.",
     who: "Presale, neglected daily, or you want it to feel new — not just tidy.",
     includes: [
       "Everything in The Full Detail",

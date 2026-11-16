@@ -159,6 +159,23 @@ export const REGIONS: Region[] = [
   "West",
 ];
 
+/** Labels shown on the areas page. Data keys stay East / West. */
+export const REGION_LABEL: Record<Region, string> = {
+  "Inner Brisbane": "Inner Brisbane",
+  Northside: "Northside",
+  Southside: "Southside",
+  East: "Eastside",
+  West: "Westside",
+};
+
+export const REGION_PILL: Record<Region, string> = {
+  "Inner Brisbane": "Inner",
+  Northside: "Northside",
+  Southside: "Southside",
+  East: "Eastside",
+  West: "Westside",
+};
+
 /** Best-known stops — shown first on /areas. Names must exist in SUBURBS. */
 export const FEATURED_SUBURB_NAMES = [
   "Brisbane City",

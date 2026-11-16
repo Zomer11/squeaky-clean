@@ -1,8 +1,7 @@
+import Link from "next/link";
 import { ContactForm } from "@/components/ContactForm";
-import { IconMark } from "@/components/IconMark";
+import { ContactStrip } from "@/components/ContactStrip";
 import { PageMast } from "@/components/PageMast";
-import { RelatedLinks } from "@/components/RelatedLinks";
-import { BUSINESS } from "@/lib/constants";
 import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
@@ -21,7 +20,7 @@ export default function ContactPage() {
         scene="contact"
          kicker="Same-day replies"
          photo="/media/masts/contact.jpg"
-         photoPos="center 40%"
+         photoPos="center 58%"
       >
         <p>
           Bookings confirm on the calendar. For everything else we aim to reply
@@ -29,54 +28,43 @@ export default function ContactPage() {
         </p>
       </PageMast>
       <div className="section-pad contact-shell mx-auto max-w-3xl !pt-10">
-        <ul className="grid gap-6 border-y border-line py-6 sm:grid-cols-3 sm:gap-0">
-          <li className="sm:pr-6">
-            <IconMark name="phone" />
-            <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-ink-soft">
-              Call
-            </p>
-            <a
-              href={`tel:${BUSINESS.phone.replace(/\s/g, "")}`}
-              className="mt-1 block font-semibold underline"
-            >
-              {BUSINESS.phone}
-            </a>
-          </li>
-          <li className="sm:border-l sm:border-line sm:px-6">
-            <IconMark name="mail" />
-            <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-ink-soft">
-              Email
-            </p>
-            <a href={`mailto:${BUSINESS.email}`} className="mt-1 block font-semibold underline">
-              {BUSINESS.email}
-            </a>
-          </li>
-          <li className="sm:border-l sm:border-line sm:pl-6">
-            <IconMark name="clock" />
-            <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-ink-soft">
-              Reply
-            </p>
-            <p className="mt-1 font-semibold">Same day when we can</p>
-          </li>
-        </ul>
+        <ContactStrip />
 
         <div className="mt-8">
           <ContactForm />
         </div>
-        <RelatedLinks
-          links={[
-            {
-              href: "/book",
-              label: "Skip the form",
-              blurb: "If you just want a slot, book it.",
-            },
-            {
-              href: "/faq",
-              label: "FAQ",
-              blurb: "Most common questions",
-            },
-          ]}
-        />
+        <nav className="contact-next" aria-label="Related pages">
+          <h2 className="font-display text-2xl font-semibold">Keep going</h2>
+          <ul>
+            <li>
+              <Link href="/book">
+                <span>
+                  <strong>Skip the form</strong>
+                  <span>If you just want a slot, book it.</span>
+                </span>
+                <span aria-hidden>→</span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/faq">
+                <span>
+                  <strong>FAQ</strong>
+                  <span>Most common questions.</span>
+                </span>
+                <span aria-hidden>→</span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/areas">
+                <span>
+                  <strong>Brisbane service areas</strong>
+                  <span>See if we already run your suburb.</span>
+                </span>
+                <span aria-hidden>→</span>
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
     </>
   );

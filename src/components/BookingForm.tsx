@@ -131,36 +131,108 @@ function scrollSheet(step: Step) {
   document.getElementById(`book-step-${step}`)?.focus();
 }
 
-function PackageButton({
+function CheckBadge() {
+  return (
+    <span className="book-check" aria-hidden>
+      <svg viewBox="0 0 16 16" width="12" height="12">
+        <path
+          d="M3.2 8.4 6.4 11.4 12.8 4.6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
+  );
+}
+
+function SizeMark({ id }: { id: VehicleId }) {
+  const body =
+    id === "small"
+      ? "M3 11.5h10.2c.7 0 1.3-.5 1.5-1.2l.8-2.2c.2-.5-.2-1.1-.8-1.1H11L9.2 4.6A1.4 1.4 0 0 0 8 3.8H5.2c-.5 0-1 .3-1.2.8L3 7"
+      : id === "medium"
+        ? "M2.4 11.6h14.2c.6 0 1.1-.4 1.2-1l.5-1.8c.1-.5-.3-1-.8-1h-2.2L13.4 5.2A1.5 1.5 0 0 0 12 4.2H6.2c-.6 0-1.1.3-1.4.8L3.2 8"
+        : "M2 11.8h15.2c.5 0 .9-.4.9-.9v-2.2c0-.5-.4-.9-.9-.9h-1.6V6.2c0-.6-.5-1.1-1.1-1.1H7.2c-.5 0-.9.3-1.1.7L4.6 8H3.1";
+  return (
+    <svg className="book-size-mark" viewBox="0 0 20 16" aria-hidden>
+      <path d={body} fill="none" stroke="currentColor" strokeWidth="1.15" strokeLinejoin="round" />
+      <circle cx={id === "large" ? 5.2 : 5.4} cy="12.2" r="1.35" fill="none" stroke="currentColor" strokeWidth="1.15" />
+      <circle cx={id === "small" ? 12.2 : id === "medium" ? 14.6 : 15.2} cy="12.2" r="1.35" fill="none" stroke="currentColor" strokeWidth="1.15" />
+    </svg>
+  );
+}
+
+function LivePrice({ value }: { value: number }) {
+  return (
+    <span className="book-live-price" key={value}>
+      ${value}
+    </span>
+  );
+}
+
+function TierCard({
   title,
   blurb,
-  meta,
+  price,
+  time,
+  includes,
   selected,
   onPick,
 }: {
   title: string;
   blurb: string;
-  meta: string;
+  price: number;
+  time: string;
+  includes: readonly string[];
   selected: boolean;
   onPick: () => void;
 }) {
   return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onPick}
-      className={`choice rounded-2xl border-2 p-3 text-left ${
-        selected
-          ? "border-fresh bg-fresh/10"
-          : "border-line bg-paper hover:border-ink/40"
-      }`}
-    >
-      <span className="flex items-start justify-between gap-3">
-        <span className="block text-sm font-bold">{title}</span>
-        <span className="book-pkg-meta">{meta}</span>
-      </span>
-      <span className="mt-1 block text-xs text-ink-soft">{blurb}</span>
-    </button>
+    <article className={`book-tier${selected ? " is-on" : ""}`}>
+      <button type="button" aria-pressed={selected} onClick={onPick} className="book-tier-hit">
+        {selected ? <CheckBadge /> : null}
+        <span className="book-tier-name">{title}</span>
+        <span className="book-tier-figures">
+          <LivePrice value={price} />
+          <span className="book-tier-time">{time}</span>
+        </span>
+        <span className="book-tier-blurb">{blurb}</span>
+      </button>
+      <details className="book-acc">
+        <summary>What&apos;s included</summary>
+        <ul>
+          {includes.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </details>
+    </article>
+  );
+}
+
+function PackageTier({
+  pkg,
+  vehicle,
+  selected,
+  onPick,
+}: {
+  pkg: (typeof PACKAGES)[number];
+  vehicle: VehicleId;
+  selected: boolean;
+  onPick: () => void;
+}) {
+  return (
+    <TierCard
+      title={pkg.label}
+      blurb={pkg.blurb}
+      price={estimatePrice(pkg.id, vehicle)}
+      time={pkg.time}
+      includes={pkg.includes}
+      selected={selected}
+      onPick={onPick}
+    />
   );
 }
 
@@ -448,7 +520,9 @@ export function BookingForm({
           {suburb ? <span>{suburb}</span> : null}
           <span>Pay on the day</span>
         </span>
-        <strong>${price}</strong>
+        <strong>
+          <LivePrice value={price} />
+        </strong>
       </p>
 
       <div className="book-steps" role="navigation" aria-label="Booking steps">
@@ -481,78 +555,70 @@ export function BookingForm({
           <fieldset className="mt-4">
             <legend className="label">Which size is your car?</legend>
             <div className="grid gap-2 sm:grid-cols-3">
-              {SIZES.map((v) => (
-                <button
-                  key={v.id}
-                  type="button"
-                  aria-pressed={vehicle === v.id}
-                  onClick={() => setVehicle(v.id)}
-                  className={`choice rounded-2xl border-2 p-3 text-left transition ${
-                    vehicle === v.id
-                      ? "border-ink bg-cream"
-                      : "border-line bg-paper hover:border-ink/40"
-                  }`}
-                >
-                  <span className="block text-sm font-bold">{v.label}</span>
-                  <span className="text-xs text-ink-soft">{SIZE_HINT[v.id]}</span>
-                </button>
-              ))}
+              {SIZES.map((v) => {
+                const on = vehicle === v.id;
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => setVehicle(v.id)}
+                    className={`book-pick${on ? " is-on" : ""}`}
+                  >
+                    {on ? <CheckBadge /> : null}
+                    <SizeMark id={v.id} />
+                    <span className="book-pick-name">{v.label}</span>
+                    <span className="book-pick-hint">{SIZE_HINT[v.id]}</span>
+                  </button>
+                );
+              })}
             </div>
           </fieldset>
 
           <fieldset className="mt-5">
             <legend className="label">The job</legend>
             <div className="book-paths">
-              {JOB_PATHS.map((path) => (
-                <button
-                  key={path.id}
-                  type="button"
-                  aria-pressed={jobPath === path.id}
-                  onClick={() => pickPath(path.id)}
-                  className={`choice rounded-2xl border-2 p-3 text-left ${
-                    jobPath === path.id
-                      ? "border-ink bg-cream"
-                      : "border-line bg-paper hover:border-ink/40"
-                  }`}
-                >
-                  <span className="block text-sm font-bold">{path.title}</span>
-                  <span className="text-xs text-ink-soft">{path.blurb}</span>
-                </button>
-              ))}
+              {JOB_PATHS.map((path) => {
+                const on = jobPath === path.id;
+                return (
+                  <button
+                    key={path.id}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => pickPath(path.id)}
+                    className={`book-pick${on ? " is-on" : ""}`}
+                  >
+                    {on ? <CheckBadge /> : null}
+                    <span className="book-pick-name">{path.title}</span>
+                    <span className="book-pick-hint">{path.blurb}</span>
+                  </button>
+                );
+              })}
             </div>
           </fieldset>
 
           {jobPath === "maintenance" ? (
             <fieldset className="mt-5">
-              <legend className="label">How often</legend>
+              <legend className="label">Which one</legend>
               <div className="grid gap-2 sm:grid-cols-3">
-                {FREQUENCIES.filter((f) => f.id !== "one-off").map((f) => (
-                  <label
-                    key={f.id}
-                    className={`flex cursor-pointer items-start gap-2 rounded-2xl border-2 p-3 ${
-                      frequency === f.id
-                        ? "border-sun bg-sun/15"
-                        : "border-line bg-paper"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="frequency"
-                      className="mt-1 h-4 w-4 accent-sun-deep"
-                      checked={frequency === f.id}
-                      onChange={() => setFrequency(f.id)}
+                {FREQUENCIES.filter((f) => f.id !== "one-off").map((f) => {
+                  const plan = PACKAGES.find((p) => p.id === "maintenance");
+                  return (
+                    <TierCard
+                      key={f.id}
+                      title={f.label}
+                      blurb={f.blurb}
+                      price={estimatePrice("maintenance", vehicle, f.id)}
+                      time={plan?.time ?? "45–75 min"}
+                      includes={plan?.includes ?? []}
+                      selected={frequency === f.id}
+                      onPick={() => {
+                        setPackageId("maintenance");
+                        setFrequency(f.id);
+                      }}
                     />
-                    <span>
-                      <span className="flex items-baseline justify-between gap-2">
-                        <span className="block text-sm font-bold">{f.label}</span>
-                        <span className="book-pkg-meta">
-                          ${estimatePrice("maintenance", vehicle, f.id)}
-                        </span>
-                      </span>
-                      <span className="text-xs text-ink-soft">{f.blurb}</span>
-                    </span>
-                  </label>
-                ))}
+                  );
+                })}
               </div>
             </fieldset>
           ) : (
@@ -564,11 +630,10 @@ export function BookingForm({
                 }`}
               >
                 {pathPackages.map((p) => (
-                  <PackageButton
+                  <PackageTier
                     key={p.id}
-                    title={p.label}
-                    blurb={p.blurb}
-                    meta={`$${estimatePrice(p.id, vehicle)} · ${p.time}`}
+                    pkg={p}
+                    vehicle={vehicle}
                     selected={packageId === p.id}
                     onPick={() => {
                       setPackageId(p.id);
@@ -882,9 +947,16 @@ export function BookingForm({
           </button>
         ) : null}
         {step === "job" ? (
-          <button type="button" className="btn btn-primary" onClick={() => go("when")}>
-            Pick a day
-          </button>
+          <div className="book-cta">
+            <button type="button" className="btn btn-primary" onClick={() => go("when")}>
+              Pick a day
+            </button>
+            <ul className="book-trust">
+              <li>No power point needed</li>
+              <li>Pay when we finish</li>
+              <li>Free cancel until 6pm prior</li>
+            </ul>
+          </div>
         ) : null}
         {step === "when" ? (
           <button

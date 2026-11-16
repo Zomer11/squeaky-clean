@@ -51,6 +51,6 @@ export const TYPICAL_JOBS: TypicalJob[] = [
     story:
       "Dual-cab that lives on job sites. Interior Basic: vacuum, mats, dash, inside glass. Tray stays as-is unless you ask. Notes said the dog goes inside before we start.",
     window: "Thursday morning",
-    photo: "/media/interior-steam.jpg",
+    photo: "/media/sponge-wash.jpg",
   },
 ];

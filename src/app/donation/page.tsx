@@ -21,7 +21,7 @@ export default function DonationPage() {
         scene="donation"
          kicker="10% of every job"
          photo="/media/masts/donation.jpg"
-         photoPos="center 45%"
+         photoPos="center 55%"
       >
         <p>
           {DONATION.percent}% of what we take goes toward Palestine, Sudan and

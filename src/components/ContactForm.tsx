@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 import { FormConsent } from "@/components/FormConsent";
 import { THANKS_STORAGE_KEY } from "@/lib/thanks";
 
+const TOPICS = [
+  { id: "fleet", label: "Fleet / Multi-Car", fill: "Fleet / multi-car: " },
+  { id: "area", label: "Out-of-Area Quote", fill: "Out-of-area quote: " },
+  { id: "stain", label: "Stain / Scratch Photo", fill: "Stain or scratch (I can send a photo): " },
+  { id: "gift", label: "Gift Voucher", fill: "Question about a gift voucher: " },
+  { id: "general", label: "General Question", fill: "" },
+] as const;
+
 export function ContactForm() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -12,6 +20,7 @@ export function ContactForm() {
   const [email, setEmail] = useState("");
   const [suburb, setSuburb] = useState("");
   const [message, setMessage] = useState("");
+  const [topic, setTopic] = useState<string | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,12 +33,21 @@ export function ContactForm() {
       document.getElementById("contact-consent")?.focus();
       return;
     }
+    const picked = TOPICS.find((item) => item.id === topic);
+    let body = message.trim();
+    if (picked?.fill && !body.startsWith(picked.fill)) {
+      body = `${picked.fill}${body}`.trim();
+    }
+    if (body.length < 5) {
+      setError("Add a short message so we know what you need.");
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, suburb, message, consent: true }),
+        body: JSON.stringify({ name, phone, email, suburb, message: body, consent: true }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -65,6 +83,7 @@ export function ContactForm() {
             name="name"
             className="field"
             autoComplete="name"
+            placeholder="Alex Taylor"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -81,6 +100,7 @@ export function ContactForm() {
             type="tel"
             inputMode="tel"
             autoComplete="tel"
+            placeholder="0400 000 000"
             required
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -99,6 +119,7 @@ export function ContactForm() {
             type="email"
             autoComplete="email"
             spellCheck={false}
+            placeholder="alex@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -112,12 +133,36 @@ export function ContactForm() {
             name="suburb"
             className="field"
             autoComplete="address-level2"
+            placeholder="e.g. Indooroopilly, Paddington"
             value={suburb}
             onChange={(e) => setSuburb(e.target.value)}
           />
         </div>
       </div>
       <div>
+        <div className="contact-pills" role="group" aria-label="What is this about?">
+          {TOPICS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={topic === item.id}
+              className={`contact-pill${topic === item.id ? " is-on" : ""}`}
+              onClick={() => {
+                const previous = TOPICS.find((entry) => entry.id === topic);
+                setTopic(item.id);
+                setMessage((current) => {
+                  const trimmed = current.trim();
+                  if (!trimmed || (previous && trimmed === previous.fill.trim())) {
+                    return item.fill;
+                  }
+                  return current;
+                });
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
         <label className="label" htmlFor="c-message">
           Message
         </label>

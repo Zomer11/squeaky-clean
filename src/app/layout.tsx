@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Outfit } from "next/font/google";
+import { Fraunces, Inter, Outfit } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { GiveBackPopup } from "@/components/GiveBackPopup";
@@ -19,6 +19,11 @@ const display = Fraunces({
 
 const body = Outfit({
   variable: "--font-body",
+  subsets: ["latin"],
+});
+
+const ui = Inter({
+  variable: "--font-ui",
   subsets: ["latin"],
 });
 
@@ -79,7 +84,7 @@ export default function RootLayout({
     <html
       lang="en-AU"
       data-scroll-behavior="smooth"
-      className={`${display.variable} ${body.variable} h-full`}
+      className={`${display.variable} ${body.variable} ${ui.variable} h-full`}
     >
       <body className="flex min-h-full flex-col antialiased">
         <JsonLd data={localBusinessJsonLd()} />
