@@ -1855,3 +1855,14 @@ body:has(.final) .footer-cta {
   height: auto;
   margin: -1rem 0 0.75rem -0.75rem;
 }
+
+.footer-credit {
+  flex-basis: 100%;
+  order: 3;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--ink-soft) 80%, transparent);
+}
+.footer-credit a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

@@ -101,10 +101,10 @@ const DIRT_FRAG = /* glsl */ `
 }
 `;
 
-type Patched = THREE.MeshPhysicalMaterial & { userData: { dirt: { value: number } } };
+type Patched = THREE.MeshStandardMaterial & { userData: { dirt: { value: number } } };
 
 function patchDirt(
-  mat: THREE.MeshPhysicalMaterial,
+  mat: THREE.MeshStandardMaterial,
   shared: Record<string, THREE.IUniform>,
   amount: number,
   tint = new THREE.Color(1, 1, 1),
@@ -281,13 +281,6 @@ export type EngineOptions = {
   onSpray?: (intensity: number, foam: boolean) => void;
 };
 
-const CALLOUT_POINTS: [number, number, number][] = [
-  [1.45, 0.82, 0.32], // bonnet paint
-  [1.42, 0.36, 1.0], // front wheel
-  [0.05, 1.12, 0.62], // glass
-  [-1.38, 0.08, 1.0], // rear tyre
-];
-
 const tmpV = new THREE.Vector3();
 
 export class WashEngine {
@@ -297,9 +290,9 @@ export class WashEngine {
   private composer: EffectComposer;
   private bloom: UnrealBloomPass;
   private carRoot = new THREE.Group();
-  private paint: THREE.MeshPhysicalMaterial | null = null;
-  private heads: THREE.MeshBasicMaterial[] = [];
-  private tails: THREE.MeshBasicMaterial[] = [];
+  private paints: THREE.MeshPhysicalMaterial[] = [];
+  private lamps: { m: THREE.MeshStandardMaterial; base: number }[] = [];
+  private callouts: THREE.Vector3[] = [];
   private floorMat!: THREE.MeshPhysicalMaterial;
   private spray: Spray;
   private lance = new THREE.Group();
@@ -340,7 +333,7 @@ export class WashEngine {
   private calloutEls: HTMLElement[] = [];
   private calloutWrap: HTMLElement | null = null;
   private blueprint = false;
-  private paintTarget = new THREE.Color("#14171c");
+  private paintTarget = new THREE.Color("#0a0b0d");
   private pr: number;
   private frames = 0;
   private frameTime = 0;
@@ -498,6 +491,13 @@ export class WashEngine {
 
   async load() {
     const loader = new GLTFLoader();
+    // Decode embedded textures through <img> (CSP img-src allows blob:) instead of
+    // fetch() (connect-src would block blob: URLs). Keeps the strict CSP intact.
+    loader.register((parser) => {
+      const p = parser as unknown as { textureLoader: THREE.Loader; options: { manager: THREE.LoadingManager } };
+      p.textureLoader = new THREE.TextureLoader(p.options.manager);
+      return { name: "acd_img_textures" };
+    });
     try {
       // Fetch the bytes ourselves so the model can also ship as base64 JSON
       // ({ "glb": "..." }) on hosts that only serve text types.
@@ -508,20 +508,7 @@ export class WashEngine {
         bytes = Uint8Array.from(atob(glb), (c) => c.charCodeAt(0)).buffer;
       }
       const gltf = await loader.parseAsync(bytes, "");
-      const model = gltf.scene;
-      this.shared.uDecal.value = await this.buildDecal();
-      model.traverse((o) => {
-        const mesh = o as THREE.Mesh;
-        if (!mesh.isMesh) return;
-        const src = mesh.material as THREE.Material;
-        mesh.material = this.materialFor(src.name);
-        this.meshes.push(mesh);
-      });
-      model.traverse((o) => {
-        if (o.name.startsWith("Wheel_")) this.wheels.push(o);
-      });
-      this.carRoot.add(model);
-      this.carRoot.updateMatrixWorld(true);
+      this.prepareCar(gltf.scene);
       if (!this.opts.reducedMotion && !this.snap) this.loadedAt = performance.now();
       await this.renderer.compileAsync(this.scene, this.camera);
       this.ready = true;
@@ -532,143 +519,114 @@ export class WashEngine {
     }
   }
 
-  /** "AUTO CARE DETAILING" door decal, drawn with the site's own display font. */
-  private async buildDecal(): Promise<THREE.Texture> {
-    try {
-      await document.fonts?.ready;
-    } catch {
-      /* fonts API missing: fall back to system font */
-    }
-    const family =
-      getComputedStyle(document.documentElement).getPropertyValue("--font-display").trim() ||
-      "system-ui, sans-serif";
-    const c = document.createElement("canvas");
-    c.width = 1024;
-    c.height = 256;
-    const g = c.getContext("2d")!;
-    g.clearRect(0, 0, c.width, c.height);
-    // car-outline swoosh
-    g.strokeStyle = "#ff5a1f";
-    g.lineWidth = 9;
-    g.lineCap = "round";
-    g.beginPath();
-    g.moveTo(330, 74);
-    g.bezierCurveTo(400, 26, 560, 18, 640, 54);
-    g.lineTo(720, 66);
-    g.stroke();
-    g.font = `800 108px ${family}`;
-    g.textAlign = "center";
-    g.textBaseline = "alphabetic";
-    g.fillStyle = "#ff5a1f";
-    g.fillText("AUTO CARE", 512, 170);
-    g.font = `600 58px ${family}`;
-    g.fillStyle = "#cfd3d8";
-    // letter-spaced second line
-    const word = "DETAILING";
-    const spacing = 14;
-    const widths = [...word].map((ch) => g.measureText(ch).width);
-    let x = 512 - (widths.reduce((a, b) => a + b, 0) + spacing * (word.length - 1)) / 2;
-    g.textAlign = "left";
-    [...word].forEach((ch, i) => {
-      g.fillText(ch, x, 236);
-      x += widths[i] + spacing;
+  /**
+   * Fit the licensed car (CC BY 4.0, Eric Chadwick / Darmstadt Graphics Group,
+   * logos removed) into car space: nose on +x, wheels on the floor, centred.
+   * Keeps its own PBR materials and layers the dirt / foam / wet shader on top.
+   */
+  private prepareCar(model: THREE.Group) {
+    const holder = new THREE.Group();
+    model.rotation.y = Math.PI / 2; // source nose points +z
+    holder.add(model);
+    holder.updateMatrixWorld(true);
+
+    const wheelNodes: THREE.Object3D[] = [];
+    model.traverse((o) => {
+      if (/^Wheel(Front|Rear)(L|R)$/.test(o.name)) wheelNodes.push(o);
     });
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.anisotropy = 8;
-    return tex;
-  }
+    const wheelBox = new THREE.Box3();
+    for (const w of wheelNodes) wheelBox.expandByObject(w);
+    const bodyBox = new THREE.Box3().setFromObject(model);
+    holder.position.set(
+      -(bodyBox.min.x + bodyBox.max.x) / 2,
+      -(wheelNodes.length ? wheelBox.min.y : bodyBox.min.y),
+      -(bodyBox.min.z + bodyBox.max.z) / 2,
+    );
+    this.carRoot.add(holder);
+    this.carRoot.updateMatrixWorld(true);
 
-  private matCache = new Map<string, THREE.Material>();
-  private materialFor(name: string): THREE.Material {
-    const hit = this.matCache.get(name);
-    if (hit) return hit;
-    const m = this.makeMaterial(name);
-    this.matCache.set(name, m);
-    return m;
-  }
+    // materials
+    const seen = new Set<THREE.Material>();
+    const accent = new THREE.Color(1.0, 0.18, 0.025);
+    const handle = (m: THREE.Material) => {
+      if (seen.has(m)) return;
+      seen.add(m);
+      const sm = m as THREE.MeshStandardMaterial;
+      const name = m.name || "";
+      if (!sm.isMeshStandardMaterial) return;
+      if (name.startsWith("Paint")) {
+        const pm = sm as THREE.MeshPhysicalMaterial;
+        pm.map = null;
+        pm.color.copy(this.paintTarget);
+        pm.metalness = 0.6;
+        pm.roughness = 0.3;
+        if (pm.isMeshPhysicalMaterial) {
+          pm.clearcoat = 1;
+          pm.clearcoatRoughness = 0.03;
+          pm.iridescence = 0;
+        }
+        pm.envMapIntensity = 1.3;
+        patchDirt(pm as THREE.MeshPhysicalMaterial, this.shared, 1, undefined, { foamLift: 1 });
+        if (pm.isMeshPhysicalMaterial) this.paints.push(pm);
+        return;
+      }
+      if (/^(Headlight|Brakelight|Signallight)/.test(name)) {
+        this.lamps.push({ m: sm, base: sm.emissiveIntensity || 1 });
+        return;
+      }
+      if (/^Interior 3/.test(name)) {
+        sm.map = null;
+        sm.color.setRGB(0.02, 0.019, 0.018);
+        return;
+      }
+      if (/^(Interior|Dashboard|Floormat)/.test(name)) return;
+      if (name === "Brake") {
+        sm.map = null;
+        sm.color.copy(accent);
+      }
+      if (name === "Glass") {
+        patchDirt(sm, this.shared, 0.5);
+        return;
+      }
+      const tyre = /^Tire/.test(name);
+      patchDirt(sm, this.shared, tyre ? 0.45 : 0.6, name.startsWith("Rim") ? new THREE.Color(0.55, 0.5, 0.45) : undefined, {
+        foamLift: tyre ? 0.3 : 0,
+      });
+    };
+    model.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      mats.forEach(handle);
+      this.meshes.push(mesh);
+    });
 
-  private makeMaterial(name: string): THREE.Material {
-    const shared = this.shared;
-    switch (name) {
-      case "Paint": {
-        const m = new THREE.MeshPhysicalMaterial({
-          color: this.paintTarget.clone(),
-          metalness: 0.5,
-          roughness: 0.28,
-          clearcoat: 1,
-          clearcoatRoughness: 0.025,
-          envMapIntensity: 1.3,
-        });
-        patchDirt(m, shared, 1, undefined, { paint: true, foamLift: 1 });
-        this.paint = m;
-        return m;
-      }
-      case "Glass": {
-        const m = new THREE.MeshPhysicalMaterial({
-          color: 0x040507,
-          metalness: 0,
-          roughness: 0.02,
-          clearcoat: 1,
-          clearcoatRoughness: 0,
-          envMapIntensity: 1.6,
-        });
-        patchDirt(m, shared, 0.55, undefined, { foamLift: 0.7 });
-        return m;
-      }
-      case "Rim": {
-        const m = new THREE.MeshPhysicalMaterial({
-          color: 0x1b1d21,
-          metalness: 0.9,
-          roughness: 0.32,
-          envMapIntensity: 1.2,
-        });
-        patchDirt(m, shared, 1, new THREE.Color(0.55, 0.5, 0.45));
-        return m;
-      }
-      case "Accent": {
-        const m = new THREE.MeshPhysicalMaterial({
-          color: 0xff5a1f,
-          metalness: 0.1,
-          roughness: 0.3,
-          clearcoat: 1,
-          clearcoatRoughness: 0.05,
-          envMapIntensity: 1.1,
-        });
-        patchDirt(m, shared, 0.6);
-        return m;
-      }
-      case "Metal": {
-        const m = new THREE.MeshPhysicalMaterial({
-          color: 0xa9adb3,
-          metalness: 1,
-          roughness: 0.25,
-          envMapIntensity: 1.2,
-        });
-        patchDirt(m, shared, 0.7, new THREE.Color(0.55, 0.5, 0.45));
-        return m;
-      }
-      case "Tyre": {
-        const m = new THREE.MeshPhysicalMaterial({ color: 0x0d0d0e, roughness: 0.86 });
-        patchDirt(m, shared, 0.45, undefined, { foamLift: 0.4 });
-        return m;
-      }
-      case "HeadLight": {
-        const m = new THREE.MeshBasicMaterial({ color: 0x000000 });
-        this.heads.push(m);
-        return m;
-      }
-      case "TailLight": {
-        const m = new THREE.MeshBasicMaterial({ color: 0x000000 });
-        this.tails.push(m);
-        return m;
-      }
-      default: {
-        const m = new THREE.MeshPhysicalMaterial({ color: 0x0a0a0b, roughness: 0.45, metalness: 0.3 });
-        patchDirt(m, shared, 0.5);
-        return m;
-      }
+    // re-pivot each wheel on its own hub so it can roll
+    const centres: THREE.Vector3[] = [];
+    for (const w of wheelNodes) {
+      const c = new THREE.Box3().setFromObject(w).getCenter(new THREE.Vector3());
+      const pivot = new THREE.Object3D();
+      pivot.position.copy(this.carRoot.worldToLocal(c.clone()));
+      this.carRoot.add(pivot);
+      pivot.updateMatrixWorld(true);
+      pivot.attach(w);
+      this.wheels.push(pivot);
+      centres.push(pivot.position.clone());
     }
+    this.carRoot.updateMatrixWorld(true);
+
+    // callout anchors from the real geometry
+    const box = new THREE.Box3().setFromObject(holder);
+    const roof = model.getObjectByName("BodyRoofPanel");
+    const top = roof ? new THREE.Box3().setFromObject(roof).max.y : box.max.y * 0.6;
+    const nearFront = centres.filter((c) => c.z > 0).sort((a, b) => b.x - a.x)[0];
+    const nearRear = centres.filter((c) => c.z > 0).sort((a, b) => a.x - b.x)[0];
+    this.callouts = [
+      new THREE.Vector3(box.max.x * 0.62, top * 0.7, 0.32),
+      nearFront ? nearFront.clone().add(new THREE.Vector3(0, 0, 0.14)) : new THREE.Vector3(1.4, 0.35, 1),
+      new THREE.Vector3(box.max.x * 0.08, top * 0.86, 0.5),
+      nearRear ? new THREE.Vector3(nearRear.x, 0.08, nearRear.z + 0.12) : new THREE.Vector3(-1.4, 0.08, 1),
+    ];
   }
 
   /* ---------- public controls ---------- */
@@ -805,7 +763,7 @@ export class WashEngine {
     if (dx !== 0) for (const w of this.wheels) w.rotation.z -= dx / 0.345;
     this.carRoot.updateMatrixWorld(true);
     (this.shared.uCarInv.value as THREE.Matrix4).copy(this.carRoot.matrixWorld).invert();
-    if (this.paint) this.paint.color.lerp(this.paintTarget, 1 - Math.exp(-dt * 4));
+    for (const pm of this.paints) pm.color.lerp(this.paintTarget, 1 - Math.exp(-dt * 4));
 
     // --- lights: intro flicker, then steady
     let lightK = 1;
@@ -813,8 +771,7 @@ export class WashEngine {
       const s = (performance.now() - this.loadedAt) / 1000;
       lightK = s < 0.2 ? 0 : s < 0.3 ? 1 : s < 0.42 ? 0.1 : s < 0.5 ? 1 : s < 0.58 ? 0.3 : s < 1.0 ? Math.min(1, (s - 0.58) * 2 + 0.5) : 1;
     }
-    for (const m of this.heads) m.color.setRGB(6 * lightK, 6.2 * lightK, 6.6 * lightK);
-    for (const m of this.tails) m.color.setRGB(4 * lightK, 0.12 * lightK, 0.06 * lightK);
+    for (const l of this.lamps) l.m.emissiveIntensity = l.base * (0.15 + 0.85 * lightK);
 
     // --- camera
     this.pointerEased.lerp(this.pointer, this.snap ? 1 : 1 - Math.exp(-dt * 3));
@@ -878,9 +835,9 @@ export class WashEngine {
     const w = this.canvas.clientWidth;
     const h = this.canvas.clientHeight;
     this.calloutEls.forEach((el, i) => {
-      const pt = CALLOUT_POINTS[i];
+      const pt = this.callouts[i];
       if (!pt) return;
-      tmpV.set(...pt);
+      tmpV.copy(pt);
       this.carRoot.localToWorld(tmpV);
       tmpV.project(this.camera);
       const x = (tmpV.x * 0.5 + 0.5) * w;

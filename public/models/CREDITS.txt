@@ -1,0 +1,13 @@
+car.glb
+-------
+Based on "Car Concept" by Eric Chadwick, Darmstadt Graphics Group GmbH (2024),
+from the Khronos glTF Sample Assets:
+https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept
+Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+That asset was started from a public-domain (CC0) model by "Unity Fan".
+
+Changes made for Auto Care Detailing: Khronos and 3D Commerce logos removed
+(licence plate, tyre sidewalls, emblem texture), interior and brake colours changed,
+paint set in the website's shader, textures resized + converted to WebP, mesh quantised.
+The Khronos logos are trademarks of the Khronos Group and are not used here.

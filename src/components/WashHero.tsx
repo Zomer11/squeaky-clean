@@ -8,7 +8,7 @@ import { WashSound } from "@/lib/wash/sound";
 type Chapter = { a: number; b: number };
 
 const PAINTS = [
-  { name: "Obsidian", hex: "#14171c" },
+  { name: "Obsidian", hex: "#0a0b0d" },
   { name: "Pearl", hex: "#d9dbdc" },
   { name: "Graphite", hex: "#3a3f46" },
   { name: "Sapphire", hex: "#0f2f63" },

@@ -97,6 +97,17 @@ export function Footer() {
           <p>
             © {year} {BUSINESS.name} · Brisbane mobile car detailing
           </p>
+          <p className="footer-credit">
+            3D car based on{" "}
+            <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept" target="_blank" rel="noopener noreferrer">
+              Car Concept
+            </a>{" "}
+            by Eric Chadwick / Darmstadt Graphics Group,{" "}
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">
+              CC BY 4.0
+            </a>
+            , modified.
+          </p>
           <ul>
             {LEGAL.map((l) => (
               <li key={l.href}>

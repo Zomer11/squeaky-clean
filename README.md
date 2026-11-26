@@ -197,6 +197,12 @@ public/                 logo, images, llms.txt
 - Donation popup removed; the 10% donation is now a full section on the homepage plus the existing page.
 - Google reviews section only shows once reviews/rating are set (it used to show an owner note to the public).
 
+### Car v3 (current hero car)
+- `public/models/car.glb` is the Khronos **Car Concept** (Eric Chadwick / Darmstadt Graphics Group, **CC BY 4.0**), logos removed, black paint, black interior, orange calipers. Credit is in the footer and `public/models/CREDITS.txt` — keep both if you change the site (the licence requires attribution).
+- Rebuild: take the model's `glTF` folder, clean the textures (see CREDITS.txt), then `gltf-transform copy → prune → resize 1024 → webp → quantize`. Don't run `simplify`: it opens the panel seams.
+- Textures load through `<img>` (blob:) so the CSP `connect-src 'self'` stays strict.
+- The earlier code-built cars (`tools/blender/coupe.py`, `gt.py`) are kept for reference; the logo still uses the coupe render.
+
 ### Car + logo v2
 - Hero car is now an original sports coupe (`tools/blender/coupe.py`): wing, orange calipers and rim lips, LED blades, splitter, diffuser, quad exhausts. Wheels are separate nodes and spin when the car rolls in on load.
 - Stripes and the door decal are drawn by the paint shader, so they get dirty and foamed with the rest of the car. Foam has real thickness (vertex push), and water beads sit on the paint after the rinse.
