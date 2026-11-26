@@ -315,11 +315,6 @@ export class WashEngine {
   private progress = 0;
   private pointer = new THREE.Vector2();
   private pointerEased = new THREE.Vector2();
-  /** auto-play: wash → hold clean → reset → rest, then again (only while at the top) */
-  private autoW = 0;
-  private autoPhase: "rest" | "wash" | "shine" | "reset" = "rest";
-  private autoT = 1.6; // first wash starts ~3s after load, once the car has rolled in
-  private autoWashing = false;
   private w = 0;
   private lastW = 0;
   private sprayLevel = 0;
@@ -771,35 +766,6 @@ export class WashEngine {
     this.adapt(dt);
   };
 
-  private autoStep(dt: number, p: number) {
-    this.autoWashing = false;
-    // scrolled away, reduced motion or still rolling in: no auto-play
-    if (p > 0.04 || this.opts.reducedMotion || this.snap) {
-      this.autoW = Math.max(0, this.autoW - dt * 0.8);
-      this.autoPhase = "rest";
-      this.autoT = 0;
-      return;
-    }
-    this.autoT += dt;
-    switch (this.autoPhase) {
-      case "rest": // down time: dirty car, nothing running
-        if (this.autoT > 4.5) { this.autoPhase = "wash"; this.autoT = 0; }
-        break;
-      case "wash":
-        this.autoW = Math.min(1, this.autoW + dt / 6.5);
-        this.autoWashing = this.autoW < 1;
-        if (this.autoW >= 1) { this.autoPhase = "shine"; this.autoT = 0; }
-        break;
-      case "shine": // clean car on show
-        if (this.autoT > 4) { this.autoPhase = "reset"; this.autoT = 0; }
-        break;
-      case "reset":
-        this.autoW = Math.max(0, this.autoW - dt / 1.4);
-        if (this.autoW <= 0) { this.autoPhase = "rest"; this.autoT = 0; }
-        break;
-    }
-  }
-
   private tick(dt: number) {
     const p = this.progress;
     const t = this.timer.getElapsed();
@@ -808,8 +774,7 @@ export class WashEngine {
 
     // --- wash amount: scroll OR the auto-play loop at the top of the page
     const scrollW = smoothstep(WASH_RANGE[0], WASH_RANGE[1], p);
-    this.autoStep(dt, p);
-    this.w += (Math.max(scrollW, this.autoW) - this.w) * (this.snap ? 1 : 1 - Math.exp(-dt * 8));
+    this.w += (scrollW - this.w) * (this.snap ? 1 : 1 - Math.exp(-dt * 8));
     const w = this.w;
     const foamPhase = Math.min(1, w / 0.45);
     const rinsePhase = Math.min(1, Math.max(0, (w - 0.4) / 0.6));
@@ -822,7 +787,7 @@ export class WashEngine {
     // spray intensity from how fast the wash is moving
     const dw = Math.abs(w - this.lastW) / Math.max(dt, 1e-3);
     this.lastW = w;
-    const target = w > 0.002 && w < 0.998 ? Math.min(1, dw * 6 + (this.autoWashing ? 1 : 0)) : 0;
+    const target = w > 0.002 && w < 0.998 ? Math.min(1, dw * 6) : 0;
     this.sprayLevel += (target - this.sprayLevel) * (1 - Math.exp(-dt * (target > this.sprayLevel ? 14 : 4)));
     const foaming = w < 0.42;
     this.opts.onSpray?.(this.sprayLevel, foaming);

@@ -1902,3 +1902,23 @@ body:has(.final) .footer-cta {
   color: var(--sun);
   flex-shrink: 0;
 }
+
+/* auto-played intro: skip button */
+.intro-skip {
+  position: absolute;
+  left: 50%;
+  bottom: 1.6rem;
+  transform: translateX(-50%);
+  z-index: 6;
+  font-family: var(--font-ui), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(236, 232, 225, 0.25);
+  background: rgba(8, 9, 11, 0.55);
+  color: var(--paper);
+  cursor: pointer;
+}
+.intro-skip:hover { border-color: var(--sun); color: var(--sun); }

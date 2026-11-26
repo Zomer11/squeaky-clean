@@ -46,6 +46,8 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
   const [sound, setSound] = useState(false);
   const [wire, setWire] = useState(false);
   const [paint, setPaint] = useState(PAINTS[0].name);
+  const [intro, setIntro] = useState(false);
+  const skipRef = useRef<() => void>(() => {});
 
   // --- boot the engine
   useEffect(() => {
@@ -132,6 +134,71 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
     };
   }, []);
 
+  // --- intro: once the car has rolled in, play the whole scroll story by itself,
+  // then hand scrolling back at the end of the section
+  useEffect(() => {
+    if (state !== "ready") return;
+    const section = sectionRef.current;
+    if (!section) return;
+    if (window.scrollY > 40) return; // came back mid-page: don't hijack
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (location.search.includes("snap")) return;
+
+    const DURATION = 17000; // ms for the whole story
+    const START_DELAY = 2800; // let the roll-in finish
+    let raf = 0;
+    let t0 = 0;
+    let running = false;
+    let done = false;
+    const html = document.documentElement;
+    const prevBehavior = html.style.scrollBehavior;
+    const end = () => section.offsetTop + section.offsetHeight - window.innerHeight;
+    const ease = (x: number) => 0.5 - Math.cos(Math.PI * x) / 2;
+
+    const block = (e: Event) => {
+      if (running) e.preventDefault();
+    };
+    const blockKeys = (e: KeyboardEvent) => {
+      if (running && [" ", "PageDown", "PageUp", "ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) e.preventDefault();
+    };
+    const finish = (jump: boolean) => {
+      if (done) return;
+      done = true;
+      running = false;
+      cancelAnimationFrame(raf);
+      if (jump) window.scrollTo({ top: end(), behavior: "instant" as ScrollBehavior });
+      html.style.scrollBehavior = prevBehavior;
+      window.removeEventListener("wheel", block);
+      window.removeEventListener("touchmove", block);
+      window.removeEventListener("keydown", blockKeys);
+      setIntro(false);
+    };
+    skipRef.current = () => finish(true);
+
+    const step = (now: number) => {
+      if (!t0) t0 = now;
+      const x = Math.min(1, (now - t0) / DURATION);
+      window.scrollTo({ top: end() * ease(x), behavior: "instant" as ScrollBehavior });
+      if (x < 1) raf = requestAnimationFrame(step);
+      else finish(false);
+    };
+    const timer = window.setTimeout(() => {
+      if (window.scrollY > 40) return; // they already started scrolling themselves
+      running = true;
+      html.style.scrollBehavior = "auto";
+      window.addEventListener("wheel", block, { passive: false });
+      window.addEventListener("touchmove", block, { passive: false });
+      window.addEventListener("keydown", blockKeys);
+      setIntro(true);
+      raf = requestAnimationFrame(step);
+    }, START_DELAY);
+
+    return () => {
+      window.clearTimeout(timer);
+      finish(false);
+    };
+  }, [state]);
+
   // --- cursor rotates the studio
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
@@ -185,6 +252,11 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
           </div>
         )}
         <div className="wash-vignette" aria-hidden />
+        {intro && (
+          <button type="button" className="intro-skip" onClick={() => skipRef.current()}>
+            Skip intro →
+          </button>
+        )}
         <div className="film-grain" aria-hidden />
 
         {/* 00 — hero */}
@@ -207,7 +279,7 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
             </Link>
           </div>
           <p className="wash-scroll-cue" aria-hidden>
-            <span /> scroll to wash it yourself
+            <span /> scroll to wash it
           </p>
         </div>
 
