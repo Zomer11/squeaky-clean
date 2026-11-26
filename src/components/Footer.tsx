@@ -1,140 +1,102 @@
 import Link from "next/link";
-import { BrandMark } from "@/components/BrandMark";
-import { IconMark } from "@/components/IconMark";
-import { BUSINESS } from "@/lib/constants";
+import { Wordmark } from "@/components/Wordmark";
+import { BUSINESS, DONATION } from "@/lib/constants";
 import { hasGoogleMapsLink, hasGoogleReviewLink } from "@/lib/reviews";
 import { isPublishedAbn } from "@/lib/site";
 
+const EXPLORE = [
+  { href: "/services", label: "Services & pricing" },
+  { href: "/book", label: "Book online" },
+  { href: "/areas", label: "Service areas" },
+  { href: "/jobs", label: "Typical jobs" },
+  { href: "/donation", label: "Donations" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/about", label: "Our story" },
+  { href: "/contact", label: "Contact" },
+];
+
+const LEGAL = [
+  { href: "/privacy", label: "Privacy" },
+  { href: "/cookies", label: "Cookies" },
+  { href: "/terms", label: "Terms" },
+  { href: "/refunds", label: "Refunds" },
+];
+
 export function Footer() {
+  const year = new Date().getFullYear();
   return (
-    <footer className="mt-auto bg-ink text-paper">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:px-6">
-        <div>
-          <div className="flex items-center gap-3">
-            <BrandMark size={56} className="shrink-0" />
-            <p className="font-display text-2xl font-semibold">{BUSINESS.name}</p>
+    <footer className="site-footer">
+      <div className="wrap">
+        <div className="footer-cta">
+          <p className="footer-big">
+            Dirty car?
+            <br />
+            <span className="dim">Clean driveway soon.</span>
+          </p>
+          <Link href="/book" className="btn btn-accent btn-lg">
+            Book a detail
+          </Link>
+        </div>
+
+        <div className="footer-grid">
+          <div>
+            <Wordmark />
+            <p className="footer-note">{BUSINESS.tagline}</p>
+            <p className="footer-note">{BUSINESS.hours}</p>
+            <p className="footer-give">
+              <b>{DONATION.percent}%</b> of every job goes to Palestine, Sudan &amp; Lebanon.
+            </p>
           </div>
-          <p className="mt-2 max-w-sm text-sm text-paper/85">{BUSINESS.tagline}</p>
-          <p className="mt-4 text-sm text-paper/80">{BUSINESS.hours}</p>
+          <div>
+            <p className="footer-h">Contact</p>
+            <ul className="footer-list">
+              <li>
+                <a href={`tel:${BUSINESS.phone.replace(/\s/g, "")}`}>{BUSINESS.phone}</a>
+              </li>
+              <li>
+                <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a>
+              </li>
+              {hasGoogleMapsLink() ? (
+                <li>
+                  <a href={BUSINESS.googleMapsUrl} target="_blank" rel="noopener noreferrer">
+                    Google Business
+                  </a>
+                </li>
+              ) : null}
+              {hasGoogleReviewLink() ? (
+                <li>
+                  <a href={BUSINESS.googleReviewUrl} target="_blank" rel="noopener noreferrer">
+                    Leave a Google review
+                  </a>
+                </li>
+              ) : null}
+              {isPublishedAbn(BUSINESS.abn) ? <li className="dim">ABN {BUSINESS.abn}</li> : null}
+            </ul>
+          </div>
+          <div>
+            <p className="footer-h">Explore</p>
+            <ul className="footer-list footer-list--cols">
+              {EXPLORE.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href}>{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-sun-on-ink">
-            Contact
+
+        <div className="footer-base">
+          <p>
+            © {year} {BUSINESS.name} · Brisbane mobile car detailing
           </p>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <a
-                href={`tel:${BUSINESS.phone.replace(/\s/g, "")}`}
-                className="inline-flex items-center gap-2 hover:text-sun-on-ink"
-              >
-                <IconMark name="phone" className="h-4 w-4" />
-                {BUSINESS.phone}
-              </a>
-            </li>
-            <li>
-              <a
-                href={`mailto:${BUSINESS.email}`}
-                className="inline-flex items-center gap-2 hover:text-sun-on-ink"
-              >
-                <IconMark name="mail" className="h-4 w-4" />
-                {BUSINESS.email}
-              </a>
-            </li>
-            {hasGoogleMapsLink() ? (
-              <li>
-                <a
-                  href={BUSINESS.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-sun-on-ink"
-                >
-                  Google Business
-                </a>
+          <ul>
+            {LEGAL.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href}>{l.label}</Link>
               </li>
-            ) : null}
-            {hasGoogleReviewLink() ? (
-              <li>
-                <a
-                  href={BUSINESS.googleReviewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-sun-on-ink"
-                >
-                  Leave a Google review
-                </a>
-              </li>
-            ) : null}
-            {isPublishedAbn(BUSINESS.abn) ? (
-              <li className="text-paper/80">ABN {BUSINESS.abn}</li>
-            ) : null}
+            ))}
           </ul>
         </div>
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-sun-on-ink">
-            Explore
-          </p>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <Link href="/services" className="hover:text-sun-on-ink">
-                Services & pricing
-              </Link>
-            </li>
-            <li>
-              <Link href="/areas" className="hover:text-sun-on-ink">
-                Service areas
-              </Link>
-            </li>
-            <li>
-              <Link href="/book" className="hover:text-sun-on-ink">
-                Book online
-              </Link>
-            </li>
-            <li>
-              <Link href="/donation" className="hover:text-sun-on-ink">
-                Donations
-              </Link>
-            </li>
-            <li>
-              <Link href="/faq" className="hover:text-sun-on-ink">
-                FAQ
-              </Link>
-            </li>
-            <li>
-              <Link href="/jobs" className="hover:text-sun-on-ink">
-                Typical jobs
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className="hover:text-sun-on-ink">
-                Our Story
-              </Link>
-            </li>
-            <li>
-              <Link href="/privacy" className="hover:text-sun-on-ink">
-                Privacy
-              </Link>
-            </li>
-            <li>
-              <Link href="/cookies" className="hover:text-sun-on-ink">
-                Cookies
-              </Link>
-            </li>
-            <li>
-              <Link href="/terms" className="hover:text-sun-on-ink">
-                Terms
-              </Link>
-            </li>
-            <li>
-              <Link href="/refunds" className="hover:text-sun-on-ink">
-                Refunds
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-paper/80">
-        © {new Date().getFullYear()} {BUSINESS.name}. Brisbane mobile car
-        detailing.
       </div>
     </footer>
   );

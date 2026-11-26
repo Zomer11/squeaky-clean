@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BUSINESS } from "@/lib/constants";
 
 /** Intended live host until NEXT_PUBLIC_SITE_URL is set. */
-export const DEFAULT_SITE_HOST = "squeakysolutions.au";
+export const DEFAULT_SITE_HOST = "autocaredetailing.com.au";
 
 export function siteUrl(): string {
   const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.trim();

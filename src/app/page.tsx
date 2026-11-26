@@ -1,28 +1,24 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { AnimateIn } from "@/components/AnimateIn";
 import { FaqList } from "@/components/FaqList";
-import { GiveBack } from "@/components/GiveBack";
 import { GoogleReviews } from "@/components/GoogleReviews";
-import { HeroCrest } from "@/components/HeroCrest";
 import { NextAvailableStrip } from "@/components/NextAvailableStrip";
-import { PhotoReel } from "@/components/PhotoReel";
-import { RegularsOffer } from "@/components/RegularsOffer";
-import {
-  BUSINESS,
-  COMBINED_PACKAGES,
-  MAINTENANCE_COPY,
-  estimatePrice,
-} from "@/lib/constants";
+import { PackagePicker } from "@/components/PackagePicker";
+import { Reveal } from "@/components/Reveal";
+import { WashHero } from "@/components/WashHero";
+import { BUSINESS, DONATION, LOYALTY, estimatePrice } from "@/lib/constants";
 import { HOME_FAQS } from "@/lib/faq";
+import { TYPICAL_JOBS } from "@/lib/jobs";
+import { CRAFT_TILES } from "@/lib/photos";
+import { hasCuratedReviews, hasPublishedRating } from "@/lib/reviews";
 import { pageMeta } from "@/lib/site";
 
 export const metadata: Metadata = {
   ...pageMeta({
     title: "Brisbane mobile car detailing",
     description:
-      "Auto Care Detailing comes to your Brisbane driveway. Want it spotless? Book morning or afternoon online, Sundays included. Pay on the day.",
+      "Auto Care Detailing comes to your Brisbane driveway. Foam, rinse, protect — inside and out. Book morning or afternoon online, Sundays included. Pay on the day.",
     path: "/",
   }),
   title: {
@@ -30,232 +26,313 @@ export const metadata: Metadata = {
   },
 };
 
+const TICKER = [
+  "Brisbane driveways",
+  "Sundays included",
+  "Pay on the day",
+  "10% of every job donated",
+  "Morning or afternoon",
+  "Insured",
+  "Inside + out",
+];
+
+const FLAGS = [
+  { src: "/media/flags/palestine.svg", name: "Palestine" },
+  { src: "/media/flags/sudan.svg", name: "Sudan" },
+  { src: "/media/flags/lebanon.svg", name: "Lebanon" },
+];
+
+const STEPS = [
+  {
+    n: "01",
+    t: "Book the driveway",
+    d: "Pick your car size, the package and a morning or afternoon window. Takes about a minute.",
+  },
+  {
+    n: "02",
+    t: "We roll up",
+    d: "All we need is a hose tap and room to work around the car. Keys sorted, dogs inside.",
+  },
+  {
+    n: "03",
+    t: "Pay on the day",
+    d: "Cash or card once you’ve had a look. No deposit, no online lock-in.",
+  },
+];
+
 export default function HomePage() {
   const fromPrice = estimatePrice("good", "small", "one-off");
+  const showReviews = hasCuratedReviews() || hasPublishedRating();
+  const stamps = Array.from({ length: LOYALTY.stampCount }, (_, i) => i + 1);
 
   return (
     <>
-      <NextAvailableStrip />
-      <section className="salon-hero">
-        <div className="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
-          <div className="grid items-center gap-8 md:grid-cols-[1.05fr_0.95fr] md:gap-10">
-            <div>
-              <p className="hero-cta text-sm font-semibold uppercase tracking-[0.16em] text-sun-on-ink">
-                Want it spotless?
-              </p>
-              <h1 className="font-display hero-headline mt-3 text-[2.4rem] font-semibold leading-[1.02] tracking-tight text-paper sm:text-5xl lg:text-6xl">
-                Meet {BUSINESS.name}.
-                <span className="hero-line2 mt-1 block">
-                  Reborn your car.
-                </span>
-              </h1>
-              <p className="hero-cta mt-5 max-w-xl text-lg text-paper/80">
-                Your car reborn. At your driveway. Exterior, interior, or a full
-                reset. Sundays included.
-              </p>
-              <p className="hero-cta mt-3 text-sm font-semibold text-sun-on-ink">
-                Bookings confirm instantly. Inquiries: we aim to reply the same
-                day.
-              </p>
-              <div className="hero-cta mt-6 flex flex-wrap items-center gap-3">
-                <Link href="/book" className="btn btn-accent">
-                  Book a detail
-                </Link>
-                <Link href="/services" className="btn btn-ghost">
-                  See prices
-                </Link>
-              </div>
-              {/* Pay-on-day kept for now — prepay / remove is a deferred conflict */}
-              <p className="hero-cta mt-4 text-sm text-paper/65">
-                {BUSINESS.payNote}
-              </p>
-            </div>
-            <AnimateIn variant="scale" delay={80}>
-              <HeroCrest />
-            </AnimateIn>
-          </div>
-        </div>
-        <div className="salon-facts">
-          {[
-            { title: "We come to you" },
-            { title: "Best prices, best results" },
-            { title: `As cheap as $${fromPrice}` },
-          ].map((item) => (
-            <div key={item.title}>
-              <h2 className="font-display text-xl font-semibold text-paper">
-                {item.title}
-              </h2>
-            </div>
+      <WashHero fromPrice={fromPrice} />
+
+      <div className="ticker" aria-hidden>
+        <div className="ticker-track">
+          {[...TICKER, ...TICKER, ...TICKER].map((t, i) => (
+            <span key={i}>
+              {t}
+              <i />
+            </span>
           ))}
         </div>
-      </section>
-      <PhotoReel />
+      </div>
 
-      <section className="packages-band">
-        <div className="section-pad mx-auto max-w-6xl">
-          <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-            Good Better Best
-          </h2>
-          <p className="mt-2 text-lg font-semibold text-ink">
-            Best in the industry, every time.
+      <NextAvailableStrip />
+
+      {/* ---------- packages ---------- */}
+      <section id="packages" className="sect">
+        <div className="wrap">
+          <Reveal className="sect-head">
+            <p className="eyebrow">Packages</p>
+            <h2 className="sect-title">
+              Pick the finish.
+              <br />
+              <span className="dim">We bring the rest.</span>
+            </h2>
+            <p className="sect-lede">
+              Inside and out in one visit. Pick your car size and the price
+              updates. GST included, paid on the day.
+            </p>
+          </Reveal>
+          <Reveal delay={80}>
+            <PackagePicker />
+          </Reveal>
+          <p className="tier-foot">
+            Only need one side?{" "}
+            <Link href="/services#exterior">Exterior only</Link> ·{" "}
+            <Link href="/services#interior">Interior only</Link> ·{" "}
+            <Link href="/services#maintenance">Maintenance plan</Link>
           </p>
-          <p className="mt-3 max-w-lg text-ink-soft">
-            Inside and outside in one visit. Exterior-only, interior-only, and a
-            maintenance plan live on{" "}
-            <Link
-              href="/services"
-              className="font-semibold text-fresh-deep underline"
-            >
-              our packages
-            </Link>
-            .
-          </p>
-          <div className="price-with-gift">
-            <ul className="salon-menu">
-              {COMBINED_PACKAGES.map((pkg) => (
-                <li key={pkg.id}>
-                  <Link href={`/services#${pkg.id}`}>
-                    <span className="copy">
-                      <span className="grade">{pkg.grade}</span>
-                      <span className="name">{pkg.label}</span>
-                    </span>
-                    <span className="rule" aria-hidden />
-                    <span className="price">From ${pkg.prices.small}</span>
-                  </Link>
-                  <p className="blurb">{pkg.blurb}</p>
+        </div>
+      </section>
+
+      {/* ---------- donation ---------- */}
+      <section className="give" aria-labelledby="give-title">
+        <div className="wrap give-grid">
+          <Reveal className="give-num" aria-hidden>
+            <span>{DONATION.percent}</span>
+            <sup>%</sup>
+          </Reveal>
+          <Reveal delay={100}>
+            <p className="eyebrow">Every job gives back</p>
+            <h2 id="give-title" className="sect-title">
+              {DONATION.tagline}
+            </h2>
+            <p className="sect-lede">
+              {DONATION.percent}% of every job goes toward relief in Palestine,
+              Sudan and Lebanon. It comes out of our side, not added to your
+              bill. You book a wash, someone gets a meal.
+            </p>
+            <ul className="give-flags">
+              {FLAGS.map((f) => (
+                <li key={f.name}>
+                  <img src={f.src} alt="" width={36} height={24} />
+                  {f.name}
                 </li>
               ))}
             </ul>
-            <GiveBack />
+            <Link href="/donation" className="text-link">
+              How the donation works →
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ---------- craft ---------- */}
+      <section className="sect">
+        <div className="wrap">
+          <Reveal className="sect-head">
+            <p className="eyebrow">The details</p>
+            <h2 className="sect-title">
+              The bits other washes
+              <br />
+              <span className="dim">skip.</span>
+            </h2>
+          </Reveal>
+          <div className="craft">
+            {CRAFT_TILES.slice(0, 3).map((t, i) => (
+              <Reveal key={t.src} delay={i * 90} className="craft-tile">
+                <div className="craft-img">
+                  <Image
+                    src={t.src}
+                    alt={t.alt}
+                    fill
+                    sizes="(min-width: 64rem) 33vw, 100vw"
+                    style={{ objectPosition: t.pos }}
+                    className="object-cover"
+                  />
+                </div>
+                <p className="craft-n">{String(i + 1).padStart(2, "0")}</p>
+                <h3>{t.title}</h3>
+                <p>{t.body}</p>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      <figure className="wash-plate">
+      {/* ---------- how it works ---------- */}
+      <section className="sect sect--line">
+        <div className="wrap">
+          <Reveal className="sect-head">
+            <p className="eyebrow">How a booking works</p>
+            <h2 className="sect-title">Three steps. One driveway.</h2>
+          </Reveal>
+          <ol className="steps">
+            {STEPS.map((s, i) => (
+              <Reveal as="li" key={s.n} delay={i * 100}>
+                <span className="step-n">{s.n}</span>
+                <h3>{s.t}</h3>
+                <p>{s.d}</p>
+              </Reveal>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* ---------- loyalty ---------- */}
+      <section className="sect">
+        <div className="wrap loyal">
+          <Reveal>
+            <p className="eyebrow">{LOYALTY.kicker}</p>
+            <h2 className="sect-title">
+              Stick with us.
+              <br />
+              <span className="dim">It gets cheaper.</span>
+            </h2>
+            <p className="sect-lede">
+              {LOYALTY.offerTitle}. {LOYALTY.offerBody} Free to join, we
+              stamp it against your phone number.
+            </p>
+            <div className="loyal-actions">
+              <Link href="/book" className="btn btn-accent">
+                Start your card
+              </Link>
+              <Link href="/services#maintenance" className="btn btn-ghost">
+                Maintenance plans
+              </Link>
+            </div>
+            <p className="fine">{LOYALTY.limit}</p>
+          </Reveal>
+          <Reveal delay={120} className="loyal-card" aria-label="Loyalty card preview">
+            <div className="loyal-card-top">
+              <span className="loyal-brand">
+                Auto Care
+                <br />
+                Detailing
+              </span>
+              <span className="loyal-chip">Member · free</span>
+            </div>
+            <div className="loyal-stamps">
+              {stamps.map((n) => {
+                const off = LOYALTY.discounts[n];
+                return (
+                  <span key={n} className={`stamp ${off ? "is-reward" : ""}`}>
+                    {off ? (
+                      <>
+                        <b>{off}%</b>
+                        <small>off</small>
+                      </>
+                    ) : (
+                      <>
+                        <b>{n}</b>
+                        <small>wash</small>
+                      </>
+                    )}
+                  </span>
+                );
+              })}
+            </div>
+            <p className="loyal-foot">Exterior Basic · same size car</p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ---------- jobs ---------- */}
+      <section className="sect sect--line">
+        <div className="wrap">
+          <Reveal className="sect-head sect-head--row">
+            <div>
+              <p className="eyebrow">Typical driveway jobs</p>
+              <h2 className="sect-title">What a visit looks like.</h2>
+            </div>
+            <Link href="/jobs" className="text-link">
+              All jobs →
+            </Link>
+          </Reveal>
+          <div className="jobs">
+            {TYPICAL_JOBS.slice(0, 3).map((j, i) => (
+              <Reveal as="article" key={j.id} delay={i * 90} className="job">
+                <div className="job-img">
+                  <Image
+                    src={j.photo}
+                    alt=""
+                    fill
+                    sizes="(min-width: 64rem) 33vw, 100vw"
+                    className="object-cover"
+                  />
+                  <span className="job-tag">{j.suburb}</span>
+                </div>
+                <h3>{j.title}</h3>
+                <p>{j.story}</p>
+                <p className="job-meta">{j.window}</p>
+              </Reveal>
+            ))}
+          </div>
+          <p className="fine mt-6">
+            Composite write-ups of typical jobs, not customer reviews.
+          </p>
+        </div>
+      </section>
+
+      {showReviews && <GoogleReviews />}
+
+      {/* ---------- faq ---------- */}
+      <section className="sect sect--line">
+        <div className="wrap faq-wrap">
+          <Reveal>
+            <p className="eyebrow">Before you book</p>
+            <h2 className="sect-title">Quick answers.</h2>
+            <p className="sect-lede">
+              The rest live on the <Link href="/faq" className="text-link">full FAQ</Link>.
+            </p>
+          </Reveal>
+          <div>
+            <FaqList items={HOME_FAQS} />
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- final cta ---------- */}
+      <section className="final">
         <Image
-          src="/media/suds-white.jpg"
-          alt="White coupe foamed on an outdoor apron"
+          src="/media/suds-interior.jpg"
+          alt=""
           fill
           sizes="100vw"
           className="object-cover"
         />
-      </figure>
-
-      <RegularsOffer />
-
-      <div className="home-ink-band">
-      <section className="section-pad mx-auto max-w-6xl">
-        <div className="loyalty-payoff rounded-3xl border border-line bg-paper/80 p-6 md:p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-fresh-deep">
-            {MAINTENANCE_COPY.kicker}
-          </p>
-          <h2 className="font-display mt-2 text-3xl font-semibold sm:text-4xl">
-            {MAINTENANCE_COPY.title}
+        <div className="final-shade" />
+        <Reveal className="wrap final-copy">
+          <p className="eyebrow">Live calendar · 7 days · AM / PM</p>
+          <h2 className="final-title">
+            Ready when
+            <br />
+            the car is.
           </h2>
-          <p className="mt-1 text-lg text-ink-soft">
-            {MAINTENANCE_COPY.subtitle}
-          </p>
-          <p className="mt-4 max-w-xl text-sm text-ink-soft">
-            {MAINTENANCE_COPY.boxBody}
-          </p>
-          <Link
-            href={MAINTENANCE_COPY.readMoreHref}
-            className="mt-5 inline-flex font-semibold text-fresh-deep underline"
-          >
-            Read more
-          </Link>
-        </div>
-      </section>
-
-      <section className="section-pad mx-auto max-w-6xl !pt-0">
-        <AnimateIn>
-          <p className="eyebrow">Three steps</p>
-          <h2 className="font-display mt-2 text-3xl font-semibold sm:text-4xl">
-            How a booking works
-          </h2>
-          <p className="mt-3 max-w-lg text-ink-soft">
-            Book a slot. Leave the car home. We wash it where it sits.
-          </p>
-        </AnimateIn>
-        <div
-          className="mt-10 grid gap-8 border-t border-line pt-8 md:grid-cols-3 md:gap-0"
-          role="list"
-        >
-          {[
-            {
-              n: "01",
-              t: "Book the driveway",
-              d: "Pick the car, the package, and a morning or afternoon window.",
-            },
-            {
-              n: "02",
-              t: "We roll up",
-              d: "Need a hose tap and room to work. Dogs in, keys sorted.",
-            },
-            {
-              n: "03",
-              t: "Pay on the day",
-              d: "Cash or card when we finish. No online lock-in.",
-            },
-          ].map((s, i) => (
-            <AnimateIn
-              key={s.n}
-              delay={i * 110}
-              className={`h-full md:px-6 ${i > 0 ? "md:border-l md:border-line" : "md:pl-0"}`}
-            >
-              <div role="listitem">
-                <span className="step-num text-xs font-bold tracking-[0.2em] text-sun-deep">
-                  {s.n}
-                </span>
-                <h3 className="font-display mt-3 text-xl font-semibold">
-                  {s.t}
-                </h3>
-                <p className="mt-2 text-sm text-ink-soft">{s.d}</p>
-              </div>
-            </AnimateIn>
-          ))}
-        </div>
-      </section>
-
-      <GoogleReviews />
-
-      <section className="section-pad mx-auto max-w-6xl">
-        <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-          Most common questions
-        </h2>
-        <p className="mt-3 max-w-lg text-ink-soft">
-          <Link href="/faq" className="font-semibold text-fresh-deep underline">
-            Read more
-          </Link>{" "}
-          on the full FAQ.
-        </p>
-        <div className="mt-6 max-w-3xl">
-          <FaqList items={HOME_FAQS} />
-        </div>
-        <AnimateIn delay={80}>
-          <div className="cabin-close">
-            <Image
-              src="/media/suds-interior.jpg"
-              alt="Foam on the windscreen, seen from the driver’s seat"
-              fill
-              sizes="(min-width: 72rem) 72rem, 100vw"
-              className="object-cover"
-            />
-            <div className="cabin-close-copy">
-              <p className="font-display text-2xl font-semibold">
-                Ready when the car is.
-              </p>
-              <p className="mt-1 text-sm text-paper/80">
-                Live calendar · 7 days · AM/PM · Greater Brisbane
-              </p>
-              <Link href="/book" className="btn btn-accent mt-5">
-                Book a time
-              </Link>
-            </div>
+          <div className="loyal-actions">
+            <Link href="/book" className="btn btn-accent btn-lg">
+              Book a detail
+            </Link>
+            <a href={`tel:${BUSINESS.phone.replace(/\s/g, "")}`} className="btn btn-ghost btn-lg">
+              Call {BUSINESS.phone}
+            </a>
           </div>
-        </AnimateIn>
+        </Reveal>
       </section>
-      </div>
     </>
   );
 }

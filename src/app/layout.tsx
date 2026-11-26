@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter, Outfit } from "next/font/google";
+import localFont from "next/font/local";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { GiveBackPopup } from "@/components/GiveBackPopup";
 import { JsonLd } from "@/components/JsonLd";
 import { SkipLink } from "@/components/SkipLink";
 import { StickyBookBar } from "@/components/StickyBookBar";
@@ -10,21 +9,30 @@ import { BUSINESS } from "@/lib/constants";
 import { localBusinessJsonLd } from "@/lib/schema";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
+import "./redesign.css";
 
-const display = Fraunces({
+// Self-hosted (no Google Fonts request at build or runtime).
+const display = localFont({
   variable: "--font-display",
-  subsets: ["latin"],
-  axes: ["SOFT", "WONK", "opsz"],
+  src: "../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2",
+  weight: "100 900",
+  display: "swap",
 });
 
-const body = Outfit({
+const body = localFont({
   variable: "--font-body",
-  subsets: ["latin"],
+  src: "../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
+  weight: "100 900",
+  display: "swap",
 });
 
-const ui = Inter({
+const ui = localFont({
   variable: "--font-ui",
-  subsets: ["latin"],
+  src: [
+    { path: "../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2", weight: "400" },
+    { path: "../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2", weight: "500" },
+  ],
+  display: "swap",
 });
 
 const description =
@@ -72,7 +80,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0b0d",
+  themeColor: "#08090b",
   width: "device-width",
   initialScale: 1,
 };
@@ -95,7 +103,6 @@ export default function RootLayout({
         </main>
         <Footer />
         <StickyBookBar />
-        <GiveBackPopup />
       </body>
     </html>
   );

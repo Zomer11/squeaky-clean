@@ -2,7 +2,7 @@ export const BUSINESS = {
   name: "Auto Care Detailing",
   tagline: "Showroom finish. Brisbane driveways.",
   phone: "0420 828 120",
-  email: "hello@squeakysolutions.au",
+  email: "hello@autocaredetailing.com.au",
   abn: "00 000 000 000",
   hours: "7 days · Morning & afternoon · Sundays too",
   payNote: "Pay on the day — cash or card. No online payment needed.",

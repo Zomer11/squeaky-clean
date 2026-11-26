@@ -175,16 +175,28 @@ public/                 logo, images, llms.txt
 
 ## Known leftovers / to-do
 
-- **Email + domain** still say `hello@squeakysolutions.au` / `squeakysolutions.au` (`src/lib/constants.ts`, `src/lib/site.ts`, `.env.example`). Swap in the real ones.
+- **Email + domain** are placeholders `hello@autocaredetailing.com.au` / `autocaredetailing.com.au` (`src/lib/constants.ts`, `src/lib/site.ts`, `.env.example`). Swap in the real ones.
 - **ABN** is the placeholder `00 000 000 000`.
 - **Logo** shows a Mercedes-style badge and grille on the car. That's a trademark risk for ads/print; regenerate with a generic car or paint it out.
 - **Google reviews** not linked yet (`googleReviewUrl`, `googleMapsUrl` in `constants.ts`; quotes in `src/lib/reviews.ts`).
-- Old project name still in internals: package name `bin-bus`, DB file `data/binbus.db`, `binbus2026` in the weak-password list. Renaming the DB file would hide existing bookings, so migrate it deliberately.
-- Packages section background is a yellow "SALE" photo (`public/media/sale-yellow.jpg`) that reads tan against the new palette; swap or grey it.
+- Old project name still in internals: DB file `data/binbus.db`, `binbus2026` in the weak-password list. Renaming the DB file would hide existing bookings, so migrate it deliberately.
 - A few pre-existing `react-hooks/set-state-in-effect` lint errors (AdminPanel, AnimateIn, BookingForm, ThanksDetails). Not security-related.
 - Dev-tool `drizzle-kit` has 4 moderate advisories; it's a dev dependency and never ships.
 
 ---
+
+## Studio redesign (branch `claude-redesign`)
+
+- **Live 3D hero** (`src/components/WashHero.tsx`, `src/lib/wash/*`). A real-time three.js car you wash by scrolling: dirty → snow foam → pressure rinse → gloss → callouts → showroom turntable. No video files.
+  - Car model: `public/models/car.glb` (~135 KB, meshopt). Built in Blender from code: `tools/blender/car.py` (`pip install bpy`, then `python3 tools/blender/car.py out.glb preview.png`, then `npx @gltf-transform/cli optimize out.glb public/models/car.glb --compress meshopt --palette false`).
+  - Dirt / foam / wet are a shader on the paint, not textures. Camera is a scroll cue list (`src/lib/wash/cues.ts`).
+  - "Hold to wash" + synthesised pressure-washer sound (Web Audio, no audio files). Wireframe toggle. Paint picker. Cursor rotates the studio lighting.
+  - Bloom + ACES + film grain. Pixel ratio and bloom step down automatically if fps drops under 40.
+  - Falls back to a still photo if WebGL isn't available. `?snap` in the URL skips camera easing (for screenshots).
+- New design system in `src/app/redesign.css` (loaded after `globals.css`, so it re-skins every page): black studio, bone type, one signal orange; Archivo (expanded) / Inter / JetBrains Mono, self-hosted from npm — no Google Fonts request.
+- New header (fixed, mobile menu), footer, wordmark, homepage sections (size-aware package picker, donation feature, craft, steps, loyalty card, jobs, FAQ, final CTA).
+- Donation popup removed; the 10% donation is now a full section on the homepage plus the existing page.
+- Google reviews section only shows once reviews/rating are set (it used to show an owner note to the public).
 
 ## History
 
