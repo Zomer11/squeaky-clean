@@ -1865,9 +1865,3 @@ body:has(.final) .footer-cta {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-
-.wordmark-car {
-  height: 2.6rem;
-  width: auto;
-  margin: -0.4rem -0.2rem -0.4rem -0.4rem;
-}
