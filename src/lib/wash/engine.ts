@@ -446,7 +446,15 @@ export class WashEngine {
   async load() {
     const loader = new GLTFLoader();
     try {
-      const gltf = await loader.loadAsync(this.opts.modelUrl);
+      // Fetch the bytes ourselves so the model can also ship as base64 JSON
+      // ({ "glb": "..." }) on hosts that only serve text types.
+      const res = await fetch(this.opts.modelUrl);
+      let bytes: ArrayBuffer = await res.arrayBuffer();
+      if (this.opts.modelUrl.endsWith(".json")) {
+        const { glb } = JSON.parse(new TextDecoder().decode(bytes)) as { glb: string };
+        bytes = Uint8Array.from(atob(glb), (c) => c.charCodeAt(0)).buffer;
+      }
+      const gltf = await loader.parseAsync(bytes, "");
       const model = gltf.scene;
       model.traverse((o) => {
         const mesh = o as THREE.Mesh;
