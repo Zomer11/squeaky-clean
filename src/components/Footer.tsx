@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Wordmark } from "@/components/Wordmark";
 import { BUSINESS, DONATION } from "@/lib/constants";
@@ -41,13 +40,6 @@ export function Footer() {
 
         <div className="footer-grid">
           <div>
-            <Image
-              src="/logo-transparent.png"
-              alt={`${BUSINESS.name} logo`}
-              width={168}
-              height={168}
-              className="footer-logo"
-            />
             <Wordmark />
             <p className="footer-note">{BUSINESS.tagline}</p>
             <p className="footer-note">{BUSINESS.hours}</p>
