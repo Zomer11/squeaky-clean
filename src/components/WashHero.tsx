@@ -22,7 +22,7 @@ const BEATS = [
 ];
 
 const CALLOUTS = [
-  { title: "Ceramic spray sealant", body: "Paint · The Full Detail" },
+  { title: "Ceramic spray sealant", body: "Paint · Signature" },
   { title: "Wheels + iron decon", body: "Brake dust, gone" },
   { title: "Glass, inside and out", body: "Every package" },
   { title: "Tyre shine", body: "Satin, not greasy" },
@@ -41,13 +41,11 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
   const soundRef = useRef<WashSound | null>(null);
   const soundOnRef = useRef<boolean | null>(null);
   const railRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<SVGCircleElement>(null);
   const calloutWrapRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<"loading" | "ready" | "fallback">("loading");
   const [sound, setSound] = useState(false);
   const [wire, setWire] = useState(false);
   const [paint, setPaint] = useState(PAINTS[0].name);
-  const [holding, setHolding] = useState(false);
 
   // --- boot the engine
   useEffect(() => {
@@ -76,8 +74,6 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
         onError: () => !disposed && setState("fallback"),
         onSpray: (level, foam) => {
           if (soundOnRef.current) soundRef.current?.set(level, foam);
-          const ring = ringRef.current;
-          if (ring) ring.style.strokeDashoffset = String(119.4 * (1 - engine.washAmount));
         },
       });
       engine.setCallouts(
@@ -149,20 +145,6 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
     return () => window.removeEventListener("pointermove", onMove);
   }, []);
 
-  const startHold = () => {
-    setHolding(true);
-    engineRef.current?.setHolding(true);
-    // the same tap that starts the wash unlocks audio (browsers gate it)
-    if (soundOnRef.current === null) {
-      soundOnRef.current = true;
-      setSound(true);
-    }
-    if (soundOnRef.current) soundRef.current?.start();
-  };
-  const endHold = () => {
-    setHolding(false);
-    engineRef.current?.setHolding(false);
-  };
   const toggleSound = () => {
     const next = !sound;
     soundOnRef.current = next;
@@ -223,27 +205,9 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
             <Link href="/book" className="btn btn-accent btn-lg">
               Book a detail
             </Link>
-            <button
-              type="button"
-              className={`hold-btn ${holding ? "is-holding" : ""}`}
-              onPointerDown={startHold}
-              onPointerUp={endHold}
-              onPointerLeave={endHold}
-              onPointerCancel={endHold}
-              onKeyDown={(e) => (e.key === " " || e.key === "Enter") && !e.repeat && startHold()}
-              onKeyUp={endHold}
-              onContextMenu={(e) => e.preventDefault()}
-              disabled={state === "fallback"}
-            >
-              <svg viewBox="0 0 44 44" aria-hidden>
-                <circle cx="22" cy="22" r="19" className="track" />
-                <circle ref={ringRef} cx="22" cy="22" r="19" className="fill" />
-              </svg>
-              <span>Hold to wash</span>
-            </button>
           </div>
           <p className="wash-scroll-cue" aria-hidden>
-            <span /> or scroll to wash it
+            <span /> scroll to wash it yourself
           </p>
         </div>
 
@@ -321,7 +285,7 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
           </div>
           <div className="wash-actions">
             <Link href="/book" className="btn btn-accent btn-lg">
-              Book from ${fromPrice}
+              As cheap as ${fromPrice}
             </Link>
             <Link href="#packages" className="btn btn-ghost btn-lg">
               Compare packages

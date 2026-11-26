@@ -29,11 +29,11 @@ export const FAQ_SECTIONS: FaqSection[] = [
     items: [
       {
         q: "What’s included in each package?",
-        a: "Inside + outside bundles: Good (The Essentials) is a proper wash, vacuum and wipe. Better (The Full Detail) adds iron decon, ceramic spray, leather and shampoo. Best (The Full Treatment) adds clay, water-spot work, stain and odour. One-side jobs are exterior or interior on their own — Basic or Premium. Full lists live on the packages page.",
+        a: "Inside + outside bundles: Good (Essential) is a proper wash, vacuum and wipe. Better (Signature) adds iron decon, ceramic spray, leather and shampoo. Best (Prestigious) adds clay, water-spot work, stain and odour. One-side jobs are exterior or interior on their own — Basic or Premium. Full lists live on the packages page.",
       },
       {
         q: "How much do you charge for a sedan or SUV?",
-        a: `We price small / medium / large, not the badge on the boot. A Corolla is small. A CX-5 is medium. A Prado, Ranger or 7-seater is large. Inside + outside from $${from.good} small to $${from.goodLarge} large for The Essentials; Full Detail from $${from.better}; Full Treatment from $${from.best} ($${from.bestLarge} large). Exterior Basic from $${from.exterior}. Interior Basic from $${from.interior}. Prices include GST.`,
+        a: `We price small / medium / large, not the badge on the boot. A Corolla is small. A CX-5 is medium. A Prado, Ranger or 7-seater is large. Inside + outside from $${from.good} small to $${from.goodLarge} large for Essential; Signature from $${from.better}; Prestigious from $${from.best} ($${from.bestLarge} large). Exterior Basic from $${from.exterior}. Interior Basic from $${from.interior}. Prices include GST.`,
       },
       {
         q: "Do you offer add-ons (pet hair, engine bay, headlight restoration)?",
@@ -41,7 +41,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
       },
       {
         q: "Is there a loyalty or recurring plan?",
-        a: `Two things, and they don’t stack. Loyalty card: stamp 2 is 20% off Exterior Basic, stamp 4 is 50% off — same size car, stamped against your member phone. Put “loyalty card” in the notes. Register as a member (free for now) so we can track it. Maintenance plan: a standing weekly, fortnightly or monthly slot (from $${from.plan} fortnightly, small) so a detail doesn’t slide. It’s a lighter visit, not a discount on a Full Treatment.`,
+        a: `Two things, and they don’t stack. Loyalty card: stamp 2 is 20% off Exterior Basic, stamp 4 is 50% off — same size car, stamped against your member phone. Put “loyalty card” in the notes. Register as a member (free for now) so we can track it. Maintenance plan: a standing weekly, fortnightly or monthly slot (from $${from.plan} fortnightly, small) so a detail doesn’t slide. It’s a lighter visit, not a discount on a Prestigious.`,
       },
     ],
   },
@@ -99,7 +99,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
     items: [
       {
         q: "How long does a detail take?",
-        a: "The Essentials 1–1.5 hrs. Full Detail 2.5–3.5 hrs. Full Treatment 4–5 hrs, especially on a large SUV. Exterior or interior only is usually under two hours. Arrival moves with the day’s route — morning or afternoon window, not a minute-past-eight promise.",
+        a: "Essential 1–1.5 hrs. Signature 2.5–3.5 hrs. Prestigious 4–5 hrs, especially on a large SUV. Exterior or interior only is usually under two hours. Arrival moves with the day’s route — morning or afternoon window, not a minute-past-eight promise.",
       },
       {
         q: "What products do you use? Are they safe for my paint and interior?",
@@ -173,7 +173,7 @@ export const HOME_FAQS: FaqItem[] = [
 export const PACKAGE_FAQS: FaqItem[] = [
   {
     q: "Good, Better or Best — what’s the difference?",
-    a: "Good (The Essentials): a proper clean, inside and out. 1–1.5 hrs. Better (The Full Detail): adds brake-dust removal (iron decon), a ceramic spray, leather care and a shampoo. 2.5–3.5 hrs. Best (The Full Treatment): adds a clay treatment, water-spot removal, plus stain and odour work. 4–5 hrs.",
+    a: "Good (Essential): a proper clean, inside and out. 1–1.5 hrs. Better (Signature): adds brake-dust removal (iron decon), a ceramic spray, leather care and a shampoo. 2.5–3.5 hrs. Best (Prestigious): adds a clay treatment, water-spot removal, plus stain and odour work. 4–5 hrs.",
   },
   {
     q: "Can I book just the inside or outside?",

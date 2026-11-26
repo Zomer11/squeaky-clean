@@ -25,7 +25,7 @@ export const TYPICAL_JOBS: TypicalJob[] = [
     packageId: "good",
     title: "Hatch reset before a road trip",
     story:
-      "City runabout, pollen on the paint, crumbs in the rails. The Essentials on a Sunday morning: foam wash, wheels, vacuum, wipe-down. Car left on the drive with the tap on.",
+      "City runabout, pollen on the paint, crumbs in the rails. Essential on a Sunday morning: foam wash, wheels, vacuum, wipe-down. Car left on the drive with the tap on.",
     window: "Sunday morning",
     photo: "/media/foam-front.jpg",
   },

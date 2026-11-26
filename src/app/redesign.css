@@ -1872,3 +1872,33 @@ body:has(.final) .footer-cta {
 .loyal-plan h3 { font-family: var(--font-display, inherit); font-size: 1.35rem; font-weight: 700; margin: 0.3rem 0 0.4rem; }
 .loyal-plan p:not(.eyebrow) { opacity: 0.75; margin-bottom: 0.6rem; }
 .loyal-join { font-size: 1.25rem; font-weight: 700; margin-top: 0.4rem; }
+
+/* loyalty card header, old-site style: name / LOYALTY CARD / member pill + droplet */
+.loyal-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.loyal-card-name {
+  font-family: var(--font-display), sans-serif;
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+  line-height: 1.05;
+  color: var(--paper);
+}
+.loyal-card-sub {
+  margin: 0.45rem 0 0.75rem;
+  font-family: var(--font-ui), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(236, 232, 225, 0.6);
+}
+.loyal-card-mark {
+  width: 2.2rem;
+  height: 2.2rem;
+  color: var(--sun);
+  flex-shrink: 0;
+}

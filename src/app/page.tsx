@@ -234,13 +234,16 @@ export default function HomePage() {
             <p className="fine">{LOYALTY.limit}</p>
           </Reveal>
           <Reveal delay={120} className="loyal-card" aria-label="Loyalty card preview">
-            <div className="loyal-card-top">
-              <span className="loyal-brand">
-                Auto Care
-                <br />
-                Detailing
-              </span>
-              <span className="loyal-chip">Member · free</span>
+            <div className="loyal-card-head">
+              <div>
+                <p className="loyal-card-name">{BUSINESS.name}</p>
+                <p className="loyal-card-sub">{LOYALTY.punchTitle}</p>
+                <span className="loyal-chip">Member · free to join</span>
+              </div>
+              <svg viewBox="0 0 32 32" className="loyal-card-mark" aria-hidden>
+                <path d="M16 3c5.5 7 9 12.2 9 16.4A9 9 0 0 1 7 19.4C7 15.2 10.5 10 16 3Z" fill="currentColor" />
+                <path d="M11.5 20.5c1 2.6 3 3.9 5.6 4" stroke="#0a0b0d" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+              </svg>
             </div>
             <div className="loyal-stamps">
               {stamps.map((n) => {
