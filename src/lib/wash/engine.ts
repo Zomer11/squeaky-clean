@@ -349,7 +349,7 @@ export class WashEngine {
       alpha: false,
       powerPreference: "high-performance",
     });
-    this.pr = Math.min(window.devicePixelRatio || 1, opts.mobile ? 1.75 : 2);
+    this.pr = Math.min(window.devicePixelRatio || 1, opts.mobile ? 1.5 : 1.75);
     this.renderer.setPixelRatio(this.pr);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -357,7 +357,7 @@ export class WashEngine {
 
     const rt = new THREE.WebGLRenderTarget(1, 1, {
       type: THREE.HalfFloatType,
-      samples: opts.mobile ? 2 : 4,
+      samples: opts.mobile ? 0 : 2,
     });
     this.composer = new EffectComposer(this.renderer, rt);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
@@ -369,7 +369,7 @@ export class WashEngine {
     this.buildStudio();
     this.buildFloor();
 
-    this.spray = new Spray(opts.mobile ? 900 : 1800, this.pr);
+    this.spray = new Spray(opts.mobile ? 500 : 1000, this.pr);
     this.scene.add(this.spray.points);
     this.buildLance();
 
@@ -554,6 +554,12 @@ export class WashEngine {
       const sm = m as THREE.MeshStandardMaterial;
       const name = m.name || "";
       if (!sm.isMeshStandardMaterial) return;
+      const phys = sm as THREE.MeshPhysicalMaterial;
+      if (phys.isMeshPhysicalMaterial && phys.transmission > 0 && name !== "Glass") {
+        phys.transmission = 0;
+        phys.transparent = true;
+        phys.opacity = Math.min(phys.opacity, 0.6);
+      }
       if (name.startsWith("Paint")) {
         const pm = sm as THREE.MeshPhysicalMaterial;
         pm.map = null;
@@ -585,6 +591,18 @@ export class WashEngine {
         sm.color.copy(accent);
       }
       if (name === "Glass") {
+        const g = sm as THREE.MeshPhysicalMaterial;
+        if (g.isMeshPhysicalMaterial) {
+          g.transmission = 0;
+          g.thickness = 0;
+          g.transparent = true;
+          g.opacity = 0.82;
+          g.color.setRGB(0.02, 0.022, 0.026);
+          g.roughness = 0.02;
+          g.metalness = 0.1;
+          g.clearcoat = 1;
+          g.envMapIntensity = 1.5;
+        }
         patchDirt(sm, this.shared, 0.5);
         return;
       }
@@ -742,7 +760,7 @@ export class WashEngine {
     this.lance.position.copy(nozzle);
     this.lance.visible = this.sprayLevel > 0.04 && !this.blueprint;
     if (!this.opts.reducedMotion && this.sprayLevel > 0.02) {
-      this.spray.emit(dt, this.sprayLevel * (this.opts.mobile ? 900 : 1800), nozzle, foaming);
+      this.spray.emit(dt, this.sprayLevel * (this.opts.mobile ? 500 : 1000), nozzle, foaming);
     }
     this.spray.update(dt);
 
@@ -851,11 +869,11 @@ export class WashEngine {
     if (this.quality === 0) return;
     this.frames++;
     this.frameTime += dt;
-    if (this.frames < 90) return;
+    if (this.frames < 45) return;
     const fps = this.frames / this.frameTime;
     this.frames = 0;
     this.frameTime = 0;
-    if (fps < 40) {
+    if (fps < 50) {
       if (this.pr > 1) {
         this.pr = Math.max(1, this.pr - 0.5);
         this.renderer.setPixelRatio(this.pr);
