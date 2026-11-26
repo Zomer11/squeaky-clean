@@ -7,7 +7,7 @@ import { NextAvailableStrip } from "@/components/NextAvailableStrip";
 import { PackagePicker } from "@/components/PackagePicker";
 import { Reveal } from "@/components/Reveal";
 import { WashHero } from "@/components/WashHero";
-import { BUSINESS, DONATION, LOYALTY, estimatePrice } from "@/lib/constants";
+import { BUSINESS, DONATION, LOYALTY, MAINTENANCE_COPY, estimatePrice } from "@/lib/constants";
 import { HOME_FAQS } from "@/lib/faq";
 import { TYPICAL_JOBS } from "@/lib/jobs";
 import { CRAFT_TILES } from "@/lib/photos";
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   ...pageMeta({
     title: "Brisbane mobile car detailing",
     description:
-      "Auto Care Detailing comes to your Brisbane driveway. Foam, rinse, protect — inside and out. Book morning or afternoon online, Sundays included. Pay on the day.",
+      "Auto Care Detailing comes to your Brisbane driveway. Want it spotless? Book morning or afternoon online, Sundays included. Pay on the day.",
     path: "/",
   }),
   title: {
@@ -27,7 +27,8 @@ export const metadata: Metadata = {
 };
 
 const TICKER = [
-  "Brisbane driveways",
+  "We come to you",
+  "Best prices, best results",
   "Sundays included",
   "Pay on the day",
   "10% of every job donated",
@@ -46,17 +47,17 @@ const STEPS = [
   {
     n: "01",
     t: "Book the driveway",
-    d: "Pick your car size, the package and a morning or afternoon window. Takes about a minute.",
+    d: "Pick the car, the package, and a morning or afternoon window.",
   },
   {
     n: "02",
     t: "We roll up",
-    d: "All we need is a hose tap and room to work around the car. Keys sorted, dogs inside.",
+    d: "Need a hose tap and room to work. Dogs in, keys sorted.",
   },
   {
     n: "03",
     t: "Pay on the day",
-    d: "Cash or card once you’ve had a look. No deposit, no online lock-in.",
+    d: "Cash or card when we finish. No online lock-in.",
   },
 ];
 
@@ -86,15 +87,16 @@ export default function HomePage() {
       <section id="packages" className="sect">
         <div className="wrap">
           <Reveal className="sect-head">
-            <p className="eyebrow">Packages</p>
+            <p className="eyebrow">As cheap as ${fromPrice}</p>
             <h2 className="sect-title">
-              Pick the finish.
+              Good Better Best
               <br />
-              <span className="dim">We bring the rest.</span>
+              <span className="dim">Best in the industry, every time.</span>
             </h2>
             <p className="sect-lede">
-              Inside and out in one visit. Pick your car size and the price
-              updates. GST included, paid on the day.
+              Inside and outside in one visit. Exterior-only, interior-only, and
+              a maintenance plan live on{" "}
+              <Link href="/services" className="text-link">our packages</Link>.
             </p>
           </Reveal>
           <Reveal delay={80}>
@@ -117,15 +119,13 @@ export default function HomePage() {
             <sup>%</sup>
           </Reveal>
           <Reveal delay={100}>
-            <p className="eyebrow">Every job gives back</p>
+            <p className="eyebrow">Donation · Palestine · Sudan · Lebanon</p>
             <h2 id="give-title" className="sect-title">
-              {DONATION.tagline}
+              {DONATION.percent}% donated every job
+              <br />
+              <span className="dim">{DONATION.tagline}</span>
             </h2>
-            <p className="sect-lede">
-              {DONATION.percent}% of every job goes toward relief in Palestine,
-              Sudan and Lebanon. It comes out of our side, not added to your
-              bill. You book a wash, someone gets a meal.
-            </p>
+            <p className="sect-lede">{DONATION.lead}</p>
             <ul className="give-flags">
               {FLAGS.map((f) => (
                 <li key={f.name}>
@@ -178,8 +178,11 @@ export default function HomePage() {
       <section className="sect sect--line">
         <div className="wrap">
           <Reveal className="sect-head">
-            <p className="eyebrow">How a booking works</p>
-            <h2 className="sect-title">Three steps. One driveway.</h2>
+            <p className="eyebrow">Three steps</p>
+            <h2 className="sect-title">How a booking works</h2>
+            <p className="sect-lede">
+              Book a slot. Leave the car home. We wash it where it sits.
+            </p>
           </Reveal>
           <ol className="steps">
             {STEPS.map((s, i) => (
@@ -199,20 +202,33 @@ export default function HomePage() {
           <Reveal>
             <p className="eyebrow">{LOYALTY.kicker}</p>
             <h2 className="sect-title">
-              Stick with us.
+              {LOYALTY.title}
               <br />
-              <span className="dim">It gets cheaper.</span>
+              <span className="dim">{LOYALTY.leadLines[0]}</span>
             </h2>
             <p className="sect-lede">
-              {LOYALTY.offerTitle}. {LOYALTY.offerBody} Free to join, we
-              stamp it against your phone number.
+              Stick with us, and it shows. {LOYALTY.leadLines[2]}
             </p>
-            <div className="loyal-actions">
-              <Link href="/book" className="btn btn-accent">
-                Start your card
+            <p className="sect-lede">
+              <strong>{LOYALTY.offerTitle}.</strong> {LOYALTY.offerBody}
+            </p>
+            <p className="sect-lede">{LOYALTY.how}</p>
+            <div className="loyal-plan">
+              <p className="eyebrow">{MAINTENANCE_COPY.kicker}</p>
+              <h3>{MAINTENANCE_COPY.title}</h3>
+              <p>{MAINTENANCE_COPY.subtitle}. {MAINTENANCE_COPY.boxBody}</p>
+              <Link href={MAINTENANCE_COPY.readMoreHref} className="text-link">
+                {MAINTENANCE_COPY.readMoreLabel} →
               </Link>
-              <Link href="/services#maintenance" className="btn btn-ghost">
-                Maintenance plans
+            </div>
+            <h3 className="loyal-join">{LOYALTY.memberTitle}</h3>
+            <p className="sect-lede">Become a member for free so it&rsquo;s easier to stamp.</p>
+            <div className="loyal-actions">
+              <Link href="/contact" className="btn btn-accent">
+                {LOYALTY.memberCta}
+              </Link>
+              <Link href="/book" className="btn btn-ghost">
+                Book a visit
               </Link>
             </div>
             <p className="fine">{LOYALTY.limit}</p>
@@ -294,10 +310,9 @@ export default function HomePage() {
       <section className="sect sect--line">
         <div className="wrap faq-wrap">
           <Reveal>
-            <p className="eyebrow">Before you book</p>
-            <h2 className="sect-title">Quick answers.</h2>
+            <h2 className="sect-title">Most common questions</h2>
             <p className="sect-lede">
-              The rest live on the <Link href="/faq" className="text-link">full FAQ</Link>.
+              <Link href="/faq" className="text-link">Read more</Link> on the full FAQ.
             </p>
           </Reveal>
           <div>
@@ -317,7 +332,7 @@ export default function HomePage() {
         />
         <div className="final-shade" />
         <Reveal className="wrap final-copy">
-          <p className="eyebrow">Live calendar · 7 days · AM / PM</p>
+          <p className="eyebrow">Live calendar · 7 days · AM/PM · Greater Brisbane</p>
           <h2 className="final-title">
             Ready when
             <br />
@@ -325,7 +340,7 @@ export default function HomePage() {
           </h2>
           <div className="loyal-actions">
             <Link href="/book" className="btn btn-accent btn-lg">
-              Book a detail
+              Book a time
             </Link>
             <a href={`tel:${BUSINESS.phone.replace(/\s/g, "")}`} className="btn btn-ghost btn-lg">
               Call {BUSINESS.phone}

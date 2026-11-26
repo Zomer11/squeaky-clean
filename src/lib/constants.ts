@@ -325,7 +325,7 @@ export const MAINTENANCE_COPY = {
   subtitle: "Weekly, fortnightly or monthly",
   boxTitle: "Maximise your value",
   boxBody:
-    "Maximise ur value through our getting continuous discounts on a weekly, fortnightly or monthly basis",
+    "Maximise your value by getting continuous discounts on a weekly, fortnightly or monthly basis.",
   readMoreHref: "/services#maintenance",
   readMoreLabel: "Read more",
 } as const;

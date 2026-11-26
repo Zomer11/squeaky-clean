@@ -9,7 +9,7 @@ export const NAV = [
   { href: "/jobs", label: "Jobs" },
   { href: "/donation", label: "Donations" },
   { href: "/faq", label: "FAQ" },
-  { href: "/about", label: "Our story" },
+  { href: "/about", label: "Our Story" },
   { href: "/contact", label: "Contact" },
 ];
 

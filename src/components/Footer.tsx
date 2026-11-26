@@ -11,7 +11,7 @@ const EXPLORE = [
   { href: "/jobs", label: "Typical jobs" },
   { href: "/donation", label: "Donations" },
   { href: "/faq", label: "FAQ" },
-  { href: "/about", label: "Our story" },
+  { href: "/about", label: "Our Story" },
   { href: "/contact", label: "Contact" },
 ];
 

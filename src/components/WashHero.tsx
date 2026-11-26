@@ -207,14 +207,17 @@ export function WashHero({ fromPrice }: { fromPrice: number }) {
 
         {/* 00 — hero */}
         <div data-a="0" data-b="0.075" className="wash-chapter wash-chapter--hero">
-          <p className="eyebrow">Brisbane · Mobile car detailing</p>
+          <p className="eyebrow">Want it spotless?</p>
           <h1 className="wash-title">
-            <span>Showroom finish.</span>
-            <span className="accent">In your driveway.</span>
+            <span>Meet Auto Care Detailing.</span>
+            <span className="accent">Reborn your car.</span>
           </h1>
           <p className="wash-lede">
-            We bring the water, the foam and the kit. You keep your weekend.
-            Sundays included, pay on the day.
+            Your car reborn. At your driveway. Exterior, interior, or a full
+            reset. Sundays included.
+          </p>
+          <p className="wash-lede wash-lede--note">
+            Bookings confirm instantly. Inquiries: we aim to reply the same day.
           </p>
           <div className="wash-actions">
             <Link href="/book" className="btn btn-accent btn-lg">
