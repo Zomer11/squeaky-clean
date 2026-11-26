@@ -1849,3 +1849,9 @@ body:has(.final) .footer-cta {
 .pkg-panel-inner .text-ink {
   color: color-mix(in srgb, var(--paper) 85%, transparent) !important;
 }
+
+.footer-logo {
+  width: 9rem;
+  height: auto;
+  margin: -1rem 0 0.75rem -0.75rem;
+}

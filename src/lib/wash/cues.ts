@@ -55,7 +55,7 @@ export const CUES: Cue[] = [
   {
     id: "showroom",
     at: 0.88,
-    shot: { pos: [6.0, 1.05, -5.0], look: [0.1, 0.35, 0], fov: 30, offset: 0.17 },
+    shot: { pos: [6.8, 1.1, -5.6], look: [0.1, 0.35, 0], fov: 30, offset: 0.17 },
     mobile: { pos: [8.4, 2.2, -7.6], look: [0.1, -0.95, 0], fov: 50, offset: 0 },
   },
   {

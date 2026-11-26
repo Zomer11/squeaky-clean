@@ -24,12 +24,16 @@ uniform mat4 uCarInv;
 uniform float uFoamX;
 uniform float uWashX;
 uniform float uTime;
+uniform float uBead;
 uniform float uDirtAmt;
+uniform float uFoamLift;
 uniform vec3 uDirtTint;
 varying vec3 vCar;
+varying vec3 vCarN;
 float gDirt = 0.0;
 float gFoam = 0.0;
 float gWet = 0.0;
+float gDrop = 0.0;
 float h3(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
 float vnoise(vec3 x){
   vec3 i = floor(x); vec3 f = fract(x); f = f * f * (3.0 - 2.0 * f);
@@ -37,6 +41,38 @@ float vnoise(vec3 x){
              mix(mix(h3(i + vec3(0,0,1)), h3(i + vec3(1,0,1)), f.x), mix(h3(i + vec3(0,1,1)), h3(i + vec3(1,1,1)), f.x), f.y), f.z);
 }
 float fbm(vec3 p){ float a = 0.5; float s = 0.0; for (int i = 0; i < 4; i++){ s += a * vnoise(p); p *= 2.03; a *= 0.5; } return s; }
+float washEdge(vec3 p){ return (fbm(p * 5.0 + 3.1) - 0.5) * 0.45; }
+`;
+
+/** Thick foam: push the surface out where it's foamed, so the foam has real volume. */
+const FOAM_VERTEX = /* glsl */ `
+{
+  vec3 cp = (uCarInv * modelMatrix * vec4(transformed, 1.0)).xyz;
+  float e = washEdge(cp);
+  float cl = smoothstep(-0.05, 0.05, cp.x - uWashX + e);
+  float fo = smoothstep(-0.07, 0.07, cp.x - uFoamX + e) * (1.0 - cl);
+  transformed += objectNormal * fo * uFoamLift * (0.012 + 0.03 * fbm(cp * 14.0));
+}
+`;
+
+/** Stripes + door decal (paint only), drawn before the dirt so dirt sits on top. */
+const LIVERY_FRAG = /* glsl */ `
+#ifdef ACD_PAINT
+{
+  float az = abs(vCar.z);
+  float st = smoothstep(0.028, 0.034, az) * (1.0 - smoothstep(0.186, 0.192, az)) * step(0.3, vCar.y) * step(0.2, vCarN.y + 0.6);
+  diffuseColor.rgb = mix(diffuseColor.rgb, uAccent, st);
+  if (abs(vCarN.z) > 0.55) {
+    float u = (vCar.x + 0.88) / 1.22;
+    if (vCar.z < 0.0) u = 1.0 - u;
+    float v = (vCar.y - 0.42) / 0.3;
+    if (u > 0.0 && u < 1.0 && v > 0.0 && v < 1.0) {
+      vec4 d = texture2D(uDecal, vec2(u, v));
+      diffuseColor.rgb = mix(diffuseColor.rgb, d.rgb, d.a);
+    }
+  }
+}
+#endif
 `;
 
 const DIRT_FRAG = /* glsl */ `
@@ -46,7 +82,7 @@ const DIRT_FRAG = /* glsl */ `
   float streak = fbm(vec3(vCar.x * 16.0, vCar.y * 1.4, vCar.z * 16.0));
   float splat = smoothstep(0.55, 0.8, fbm(vCar * 11.0));
   float mask = clamp(0.32 + 0.75 * low + (n - 0.5) * 1.1 + (streak - 0.5) * 0.5 + splat * 0.35, 0.0, 1.0) * uDirtAmt;
-  float edge = (fbm(vCar * 5.0 + 3.1) - 0.5) * 0.45;
+  float edge = washEdge(vCar);
   float clean = smoothstep(-0.05, 0.05, vCar.x - uWashX + edge);
   float foamed = smoothstep(-0.07, 0.07, vCar.x - uFoamX + edge) * (1.0 - clean);
   gWet = clean * (1.0 - smoothstep(0.0, 1.1, vCar.x - uWashX + edge));
@@ -58,6 +94,10 @@ const DIRT_FRAG = /* glsl */ `
   gFoam = foamed * step(0.01, uDirtAmt) * (1.0 - 0.35 * drip * smoothstep(0.9, 0.3, vCar.y));
   diffuseColor.rgb = mix(diffuseColor.rgb, vec3(1.0) * (0.9 + 0.1 * bub), gFoam);
   diffuseColor.rgb *= mix(1.0, 0.78, gWet);
+  // water beads left on the clean paint after the rinse
+  float cell = vnoise(vCar * vec3(46.0, 46.0, 46.0));
+  gDrop = smoothstep(0.83, 0.86, cell) * clean * uBead * step(0.01, uDirtAmt);
+  diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 0.7, gDrop);
 }
 `;
 
@@ -68,34 +108,41 @@ function patchDirt(
   shared: Record<string, THREE.IUniform>,
   amount: number,
   tint = new THREE.Color(1, 1, 1),
+  opts: { paint?: boolean; foamLift?: number } = {},
 ) {
   const dirt = { value: amount };
   const tintU = { value: tint };
+  const lift = { value: opts.foamLift ?? 0 };
   (mat as Patched).userData.dirt = dirt;
+  if (opts.paint) mat.defines = { ...(mat.defines ?? {}), ACD_PAINT: "" };
   mat.onBeforeCompile = (shader) => {
-    Object.assign(shader.uniforms, shared, { uDirtAmt: dirt, uDirtTint: tintU });
+    Object.assign(shader.uniforms, shared, { uDirtAmt: dirt, uDirtTint: tintU, uFoamLift: lift });
     shader.vertexShader = shader.vertexShader
-      .replace(
-        "#include <common>",
-        "#include <common>\nuniform mat4 uCarInv;\nvarying vec3 vCar;",
-      )
+      .replace("#include <common>", "#include <common>\n" + NOISE)
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\n" + FOAM_VERTEX)
       .replace(
         "#include <project_vertex>",
-        "#include <project_vertex>\nvCar = (uCarInv * modelMatrix * vec4(transformed, 1.0)).xyz;",
+        `#include <project_vertex>
+vCar = (uCarInv * modelMatrix * vec4(transformed, 1.0)).xyz;
+vCarN = normalize(mat3(uCarInv * modelMatrix) * objectNormal);`,
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace("#include <common>", "#include <common>\n" + NOISE)
-      .replace("#include <color_fragment>", "#include <color_fragment>\n" + DIRT_FRAG)
+      .replace(
+        "#include <common>",
+        "#include <common>\n" + NOISE + "\nuniform sampler2D uDecal;\nuniform vec3 uAccent;",
+      )
+      .replace("#include <color_fragment>", "#include <color_fragment>\n" + LIVERY_FRAG + DIRT_FRAG)
       .replace(
         "#include <roughnessmap_fragment>",
         `#include <roughnessmap_fragment>
 roughnessFactor = mix(roughnessFactor, 0.9, gDirt);
 roughnessFactor = mix(roughnessFactor, 0.7, gFoam);
-roughnessFactor = mix(roughnessFactor, 0.015, gWet * 0.85);`,
+roughnessFactor = mix(roughnessFactor, 0.015, gWet * 0.85);
+roughnessFactor = mix(roughnessFactor, 0.0, gDrop);`,
       )
       .replace(
         "#include <metalnessmap_fragment>",
-        "#include <metalnessmap_fragment>\nmetalnessFactor *= 1.0 - max(gDirt, gFoam);",
+        "#include <metalnessmap_fragment>\nmetalnessFactor *= 1.0 - max(max(gDirt, gFoam), gDrop);",
       )
       .replace(
         "#include <lights_physical_fragment>",
@@ -105,7 +152,7 @@ material.clearcoat *= 1.0 - max(gDirt * 0.7, gFoam * 0.6);
 #endif`,
       );
   };
-  mat.customProgramCacheKey = () => "dirt-v1";
+  mat.customProgramCacheKey = () => (opts.paint ? "dirt-v2-paint" : "dirt-v2");
 }
 
 /* ------------------------------------------------------------------ */
@@ -196,7 +243,7 @@ class Spray {
       pos[i * 3 + 1] += vel[i * 3 + 1] * dt;
       pos[i * 3 + 2] += vel[i * 3 + 2] * dt;
       const y = pos[i * 3 + 1];
-      const surf = y < 1.0 ? 0.93 : y < 1.42 ? 0.72 : -9;
+      const surf = y < 0.9 ? 0.96 : y < 1.28 ? 0.7 : -9;
       if (vel[i * 3 + 2] < 0 && pos[i * 3 + 2] < surf && y > 0.15) {
         pos[i * 3 + 2] = surf;
         if (foam) {
@@ -235,10 +282,10 @@ export type EngineOptions = {
 };
 
 const CALLOUT_POINTS: [number, number, number][] = [
-  [1.65, 0.86, 0.3], // bonnet paint
-  [1.4, 0.34, 0.98], // front wheel
-  [0.55, 1.22, 0.7], // glass
-  [-1.4, 0.12, 0.95], // rear tyre
+  [1.45, 0.82, 0.32], // bonnet paint
+  [1.42, 0.36, 1.0], // front wheel
+  [0.05, 1.12, 0.62], // glass
+  [-1.38, 0.08, 1.0], // rear tyre
 ];
 
 const tmpV = new THREE.Vector3();
@@ -264,7 +311,13 @@ export class WashEngine {
     uFoamX: { value: 3 },
     uWashX: { value: 3 },
     uTime: { value: 0 },
+    uBead: { value: 0 },
+    uDecal: { value: null as THREE.Texture | null },
+    uAccent: { value: new THREE.Color(1.0, 0.16, 0.02) },
   };
+  private wheels: THREE.Object3D[] = [];
+  /** seconds the car takes to roll into frame on load */
+  private static ROLL = 2.6;
 
   private progress = 0;
   private pointer = new THREE.Vector2();
@@ -456,6 +509,7 @@ export class WashEngine {
       }
       const gltf = await loader.parseAsync(bytes, "");
       const model = gltf.scene;
+      this.shared.uDecal.value = await this.buildDecal();
       model.traverse((o) => {
         const mesh = o as THREE.Mesh;
         if (!mesh.isMesh) return;
@@ -463,9 +517,12 @@ export class WashEngine {
         mesh.material = this.materialFor(src.name);
         this.meshes.push(mesh);
       });
+      model.traverse((o) => {
+        if (o.name.startsWith("Wheel_")) this.wheels.push(o);
+      });
       this.carRoot.add(model);
       this.carRoot.updateMatrixWorld(true);
-      if (!this.opts.reducedMotion) this.loadedAt = performance.now();
+      if (!this.opts.reducedMotion && !this.snap) this.loadedAt = performance.now();
       await this.renderer.compileAsync(this.scene, this.camera);
       this.ready = true;
       this.opts.onReady?.();
@@ -475,19 +532,75 @@ export class WashEngine {
     }
   }
 
+  /** "AUTO CARE DETAILING" door decal, drawn with the site's own display font. */
+  private async buildDecal(): Promise<THREE.Texture> {
+    try {
+      await document.fonts?.ready;
+    } catch {
+      /* fonts API missing: fall back to system font */
+    }
+    const family =
+      getComputedStyle(document.documentElement).getPropertyValue("--font-display").trim() ||
+      "system-ui, sans-serif";
+    const c = document.createElement("canvas");
+    c.width = 1024;
+    c.height = 256;
+    const g = c.getContext("2d")!;
+    g.clearRect(0, 0, c.width, c.height);
+    // car-outline swoosh
+    g.strokeStyle = "#ff5a1f";
+    g.lineWidth = 9;
+    g.lineCap = "round";
+    g.beginPath();
+    g.moveTo(330, 74);
+    g.bezierCurveTo(400, 26, 560, 18, 640, 54);
+    g.lineTo(720, 66);
+    g.stroke();
+    g.font = `800 108px ${family}`;
+    g.textAlign = "center";
+    g.textBaseline = "alphabetic";
+    g.fillStyle = "#ff5a1f";
+    g.fillText("AUTO CARE", 512, 170);
+    g.font = `600 58px ${family}`;
+    g.fillStyle = "#cfd3d8";
+    // letter-spaced second line
+    const word = "DETAILING";
+    const spacing = 14;
+    const widths = [...word].map((ch) => g.measureText(ch).width);
+    let x = 512 - (widths.reduce((a, b) => a + b, 0) + spacing * (word.length - 1)) / 2;
+    g.textAlign = "left";
+    [...word].forEach((ch, i) => {
+      g.fillText(ch, x, 236);
+      x += widths[i] + spacing;
+    });
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 8;
+    return tex;
+  }
+
+  private matCache = new Map<string, THREE.Material>();
   private materialFor(name: string): THREE.Material {
+    const hit = this.matCache.get(name);
+    if (hit) return hit;
+    const m = this.makeMaterial(name);
+    this.matCache.set(name, m);
+    return m;
+  }
+
+  private makeMaterial(name: string): THREE.Material {
     const shared = this.shared;
     switch (name) {
       case "Paint": {
         const m = new THREE.MeshPhysicalMaterial({
           color: this.paintTarget.clone(),
-          metalness: 0.55,
-          roughness: 0.3,
+          metalness: 0.5,
+          roughness: 0.28,
           clearcoat: 1,
-          clearcoatRoughness: 0.03,
-          envMapIntensity: 1.25,
+          clearcoatRoughness: 0.025,
+          envMapIntensity: 1.3,
         });
-        patchDirt(m, shared, 1);
+        patchDirt(m, shared, 1, undefined, { paint: true, foamLift: 1 });
         this.paint = m;
         return m;
       }
@@ -500,22 +613,44 @@ export class WashEngine {
           clearcoatRoughness: 0,
           envMapIntensity: 1.6,
         });
-        patchDirt(m, shared, 0.55);
+        patchDirt(m, shared, 0.55, undefined, { foamLift: 0.7 });
         return m;
       }
       case "Rim": {
         const m = new THREE.MeshPhysicalMaterial({
-          color: 0xc3c7cc,
-          metalness: 1,
-          roughness: 0.2,
+          color: 0x1b1d21,
+          metalness: 0.9,
+          roughness: 0.32,
           envMapIntensity: 1.2,
         });
         patchDirt(m, shared, 1, new THREE.Color(0.55, 0.5, 0.45));
         return m;
       }
+      case "Accent": {
+        const m = new THREE.MeshPhysicalMaterial({
+          color: 0xff5a1f,
+          metalness: 0.1,
+          roughness: 0.3,
+          clearcoat: 1,
+          clearcoatRoughness: 0.05,
+          envMapIntensity: 1.1,
+        });
+        patchDirt(m, shared, 0.6);
+        return m;
+      }
+      case "Metal": {
+        const m = new THREE.MeshPhysicalMaterial({
+          color: 0xa9adb3,
+          metalness: 1,
+          roughness: 0.25,
+          envMapIntensity: 1.2,
+        });
+        patchDirt(m, shared, 0.7, new THREE.Color(0.55, 0.5, 0.45));
+        return m;
+      }
       case "Tyre": {
         const m = new THREE.MeshPhysicalMaterial({ color: 0x0d0d0e, roughness: 0.86 });
-        patchDirt(m, shared, 0.45);
+        patchDirt(m, shared, 0.45, undefined, { foamLift: 0.4 });
         return m;
       }
       case "HeadLight": {
@@ -631,6 +766,7 @@ export class WashEngine {
     const washX = 3 - 6 * rinsePhase;
     this.shared.uFoamX.value = foamX;
     this.shared.uWashX.value = washX;
+    this.shared.uBead.value = rinsePhase * (1 - smoothstep(0.53, 0.58, p));
 
     // spray intensity from how fast the wash is moving
     const dw = Math.abs(w - this.lastW) / Math.max(dt, 1e-3);
@@ -659,6 +795,14 @@ export class WashEngine {
     // --- car turntable + paint easing
     const spin = smoothstep(SPIN_RANGE[0], SPIN_RANGE[1], p);
     this.carRoot.rotation.y = spin * Math.PI * 0.55 + Math.sin(t * 0.3) * 0.02 * spin;
+    // roll-in on load: drives in from behind and settles, wheels turning
+    const since = this.loadedAt ? (performance.now() - this.loadedAt) / 1000 : 99;
+    const roll = Math.min(1, since / WashEngine.ROLL);
+    const eased = 1 - Math.pow(1 - roll, 3);
+    const x = -11 * (1 - eased);
+    const dx = x - this.carRoot.position.x;
+    this.carRoot.position.x = x;
+    if (dx !== 0) for (const w of this.wheels) w.rotation.z -= dx / 0.345;
     this.carRoot.updateMatrixWorld(true);
     (this.shared.uCarInv.value as THREE.Matrix4).copy(this.carRoot.matrixWorld).invert();
     if (this.paint) this.paint.color.lerp(this.paintTarget, 1 - Math.exp(-dt * 4));
@@ -667,7 +811,7 @@ export class WashEngine {
     let lightK = 1;
     if (this.loadedAt) {
       const s = (performance.now() - this.loadedAt) / 1000;
-      lightK = s < 0.35 ? 0 : s < 0.45 ? 1 : s < 0.6 ? 0.1 : s < 0.7 ? 1 : s < 0.78 ? 0.3 : s < 1.4 ? Math.min(1, (s - 0.78) * 2 + 0.5) : 1;
+      lightK = s < 0.2 ? 0 : s < 0.3 ? 1 : s < 0.42 ? 0.1 : s < 0.5 ? 1 : s < 0.58 ? 0.3 : s < 1.0 ? Math.min(1, (s - 0.58) * 2 + 0.5) : 1;
     }
     for (const m of this.heads) m.color.setRGB(6 * lightK, 6.2 * lightK, 6.6 * lightK);
     for (const m of this.tails) m.color.setRGB(4 * lightK, 0.12 * lightK, 0.06 * lightK);

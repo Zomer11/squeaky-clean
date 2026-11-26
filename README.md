@@ -177,7 +177,6 @@ public/                 logo, images, llms.txt
 
 - **Email + domain** are placeholders `hello@autocaredetailing.com.au` / `autocaredetailing.com.au` (`src/lib/constants.ts`, `src/lib/site.ts`, `.env.example`). Swap in the real ones.
 - **ABN** is the placeholder `00 000 000 000`.
-- **Logo** shows a Mercedes-style badge and grille on the car. That's a trademark risk for ads/print; regenerate with a generic car or paint it out.
 - **Google reviews** not linked yet (`googleReviewUrl`, `googleMapsUrl` in `constants.ts`; quotes in `src/lib/reviews.ts`).
 - Old project name still in internals: DB file `data/binbus.db`, `binbus2026` in the weak-password list. Renaming the DB file would hide existing bookings, so migrate it deliberately.
 - A few pre-existing `react-hooks/set-state-in-effect` lint errors (AdminPanel, AnimateIn, BookingForm, ThanksDetails). Not security-related.
@@ -197,6 +196,12 @@ public/                 logo, images, llms.txt
 - New header (fixed, mobile menu), footer, wordmark, homepage sections (size-aware package picker, donation feature, craft, steps, loyalty card, jobs, FAQ, final CTA).
 - Donation popup removed; the 10% donation is now a full section on the homepage plus the existing page.
 - Google reviews section only shows once reviews/rating are set (it used to show an owner note to the public).
+
+### Car + logo v2
+- Hero car is now an original sports coupe (`tools/blender/coupe.py`): wing, orange calipers and rim lips, LED blades, splitter, diffuser, quad exhausts. Wheels are separate nodes and spin when the car rolls in on load.
+- Stripes and the door decal are drawn by the paint shader, so they get dirty and foamed with the rest of the car. Foam has real thickness (vertex push), and water beads sit on the paint after the rinse.
+- New logo from the same car (`public/logo.png`, `logo-transparent.png`, `logo-mark.png`), no third-party car or badge. Re-render with `python3 tools/blender/coupe.py out.glb car.png logo`.
+- App icon / favicon: orange drop mark (`src/app/icon.png`, `apple-icon.png`, `favicon.ico`).
 
 ## History
 

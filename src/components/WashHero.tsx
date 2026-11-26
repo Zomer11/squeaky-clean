@@ -10,7 +10,7 @@ type Chapter = { a: number; b: number };
 const PAINTS = [
   { name: "Obsidian", hex: "#14171c" },
   { name: "Pearl", hex: "#d9dbdc" },
-  { name: "Ember", hex: "#c2410c" },
+  { name: "Graphite", hex: "#3a3f46" },
   { name: "Sapphire", hex: "#0f2f63" },
 ];
 
