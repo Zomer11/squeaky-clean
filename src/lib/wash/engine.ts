@@ -40,13 +40,13 @@ float vnoise(vec3 x){
   return mix(mix(mix(h3(i), h3(i + vec3(1,0,0)), f.x), mix(h3(i + vec3(0,1,0)), h3(i + vec3(1,1,0)), f.x), f.y),
              mix(mix(h3(i + vec3(0,0,1)), h3(i + vec3(1,0,1)), f.x), mix(h3(i + vec3(0,1,1)), h3(i + vec3(1,1,1)), f.x), f.y), f.z);
 }
-float fbm(vec3 p){ float a = 0.5; float s = 0.0; for (int i = 0; i < 4; i++){ s += a * vnoise(p); p *= 2.03; a *= 0.5; } return s; }
+float fbm(vec3 p){ float a = 0.5; float s = 0.0; for (int i = 0; i < 3; i++){ s += a * vnoise(p); p *= 2.03; a *= 0.5; } return s * 1.14; }
 float washEdge(vec3 p){ return (fbm(p * 5.0 + 3.1) - 0.5) * 0.45; }
 `;
 
 /** Thick foam: push the surface out where it's foamed, so the foam has real volume. */
 const FOAM_VERTEX = /* glsl */ `
-{
+if (uFoamLift > 0.0 && uFoamX < 2.95 && uWashX > -2.95) {
   vec3 cp = (uCarInv * modelMatrix * vec4(transformed, 1.0)).xyz;
   float e = washEdge(cp);
   float cl = smoothstep(-0.05, 0.05, cp.x - uWashX + e);
@@ -76,7 +76,7 @@ const LIVERY_FRAG = /* glsl */ `
 `;
 
 const DIRT_FRAG = /* glsl */ `
-{
+if (uWashX > -2.95 || uBead > 0.001) {
   float n = fbm(vCar * 3.2);
   float low = 1.0 - smoothstep(0.2, 1.15, vCar.y);
   float streak = fbm(vec3(vCar.x * 16.0, vCar.y * 1.4, vCar.z * 16.0));
@@ -621,8 +621,18 @@ export class WashEngine {
 
     // re-pivot each wheel on its own hub so it can roll
     const centres: THREE.Vector3[] = [];
+    const hubInfo: { c: THREE.Vector3; outZ: number; r: number }[] = [];
     for (const w of wheelNodes) {
-      const c = new THREE.Box3().setFromObject(w).getCenter(new THREE.Vector3());
+      // hub = centre of the rim (the whole node also holds brake parts that skew its box)
+      const rimNode = w.children.find((ch) => /Rim$/.test(ch.name)) ?? w;
+      const rimBox = new THREE.Box3().setFromObject(rimNode);
+      const c = rimBox.getCenter(new THREE.Vector3());
+      const tyreBox = new THREE.Box3().setFromObject(w);
+      hubInfo.push({
+        c: this.carRoot.worldToLocal(c.clone()),
+        outZ: this.carRoot.worldToLocal(rimBox.max.clone()).z,
+        r: (tyreBox.max.y - tyreBox.min.y) / 2,
+      });
       const pivot = new THREE.Object3D();
       pivot.position.copy(this.carRoot.worldToLocal(c.clone()));
       this.carRoot.add(pivot);
@@ -633,17 +643,39 @@ export class WashEngine {
     }
     this.carRoot.updateMatrixWorld(true);
 
-    // callout anchors from the real geometry
+    // callout anchors snapped onto the real surfaces (raycast down onto bonnet / windscreen,
+    // rim face and lower tyre sidewall on the camera-facing side)
+    this.carRoot.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(holder);
-    const roof = model.getObjectByName("BodyRoofPanel");
-    const top = roof ? new THREE.Box3().setFromObject(roof).max.y : box.max.y * 0.6;
-    const nearFront = centres.filter((c) => c.z > 0).sort((a, b) => b.x - a.x)[0];
-    const nearRear = centres.filter((c) => c.z > 0).sort((a, b) => a.x - b.x)[0];
+    const ray = new THREE.Raycaster();
+    const surfaceAt = (name: string, fallback: THREE.Vector3) => {
+      const part = model.getObjectByName(name);
+      if (!part) return fallback;
+      const pb = new THREE.Box3().setFromObject(part);
+      const c = pb.getCenter(new THREE.Vector3());
+      const from = this.carRoot.localToWorld(this.carRoot.worldToLocal(new THREE.Vector3(c.x, box.max.y + 2, c.z + 0.25)));
+      ray.set(from, new THREE.Vector3(0, -1, 0));
+      const hit = ray.intersectObject(part, true)[0];
+      return hit ? this.carRoot.worldToLocal(hit.point.clone()) : this.carRoot.worldToLocal(c);
+    };
+    const sideWheels = hubInfo.filter((w) => w.c.z > 0);
+    const front = sideWheels.sort((a, b) => b.c.x - a.c.x)[0];
+    const rear = [...sideWheels].sort((a, b) => a.c.x - b.c.x)[0];
+    // fire a ray in from the camera side so the dot lands on the actual rim / sidewall
+    const sideHit = (x: number, y: number, fallback: THREE.Vector3) => {
+      ray.set(this.carRoot.localToWorld(new THREE.Vector3(x, y, 4)), new THREE.Vector3(0, 0, -1));
+      const hit = ray.intersectObjects(this.wheels, true)[0];
+      return hit ? this.carRoot.worldToLocal(hit.point.clone()) : fallback;
+    };
     this.callouts = [
-      new THREE.Vector3(box.max.x * 0.62, top * 0.7, 0.32),
-      nearFront ? nearFront.clone().add(new THREE.Vector3(0, 0, 0.14)) : new THREE.Vector3(1.4, 0.35, 1),
-      new THREE.Vector3(box.max.x * 0.08, top * 0.86, 0.5),
-      nearRear ? new THREE.Vector3(nearRear.x, 0.08, nearRear.z + 0.12) : new THREE.Vector3(-1.4, 0.08, 1),
+      surfaceAt("BodyHood", new THREE.Vector3(box.max.x * 0.6, box.max.y * 0.6, 0.3)),
+      front
+        ? sideHit(front.c.x, front.c.y, new THREE.Vector3(front.c.x, front.c.y, front.outZ))
+        : new THREE.Vector3(1.4, 0.35, 1),
+      surfaceAt("BodyWindshield", new THREE.Vector3(box.max.x * 0.1, box.max.y * 0.8, 0.3)),
+      rear
+        ? sideHit(rear.c.x - rear.r * 0.42, rear.c.y - rear.r * 0.62, new THREE.Vector3(rear.c.x, rear.c.y - rear.r * 0.6, rear.outZ))
+        : new THREE.Vector3(-1.4, 0.12, 1),
     ];
   }
 
@@ -728,7 +760,7 @@ export class WashEngine {
     const p = this.progress;
     const t = this.timer.getElapsed();
     this.shared.uTime.value = t;
-    const k = this.snap ? 1 : 1 - Math.exp(-dt * 5);
+    const k = this.snap ? 1 : 1 - Math.exp(-dt * 9);
 
     // --- wash amount: scroll OR hold-to-wash
     const scrollW = smoothstep(WASH_RANGE[0], WASH_RANGE[1], p);
