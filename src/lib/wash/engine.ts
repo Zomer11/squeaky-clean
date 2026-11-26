@@ -339,17 +339,19 @@ export class WashEngine {
   private frameTime = 0;
   private quality = 2;
   private ro: ResizeObserver;
+  /** full post chain (bloom) only on request: it blurs the whole screen several times a frame */
+  private post = false;
   /** ?snap in the URL: skip easing (for screenshots / QA). */
   private snap = typeof location !== "undefined" && location.search.includes("snap");
 
   constructor(private canvas: HTMLCanvasElement, private opts: EngineOptions) {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: false,
+      antialias: true,
       alpha: false,
       powerPreference: "high-performance",
     });
-    this.pr = Math.min(window.devicePixelRatio || 1, opts.mobile ? 1.5 : 1.75);
+    this.pr = Math.min(window.devicePixelRatio || 1, opts.mobile ? 1.25 : 1.35);
     this.renderer.setPixelRatio(this.pr);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -359,6 +361,7 @@ export class WashEngine {
       type: THREE.HalfFloatType,
       samples: opts.mobile ? 0 : 2,
     });
+    this.post = typeof location !== "undefined" && location.search.includes("bloom");
     this.composer = new EffectComposer(this.renderer, rt);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
     this.bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.45, 0.45, 0.97);
@@ -596,7 +599,7 @@ export class WashEngine {
           g.transmission = 0;
           g.thickness = 0;
           g.transparent = true;
-          g.opacity = 0.82;
+          g.opacity = 0.94;
           g.color.setRGB(0.02, 0.022, 0.026);
           g.roughness = 0.02;
           g.metalness = 0.1;
@@ -616,6 +619,17 @@ export class WashEngine {
       if (!mesh.isMesh) return;
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       mats.forEach(handle);
+      // only the part's own node name (multi-material parts sit in a small group)
+      const names = [mesh.name];
+      const parent = mesh.parent;
+      if (parent && parent !== model && parent.children.length > 1 && parent.children.every((c) => (c as THREE.Mesh).isMesh)) {
+        names.push(parent.name);
+      }
+      const hide = names.some((n) => /^(Interior|Engine|BodyHoodInterior|BodyHoodUnder)/.test(n));
+      if (hide) {
+        mesh.visible = false;
+        return;
+      }
       this.meshes.push(mesh);
     });
 
@@ -752,7 +766,8 @@ export class WashEngine {
     this.timer.update();
     const dt = Math.min(0.05, this.timer.getDelta());
     this.tick(dt);
-    this.composer.render(dt);
+    if (this.post) this.composer.render(dt);
+    else this.renderer.render(this.scene, this.camera);
     this.adapt(dt);
   };
 
@@ -931,7 +946,10 @@ export class WashEngine {
     this.lastOffset = NaN;
     this.applyOffset();
     this.camera.updateProjectionMatrix();
-    if (this.ready && !this.active) this.composer.render(0);
+    if (this.ready && !this.active) {
+      if (this.post) this.composer.render(0);
+      else this.renderer.render(this.scene, this.camera);
+    }
   }
 
   dispose() {
