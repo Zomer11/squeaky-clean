@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata: Metadata = {
   ...pageMeta({
     title: "Photo drafts",
-    description: "Scratch layouts for leftover Squeaky photos. Not in the nav.",
+    description: "Scratch layouts for leftover photos. Not in the nav.",
     path: "/look",
     index: false,
   }),

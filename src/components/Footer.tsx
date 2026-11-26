@@ -11,7 +11,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:px-6">
         <div>
           <div className="flex items-center gap-3">
-            <BrandMark size={64} className="h-16 w-16 shrink-0" />
+            <BrandMark size={56} className="shrink-0" />
             <p className="font-display text-2xl font-semibold">{BUSINESS.name}</p>
           </div>
           <p className="mt-2 max-w-sm text-sm text-paper/85">{BUSINESS.tagline}</p>

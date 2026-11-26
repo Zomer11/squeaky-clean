@@ -9,7 +9,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Typical jobs",
   description:
-    "How a Squeaky Solutions driveway detail usually looks in Brisbane — small, medium, large. Composite jobs, not customer reviews.",
+    "How an Auto Care Detailing driveway detail usually looks in Brisbane — small, medium, large. Composite jobs, not customer reviews.",
   path: "/jobs",
 });
 

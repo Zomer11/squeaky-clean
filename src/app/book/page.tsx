@@ -9,7 +9,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Book a detail",
   description:
-    "Book a Squeaky Solutions driveway detail in Brisbane. Live morning and afternoon calendar, seven days. Pay on the day.",
+    "Book an Auto Care Detailing driveway detail in Brisbane. Live morning and afternoon calendar, seven days. Pay on the day.",
   path: "/book",
 });
 

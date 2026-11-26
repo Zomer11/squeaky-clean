@@ -22,7 +22,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Our packages",
   description:
-    "Squeaky Solutions driveway packages: Good, Better and Best, plus exterior, interior and a maintenance plan. Small, medium, large. Brisbane mobile.",
+    "Auto Care Detailing driveway packages: Good, Better and Best, plus exterior, interior and a maintenance plan. Small, medium, large. Brisbane mobile.",
   path: "/services",
 });
 

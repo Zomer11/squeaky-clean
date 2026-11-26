@@ -16,24 +16,86 @@ type Bucket = { count: number; resetAt: number };
 
 const buckets = new Map<string, Bucket>();
 
+const MAX_BUCKETS = 20_000;
+
 function pruneBuckets(now: number) {
   if (buckets.size < 200) return;
   for (const [key, bucket] of buckets) {
     if (bucket.resetAt <= now) buckets.delete(key);
   }
+  // A flood from many IPs must not grow memory without bound; drop the oldest keys.
+  if (buckets.size > MAX_BUCKETS) {
+    const excess = buckets.size - MAX_BUCKETS;
+    let i = 0;
+    for (const key of buckets.keys()) {
+      if (i++ >= excess) break;
+      buckets.delete(key);
+    }
+  }
 }
 
 /**
- * Client IP for rate limits. In production, refuse to collapse everyone
- * onto one bucket — that made spray attacks look like a single client.
+ * Reads a JSON body with a hard byte cap, even when Content-Length is missing
+ * or lies (chunked uploads). Returns undefined if too big or not JSON.
+ */
+export async function readJsonLimited(request: Request, maxBytes = 16 * 1024): Promise<unknown> {
+  const declared = Number(request.headers.get("content-length") || 0);
+  if (declared > maxBytes) return undefined;
+  if (!request.body) return undefined;
+
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel().catch(() => {});
+      return undefined;
+    }
+    chunks.push(value);
+  }
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    return undefined;
+  }
+}
+
+/** Strips CR/LF and other control chars so user text can't break email headers. */
+export function oneLine(value: string, max = 120): string {
+  return value.replace(/[\u0000-\u001f\u007f]+/g, " ").trim().slice(0, max);
+}
+
+function cleanIp(value: string | null | undefined): string | null {
+  const ip = value?.trim();
+  if (!ip || ip.length > 64 || !/^[0-9a-fA-F:.]+$/.test(ip)) return null;
+  return ip;
+}
+
+/**
+ * Client IP for rate limits. The left side of X-Forwarded-For is whatever the
+ * client typed, so never trust it. Set TRUSTED_IP_HEADER to the header your
+ * host overwrites (cf-connecting-ip, fly-client-ip, x-vercel-forwarded-for,
+ * x-real-ip). Otherwise use the right-most X-Forwarded-For hop, which is the
+ * one appended by the proxy in front of the app.
  */
 export function clientIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  const first = forwarded?.split(",")[0]?.trim();
-  if (first) return first;
+  return clientIpFromHeaders(request.headers);
+}
 
-  const real = request.headers.get("x-real-ip")?.trim();
-  if (real) return real;
+export function clientIpFromHeaders(headers: Headers): string {
+  const trusted = process.env.TRUSTED_IP_HEADER?.trim().toLowerCase();
+  if (trusted) {
+    const value = headers.get(trusted)?.split(",")[0];
+    const ip = cleanIp(value);
+    if (ip) return ip;
+  }
+
+  const hops = headers.get("x-forwarded-for")?.split(",") ?? [];
+  const last = cleanIp(hops[hops.length - 1]);
+  if (last) return last;
 
   if (process.env.NODE_ENV === "production") {
     return "unknown";
@@ -77,7 +139,8 @@ function allowedOrigins(request: Request): Set<string> {
       } catch {
         /* ignore bad NEXT_PUBLIC_SITE_URL */
       }
-    } else if (process.env.NODE_ENV !== "production") {
+    }
+    if (process.env.NODE_ENV !== "production" && /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host)) {
       allowed.add(`http://${host}`);
       allowed.add(`https://${host}`);
     }

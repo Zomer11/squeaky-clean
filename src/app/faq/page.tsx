@@ -9,7 +9,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "FAQ",
   description:
-    "Squeaky Solutions FAQ: packages and prices, booking and cancel rules, driveway setup, rain, pay on the day, insurance. Brisbane mobile detailing.",
+    "Auto Care Detailing FAQ: packages and prices, booking and cancel rules, driveway setup, rain, pay on the day, insurance. Brisbane mobile detailing.",
   path: "/faq",
 });
 

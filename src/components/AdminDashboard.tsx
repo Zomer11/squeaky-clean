@@ -111,16 +111,16 @@ function LineChart({
           x2={w - pad}
           y1={h - pad - step * (h - pad * 2 - 10)}
           y2={h - pad - step * (h - pad * 2 - 10)}
-          stroke="rgba(212, 176, 122, 0.2)"
+          stroke="rgba(248, 136, 48, 0.2)"
         />
       ))}
-      <path d={line("yCancelled")} fill="none" stroke="#8a7560" strokeWidth="2" strokeDasharray="5 4" />
-      <path d={line("yConfirmed")} fill="none" stroke="#d4b07a" strokeWidth="3" strokeLinejoin="round" />
+      <path d={line("yCancelled")} fill="none" stroke="#8c8f94" strokeWidth="2" strokeDasharray="5 4" />
+      <path d={line("yConfirmed")} fill="none" stroke="#f88830" strokeWidth="3" strokeLinejoin="round" />
       {coords.map((p) => (
         <g key={p.label}>
-          <circle cx={p.x} cy={p.yCancelled} r="3.5" fill="#8a7560" />
-          <circle cx={p.x} cy={p.yConfirmed} r="4" fill="#d4b07a" />
-          <text x={p.x} y={h - 4} textAnchor="middle" fontSize="11" fill="#c9b89a">
+          <circle cx={p.x} cy={p.yCancelled} r="3.5" fill="#8c8f94" />
+          <circle cx={p.x} cy={p.yConfirmed} r="4" fill="#f88830" />
+          <text x={p.x} y={h - 4} textAnchor="middle" fontSize="11" fill="#c9cbce">
             {p.label}
           </text>
         </g>

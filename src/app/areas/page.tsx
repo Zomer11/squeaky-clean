@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Service areas",
   description:
-    "Squeaky Solutions covers Greater Brisbane — inner, northside, southside, east and west. Check your suburb and open Maps to see the area.",
+    "Auto Care Detailing covers Greater Brisbane — inner, northside, southside, east and west. Check your suburb and open Maps to see the area.",
   path: "/areas",
 });
 

@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Donations",
   description:
-    "Your detail, their meal — Squeaky Solutions donates 10% of every job toward Palestine, Sudan and Lebanon.",
+    "Your detail, their meal — Auto Care Detailing donates 10% of every job toward Palestine, Sudan and Lebanon.",
   path: "/donation",
 });
 

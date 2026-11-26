@@ -11,9 +11,9 @@ function resolveDbPath(): string {
   if (fromEnv) {
     return path.isAbsolute(fromEnv)
       ? fromEnv
-      : path.join(process.cwd(), fromEnv);
+      : path.join(/*turbopackIgnore: true*/ process.cwd(), fromEnv);
   }
-  return path.join(process.cwd(), "data", "binbus.db");
+  return path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "binbus.db");
 }
 
 const dbPath = resolveDbPath();
@@ -76,6 +76,26 @@ sqlite.exec(`
     created_at TEXT NOT NULL,
     consented_at TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS admin_sessions (
+    token_hash TEXT PRIMARY KEY,
+    fingerprint TEXT NOT NULL,
+    ua_hash TEXT NOT NULL,
+    ip TEXT,
+    created_at INTEGER NOT NULL,
+    last_seen INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS admin_auth_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    at INTEGER NOT NULL,
+    event TEXT NOT NULL,
+    ip TEXT,
+    ua TEXT
+  );
+
+  CREATE INDEX IF NOT EXISTS admin_auth_events_at ON admin_auth_events (at);
 `);
 
 function ensureColumn(table: string, column: string, ddl: string) {

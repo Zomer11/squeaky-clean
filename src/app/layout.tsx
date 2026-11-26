@@ -28,7 +28,7 @@ const ui = Inter({
 });
 
 const description =
-  "Squeaky Solutions — showroom finish at your Brisbane driveway. Inside + outside bundles, or exterior / interior only. Book morning or afternoon online. Pay on the day.";
+  "Auto Care Detailing — showroom finish at your Brisbane driveway. Inside + outside bundles, or exterior / interior only. Book morning or afternoon online. Pay on the day.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     "mobile car detailing Brisbane",
     "driveway car wash Brisbane",
     "car detailing Sunday",
-    "Squeaky Solutions",
+    "Auto Care Detailing",
   ],
   alternates: { canonical: "/" },
   openGraph: {
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ebe4d6",
+  themeColor: "#0b0b0d",
   width: "device-width",
   initialScale: 1,
 };

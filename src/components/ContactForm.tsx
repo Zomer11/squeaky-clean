@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BotGuard, botCheckEnabled } from "@/components/BotGuard";
 import { FormConsent } from "@/components/FormConsent";
 import { THANKS_STORAGE_KEY } from "@/lib/thanks";
 
@@ -24,6 +25,8 @@ export function ContactForm() {
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [website, setWebsite] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,12 +45,25 @@ export function ContactForm() {
       setError("Add a short message so we know what you need.");
       return;
     }
+    if (botCheckEnabled && !turnstileToken) {
+      setError("Give the human check a second to finish, then send again.");
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, suburb, message: body, consent: true }),
+        body: JSON.stringify({
+          name,
+          phone,
+          email,
+          suburb,
+          message: body,
+          consent: true,
+          website,
+          turnstileToken,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -181,6 +197,7 @@ export function ContactForm() {
         checked={agreed}
         onChange={setAgreed}
       />
+      <BotGuard honeypot={website} onHoneypot={setWebsite} onToken={setTurnstileToken} />
       {error && (
         <p
           className="text-sm font-medium text-danger"

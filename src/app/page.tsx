@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   ...pageMeta({
     title: "Brisbane mobile car detailing",
     description:
-      "Squeaky Solutions comes to your Brisbane driveway. Want it squeaky clean? Book morning or afternoon online, Sundays included. Pay on the day.",
+      "Auto Care Detailing comes to your Brisbane driveway. Want it spotless? Book morning or afternoon online, Sundays included. Pay on the day.",
     path: "/",
   }),
   title: {
@@ -41,7 +41,7 @@ export default function HomePage() {
           <div className="grid items-center gap-8 md:grid-cols-[1.05fr_0.95fr] md:gap-10">
             <div>
               <p className="hero-cta text-sm font-semibold uppercase tracking-[0.16em] text-sun-on-ink">
-                Want it squeaky clean?
+                Want it spotless?
               </p>
               <h1 className="font-display hero-headline mt-3 text-[2.4rem] font-semibold leading-[1.02] tracking-tight text-paper sm:text-5xl lg:text-6xl">
                 Meet {BUSINESS.name}.

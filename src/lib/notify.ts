@@ -96,7 +96,7 @@ async function sendCustomerSms(job: BookingNotice): Promise<boolean> {
   const auth = process.env.TWILIO_AUTH_TOKEN?.trim();
   const from = process.env.TWILIO_FROM?.trim();
   const when = `${formatDateLabel(job.date)}, ${formatSlotLabel(job.slot).toLowerCase()}`;
-  const body = `Squeaky Solutions: you're booked ${when}. #${job.id}. Pay on the day. Cancel by 6pm the day before.`;
+  const body = `Auto Care Detailing: you're booked ${when}. #${job.id}. Pay on the day. Cancel by 6pm the day before.`;
 
   if (!sid || !auth || !from) {
     if (process.env.NODE_ENV !== "production") {
@@ -142,6 +142,15 @@ export async function notifyBooking(job: BookingNotice): Promise<NotifyResult> {
     }),
   ]);
   return { sms, email };
+}
+
+/** Desk alert for admin sign-ins and lockouts. Never throws. */
+export async function notifySecurity(subject: string, lines: string[]): Promise<void> {
+  try {
+    await sendDeskMail(`[Security] ${subject}`, lines.join("\n"), "security alert");
+  } catch (err) {
+    console.error("[notify] security email threw", err);
+  }
 }
 
 export async function notifyInquiry(inquiry: InquiryNotice): Promise<boolean> {

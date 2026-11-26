@@ -1,5 +1,5 @@
 export const BUSINESS = {
-  name: "Squeaky Solutions",
+  name: "Auto Care Detailing",
   tagline: "Showroom finish. Brisbane driveways.",
   phone: "0420 828 120",
   email: "hello@squeakysolutions.au",

@@ -19,6 +19,7 @@ import {
   type Slot,
   type VehicleId,
 } from "@/lib/constants";
+import { BotGuard, botCheckEnabled } from "@/components/BotGuard";
 import { FormConsent } from "@/components/FormConsent";
 import { SUBURBS } from "@/lib/suburbs";
 import { parseAuMobile, maskMobile } from "@/lib/phone";
@@ -269,6 +270,8 @@ export function BookingForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<number | null>(null);
+  const [website, setWebsite] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const openDates = useMemo(() => {
     const map = new Map<string, { am?: SlotInfo; pm?: SlotInfo }>();
@@ -407,6 +410,10 @@ export function BookingForm({
       document.getElementById("book-consent")?.focus();
       return;
     }
+    if (botCheckEnabled && !turnstileToken) {
+      setError("Give the human check a second to finish, then book again.");
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch("/api/bookings", {
@@ -425,6 +432,8 @@ export function BookingForm({
           slot,
           notes,
           consent: true,
+          website,
+          turnstileToken,
         }),
       });
       const data = await res.json();
@@ -923,6 +932,7 @@ export function BookingForm({
             checked={agreed}
             onChange={setAgreed}
           />
+          <BotGuard honeypot={website} onHoneypot={setWebsite} onToken={setTurnstileToken} />
         </section>
       ) : null}
 

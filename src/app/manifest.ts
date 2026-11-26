@@ -8,13 +8,13 @@ export default function manifest(): MetadataRoute.Manifest {
     description: BUSINESS.tagline,
     start_url: "/",
     display: "browser",
-    background_color: "#eef2f6",
-    theme_color: "#0c1014",
+    background_color: "#0b0b0d",
+    theme_color: "#0b0b0d",
     lang: "en-AU",
     icons: [
       {
         src: "/logo.png",
-        sizes: "512x512",
+        sizes: "1024x1024",
         type: "image/png",
       },
     ],

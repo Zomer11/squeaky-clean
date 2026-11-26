@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Our Story",
   description:
-    "Squeaky Solutions began with three young entrepreneurs, a shared passion for cars, and a belief that a business could stand for something bigger than profit.",
+    "Auto Care Detailing began with three young entrepreneurs, a shared passion for cars, and a belief that a business could stand for something bigger than profit.",
   path: "/about",
 });
 
@@ -28,7 +28,7 @@ export default function AboutPage() {
       </PageMast>
       <article className="story section-pad mx-auto !pt-10">
         <p>
-          Squeaky Solutions began with three young entrepreneurs, a shared
+          Auto Care Detailing began with three young entrepreneurs, a shared
           passion for cars, and a belief that a business could stand for
           something bigger than profit.
         </p>
@@ -43,7 +43,7 @@ export default function AboutPage() {
           beginning.
         </p>
         <p>
-          As Squeaky Solutions grows, we want our success to help support
+          As Auto Care Detailing grows, we want our success to help support
           humanitarian efforts for people and families facing hardship in
           Palestine, Lebanon and Sudan.
         </p>
@@ -52,7 +52,7 @@ export default function AboutPage() {
           It means more when something you build with your own hands can
           eventually help someone you may never meet.
         </p>
-        <p>And that belief is at the heart of Squeaky Solutions.</p>
+        <p>And that belief is at the heart of Auto Care Detailing.</p>
 
         <hr className="story-break" />
 
@@ -67,7 +67,7 @@ export default function AboutPage() {
         <p>We had to create it ourselves.</p>
         <p>So that is exactly what we decided to do.</p>
         <p>
-          Squeaky Solutions became our chance to build something from the
+          Auto Care Detailing became our chance to build something from the
           ground up. Something we could put our names behind.
         </p>
 
@@ -80,8 +80,8 @@ export default function AboutPage() {
         <p>It doesn’t just look cleaner. It feels different.</p>
         <p>That transformation is what made us fall in love with detailing.</p>
 
-        <h2>The Squeaky standard</h2>
-        <p>Squeaky Solutions is being built around a simple principle:</p>
+        <h2>The Auto Care standard</h2>
+        <p>Auto Care Detailing is being built around a simple principle:</p>
         <p className="story-pull">Honest work with purpose.</p>
         <p>
           We want customers to know what they’re paying for. No unnecessary
@@ -91,7 +91,7 @@ export default function AboutPage() {
         <h2>A business with purpose</h2>
         <p>
           Cars may be our passion. But they’re not the entire reason we want
-          Squeaky Solutions to succeed.
+          Auto Care Detailing to succeed.
         </p>
         <p>
           We also want to see what can happen when three young people refuse

@@ -19,7 +19,7 @@ export function Header() {
     <header className="site-header sticky top-0 z-40">
       <div className="mx-auto flex w-full max-w-[90rem] items-center gap-5 px-4 py-3 md:px-6 xl:px-8">
         <Link href="/" className="group flex shrink-0 items-center gap-3">
-          <BrandMark size={52} className="h-[52px] w-[52px] shrink-0" priority />
+          <BrandMark size={46} className="shrink-0" priority />
           <span className="leading-tight">
             <span className="font-display block text-lg font-semibold tracking-tight text-paper">
               {BUSINESS.name}

@@ -3,7 +3,7 @@ import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({
   title: "Thanks",
-  description: "Your Squeaky Solutions booking or inquiry is in.",
+  description: "Your Auto Care Detailing booking or inquiry is in.",
   path: "/thanks",
   index: false,
 });

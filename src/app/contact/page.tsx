@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/site";
 export const metadata = pageMeta({
   title: "Contact",
   description:
-    "Call, email, or send Squeaky Solutions an inquiry. We aim to reply the same day. Bookings confirm instantly on the calendar.",
+    "Call, email, or send Auto Care Detailing an inquiry. We aim to reply the same day. Bookings confirm instantly on the calendar.",
   path: "/contact",
 });
 

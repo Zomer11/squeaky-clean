@@ -4,7 +4,9 @@ import { createBooking } from "@/lib/booking";
 import { estimatePrice, PACKAGE_IDS, SIZE_IDS } from "@/lib/constants";
 import { notifyBooking } from "@/lib/notify";
 import { parseAuMobile } from "@/lib/phone";
-import { clientIp, isTrustedOrigin, takeRateLimit } from "@/lib/security";
+import { bookingFloodError } from "@/lib/abuse";
+import { clientIp, isTrustedOrigin, readJsonLimited, takeRateLimit } from "@/lib/security";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
@@ -25,6 +27,8 @@ const schema = z.object({
   slot: z.enum(["am", "pm"]),
   notes: z.string().max(500).optional(),
   consent: z.literal(true),
+  website: z.string().max(200).optional(),
+  turnstileToken: z.string().max(2048).optional(),
 });
 
 function schemaErrorMessage(error: z.ZodError): string {
@@ -63,18 +67,17 @@ export async function POST(request: Request) {
   if (!isTrustedOrigin(request)) {
     return NextResponse.json({ error: "Forbidden." }, { status: 403 });
   }
-  if (!takeRateLimit(`book:${clientIp(request)}`, 8, 60 * 60 * 1000)) {
+  const ip = clientIp(request);
+  if (!takeRateLimit(`book:${ip}`, 8, 60 * 60 * 1000)) {
     return NextResponse.json(
       { error: "Too many booking attempts. Wait a bit and try again." },
       { status: 429 },
     );
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  const body = await readJsonLimited(request, 8 * 1024);
+  if (body === undefined) {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
   const parsed = schema.safeParse(body);
@@ -85,7 +88,23 @@ export async function POST(request: Request) {
     );
   }
 
-  const data = parsed.data;
+  const { website, turnstileToken, ...data } = parsed.data;
+
+  // Honeypot tripped: look successful so the bot moves on, but store and send nothing.
+  if (website) {
+    return NextResponse.json({ id: 0, smsSent: false, emailSent: false });
+  }
+  if (!(await verifyTurnstile(turnstileToken, ip))) {
+    return NextResponse.json(
+      { error: "Couldn’t verify you’re human. Refresh the page and try again." },
+      { status: 403 },
+    );
+  }
+  const flood = bookingFloodError(parseAuMobile(data.phone)!);
+  if (flood) {
+    return NextResponse.json({ error: flood }, { status: 429 });
+  }
+
   const result = await createBooking({
     ...data,
     email: data.email || undefined,

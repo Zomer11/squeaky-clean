@@ -3,10 +3,10 @@ import type { CSSProperties } from "react";
 export type CarKind = "hatch" | "sedan" | "suv" | "ute";
 
 const PAINT: Record<CarKind, { body: string; dark: string; glass: string }> = {
-  hatch: { body: "#47a9da", dark: "#1e6fa0", glass: "#b7d4e4" },
-  sedan: { body: "#0c1014", dark: "#06080b", glass: "#9bb8c4" },
-  suv: { body: "#2a8ec4", dark: "#164e78", glass: "#c5d5e0" },
-  ute: { body: "#3e4a56", dark: "#0c1014", glass: "#a8bcc4" },
+  hatch: { body: "#f0560a", dark: "#b83d00", glass: "#d9dadc" },
+  sedan: { body: "#141417", dark: "#09090b", glass: "#b5b7bb" },
+  suv: { body: "#8c8f94", dark: "#5e6165", glass: "#d9dadc" },
+  ute: { body: "#3a3a3f", dark: "#0b0b0d", glass: "#b5b7bb" },
 };
 
 const FROM_SIZE: Record<string, CarKind> = {

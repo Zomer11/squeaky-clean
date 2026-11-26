@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { BUSINESS } from "@/lib/constants";
 
-export const alt = "Squeaky Solutions — Brisbane mobile car detailing";
+export const alt = "Auto Care Detailing — Brisbane mobile car detailing";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -22,8 +22,8 @@ export default async function OpenGraphImage() {
           justifyContent: "space-between",
           padding: 72,
           background:
-            "radial-gradient(70% 80% at 90% 10%, rgba(71, 169, 218, 0.28), transparent 55%), #0c1014",
-          color: "#f8fafc",
+            "radial-gradient(70% 80% at 90% 10%, rgba(240, 86, 10, 0.28), transparent 55%), #0b0b0d",
+          color: "#f1f1f2",
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 720 }}>
@@ -34,7 +34,7 @@ export default async function OpenGraphImage() {
               fontWeight: 700,
               letterSpacing: 2,
               textTransform: "uppercase",
-              color: "#7ec8e8",
+              color: "#f88830",
             }}
           >
             Brisbane · mobile detailing
@@ -50,11 +50,11 @@ export default async function OpenGraphImage() {
           >
             {BUSINESS.name}
           </div>
-          <div style={{ display: "flex", fontSize: 28, color: "#c5cdd4", maxWidth: 640 }}>
+          <div style={{ display: "flex", fontSize: 28, color: "#c9cbce", maxWidth: 640 }}>
             Showroom finish. Your driveway. Pay on the day.
           </div>
         </div>
-        <img src={logoSrc} width={280} height={280} alt="" />
+        <img src={logoSrc} width={400} height={400} alt="" />
       </div>
     ),
     { ...size },

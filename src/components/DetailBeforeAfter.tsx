@@ -25,7 +25,7 @@ export function DetailBeforeAfter() {
             <DetailCar3D vehicle="sedan" dirty={false} size="md" />
           </div>
           <figcaption className="mt-2 text-center text-xs font-semibold text-fresh-deep">
-            Washed · wiped · squeaky
+            Washed · wiped · spotless
           </figcaption>
         </figure>
       </div>

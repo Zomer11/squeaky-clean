@@ -78,7 +78,7 @@ export function RegularsOffer({ compact = false }: Props) {
 
         <div className="punch-card" aria-hidden>
           <div className="punch-card-shine" />
-          <BrandMark size={52} className="punch-logo" />
+          <BrandMark size={34} className="punch-logo" />
           <p className="punch-brand">{BUSINESS.name}</p>
           <p className="punch-sub">{LOYALTY.punchTitle}</p>
           <p className="punch-member">Member · free to join</p>

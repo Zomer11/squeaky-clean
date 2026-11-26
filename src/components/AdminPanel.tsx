@@ -94,10 +94,34 @@ async function copyText(value: string): Promise<boolean> {
   }
 }
 
-export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
+type AuthEventRow = { at: number; event: string; ip: string | null; ua: string | null };
+
+const EVENT_LABELS: Record<string, string> = {
+  login_ok: "Signed in",
+  login_failed: "Failed sign-in",
+  rate_limited: "Blocked (rate limit)",
+  locked_out: "Locked out",
+  forbidden_origin: "Blocked (bad origin)",
+  not_configured: "Sign-in unavailable",
+  logout: "Signed out",
+  logout_all: "Signed out everywhere",
+};
+
+export function AdminPanel({
+  initiallyAuthed,
+  needsCode,
+}: {
+  initiallyAuthed: boolean;
+  needsCode: boolean;
+}) {
   const [authed, setAuthed] = useState(initiallyAuthed);
   const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [signingIn, setSigningIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [security, setSecurity] = useState<{ sessions: number; events: AuthEventRow[] } | null>(
+    null,
+  );
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [blocked, setBlocked] = useState<Blocked[]>([]);
@@ -114,11 +138,12 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [bRes, blRes, sRes, iRes] = await Promise.all([
+      const [bRes, blRes, sRes, iRes, secRes] = await Promise.all([
         fetch("/api/admin/bookings"),
         fetch("/api/admin/blocked"),
         fetch("/api/admin/settings"),
         fetch("/api/admin/inquiries"),
+        fetch("/api/admin/security"),
       ]);
       if (bRes.status === 401) {
         setAuthed(false);
@@ -133,6 +158,7 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
       setAm(sData.am ?? 8);
       setPm(sData.pm ?? 8);
       setInquiries(iData.inquiries || []);
+      if (secRes.ok) setSecurity(await secRes.json());
     } finally {
       setLoading(false);
     }
@@ -157,22 +183,37 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
   async function login(e: React.FormEvent) {
     e.preventDefault();
     setLoginError(null);
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-    if (!res.ok) {
-      const data = await res.json();
-      setLoginError(data.error || "Login failed");
-      return;
+    setSigningIn(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password, code }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setLoginError(data.error || "Login failed");
+        setCode("");
+        return;
+      }
+      setPassword("");
+      setCode("");
+      setAuthed(true);
+    } finally {
+      setSigningIn(false);
     }
-    setPassword("");
-    setAuthed(true);
   }
 
   async function logout() {
     await fetch("/api/admin/logout", { method: "POST" });
+    setSecurity(null);
+    setAuthed(false);
+  }
+
+  async function logoutEverywhere() {
+    if (!confirm("Sign out every device, including this one?")) return;
+    await fetch("/api/admin/logout?everywhere=1", { method: "POST" });
+    setSecurity(null);
     setAuthed(false);
   }
 
@@ -254,16 +295,38 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            maxLength={256}
             required
           />
         </div>
+        {needsCode && (
+          <div>
+            <label className="label" htmlFor="admin-code">
+              Authenticator code
+            </label>
+            <input
+              id="admin-code"
+              name="code"
+              type="text"
+              className="field tracking-[0.3em]"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="\d{6}"
+              maxLength={6}
+              placeholder="000000"
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+              required
+            />
+          </div>
+        )}
         {loginError && (
           <p className="text-sm text-danger" role="alert">
             {loginError}
           </p>
         )}
-        <button type="submit" className="btn btn-primary w-full">
-          Sign in
+        <button type="submit" className="btn btn-primary w-full" disabled={signingIn}>
+          {signingIn ? "Checking…" : "Sign in"}
         </button>
       </form>
     );
@@ -343,6 +406,26 @@ export function AdminPanel({ initiallyAuthed }: { initiallyAuthed: boolean }) {
           </button>
         </div>
       </div>
+
+      {security && (
+        <details className="card p-5">
+          <summary className="cursor-pointer text-sm font-semibold">
+            Security · {security.sessions} active session{security.sessions === 1 ? "" : "s"}
+          </summary>
+          <ul className="mt-4 space-y-1.5 text-sm">
+            {security.events.map((ev) => (
+              <li key={`${ev.at}-${ev.event}`} className="flex flex-wrap gap-x-3">
+                <span className="font-medium">{EVENT_LABELS[ev.event] ?? ev.event}</span>
+                <span className="text-ink-soft">{new Date(ev.at).toLocaleString("en-AU")}</span>
+                <span className="text-ink-soft">{ev.ip ?? "unknown IP"}</span>
+              </li>
+            ))}
+          </ul>
+          <button type="button" className="btn btn-ghost mt-4" onClick={logoutEverywhere}>
+            Sign out everywhere
+          </button>
+        </details>
+      )}
 
       {msg && (
         <p className="rounded-xl bg-fresh/15 px-3 py-2 text-sm font-medium text-fresh-deep">
