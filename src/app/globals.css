@@ -888,15 +888,7 @@ main {
   overflow: hidden;
   margin-bottom: -1px;
   padding-bottom: 2.75rem;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(18, 18, 21, 0.28) 0%,
-      rgba(18, 18, 21, 0.2) 38%,
-      rgba(11, 11, 13, 0.55) 70%,
-      #0b0b0d 100%
-    ),
-    url("/media/regulars-mountain.jpg") center 55% / cover no-repeat;
+  background: transparent;
 }
 
 .regulars-section--compact {
